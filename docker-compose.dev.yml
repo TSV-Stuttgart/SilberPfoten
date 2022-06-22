@@ -1,0 +1,32 @@
+version: "3"
+services:
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:16.1.1
+    restart: always
+    environment:
+      DB_VENDOR: ${KEYCLOAK_DB_VENDOR}
+      DB_ADDR: ${PGHOST}
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: ${PGPASSWORD}
+      #KEYCLOAK_DEFAULT_THEME: "silberpfoten"
+      KEYCLOAK_FRONTEND_URL: ${KEYCLOAK_FRONTEND_URL}
+      KEYCLOAK_IMPORT: "/tmp/silberpfoten-realm-export.json"
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      PROXY_ADDRESS_FORWARDING: ${KEYCLOAK_PROXY_ADDRESS_FORWARDING}
+    ports:
+      - 8080:8080
+    volumes:
+      - "./config/keycloak/silberpfoten-realm-export.json:/tmp/silberpfoten-realm-export.json"
+      - "./config/keycloak/scripts/disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli"
+      - "./config/keycloak/themes/silberpfoten:/opt/jboss/keycloak/themes/silberpfoten"
+      #- "./config/keycloak/themes:/opt/jboss/keycloak/themes"
+    networks:
+      - keycloak
+
+networks:
+  keycloak: {}
