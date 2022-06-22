@@ -1,0 +1,12 @@
+{
+  "name": "silberpfoten",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "repository": "git@gitlab.stigits.com:tierschutzverein-stuttgart/silberpfoten.git",
+  "author": "Sandro Coletti <scoletti@stigits.com>",
+  "license": "MIT",
+  "workspaces": [
+    "packages/mein.silberpfoten.de"
+  ]
+}
