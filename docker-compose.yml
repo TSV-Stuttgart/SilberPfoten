@@ -15,7 +15,7 @@ services:
       - 443:443
 
   silberpfoten-app:
-    container_name: silberpfoten-app
+    # container_name: silberpfoten-app
     build: ./packages/mein.silberpfoten.de
     image: ${CI_REGISTRY}/tierschutzverein-stuttgart/silberpfoten:${CI_COMMIT_REF_SLUG}
     deploy:
