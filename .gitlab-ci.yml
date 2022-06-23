@@ -24,7 +24,7 @@ deploy:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker compose pull
-    - docker stack deploy --compose-file=docker-compose.yml silberpfoten
+    - docker stack deploy --compose-file=docker-compose.yml --with-registry-auth silberpfoten
     # - docker compose up --detach
     - docker system prune --all --force
 
