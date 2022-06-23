@@ -16,7 +16,7 @@ Build:
   # only:
   #   - tags
 
-deploy-test-01:
+deploy:
   stage: deploy
   environment:
     name: production
@@ -24,7 +24,8 @@ deploy-test-01:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker compose pull
-    - docker compose up --detach
+    - docker stack deploy --compose-file=docker-compose.yml silberpfoten
+    # - docker compose up --detach
     - docker system prune --all --force
   tags:
     - "silberpfoten-shell"
