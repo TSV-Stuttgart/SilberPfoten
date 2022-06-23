@@ -1,6 +1,6 @@
 {
   "name": "silberpfoten",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "main": "index.js",
   "repository": "git@gitlab.stigits.com:tierschutzverein-stuttgart/silberpfoten.git",
