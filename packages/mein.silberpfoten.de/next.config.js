@@ -1,3 +1,4 @@
+const package = require('./package.json')
 const withPWA = require('next-pwa')
 const runtimeCaching = require('next-pwa/cache')
 
