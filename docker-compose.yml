@@ -3,7 +3,6 @@ services:
 
   silberpfoten-nginx:
     image: nginx:1.17.6-alpine
-    restart: always
     volumes:
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt:/etc/letsencrypt
@@ -15,15 +14,14 @@ services:
 
   silberpfoten-app:
     build: ./packages/mein.silberpfoten.de
-    image: ${CI_REGISTRY}/tierschutzverein-stuttgart/silberpfoten:${CI_COMMIT_TAG}
+    image: ${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}
     deploy:
-      replicas: 3
+      replicas: 5
     environment:
       JWT_SECRET: MYSECRET # $JWT_SECRET
       NEXT_PUBLIC_HOST: mein.silberpfoten.stigits.com # $NEXT_PUBLIC_HOST
       NEXTAUTH_SECRET: 123456787 # $NEXTAUTH_SECRET
       NEXTAUTH_URL: mein.silberpfoten.stigits.com # $NEXTAUTH_URL
-    restart: always
     networks:
       - silberpfoten
     # expose:
