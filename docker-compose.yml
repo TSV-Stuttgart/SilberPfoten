@@ -2,7 +2,6 @@ version: "3.8"
 services:
 
   silberpfoten-nginx:
-    container_name: silberpfoten-nginx
     image: nginx:1.17.6-alpine
     restart: always
     volumes:
@@ -15,7 +14,6 @@ services:
       - 443:443
 
   silberpfoten-app:
-    # container_name: silberpfoten-app
     build: ./packages/mein.silberpfoten.de
     image: ${CI_REGISTRY}/tierschutzverein-stuttgart/silberpfoten:${CI_COMMIT_REF_SLUG}
     deploy:
