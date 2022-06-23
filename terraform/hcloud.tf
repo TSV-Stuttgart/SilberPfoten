@@ -42,9 +42,13 @@ resource "hcloud_firewall" "firewall-web" {
   }
 }
 
-resource "hcloud_server" "webserver01" {
-  name = "webserver01"
-  image = "ubuntu-20.04"
+data "hcloud_image" "docker_ce" {
+  name = "docker-ce"
+}
+
+resource "hcloud_server" "docker_manager_01" {
+  name = "dockermanager01"
+  image = data.hcloud_image.docker_ce.id
   server_type = "cx11"
   location = "nbg1"
   firewall_ids = [hcloud_firewall.firewall-web.id]
@@ -52,7 +56,7 @@ resource "hcloud_server" "webserver01" {
   
   network {
     network_id = hcloud_network.network.id
-    ip = "10.0.1.5"
+    ip = "10.0.1.10"
   }
 
   depends_on = [
@@ -60,27 +64,41 @@ resource "hcloud_server" "webserver01" {
   ]
 }
 
-# data "hcloud_image" "ubuntu_20_04_docker" {
-#   with_selector = "type=ubuntu_20_04_docker"
-# }
-
-# resource "hcloud_server" "webserver02" {
-#   name = "webserver02"
-#   image = data.hcloud_image.ubuntu_20_04_docker.id
-#   server_type = "cx11"
-#   location = "nbg1"
-#   firewall_ids = [hcloud_firewall.firewall-web.id]
-#   ssh_keys = [hcloud_ssh_key.scoletti.id]
+resource "hcloud_server" "docker_node_01" {
+  name = "dockernode01"
+  image = data.hcloud_image.docker_ce.id
+  server_type = "cx11"
+  location = "nbg1"
+  firewall_ids = [hcloud_firewall.firewall-web.id]
+  ssh_keys = [hcloud_ssh_key.scoletti.id]
   
-#   network {
-#     network_id = hcloud_network.network.id
-#     ip = "10.0.1.6"
-#   }
+  network {
+    network_id = hcloud_network.network.id
+    ip = "10.0.1.11"
+  }
 
-#   depends_on = [
-#     hcloud_network_subnet.network-subnet
-#   ]
-# }
+  depends_on = [
+    hcloud_network_subnet.network-subnet
+  ]
+}
+
+resource "hcloud_server" "docker_node_02" {
+  name = "dockernode02"
+  image = data.hcloud_image.docker_ce.id
+  server_type = "cx11"
+  location = "nbg1"
+  firewall_ids = [hcloud_firewall.firewall-web.id]
+  ssh_keys = [hcloud_ssh_key.scoletti.id]
+  
+  network {
+    network_id = hcloud_network.network.id
+    ip = "10.0.1.12"
+  }
+
+  depends_on = [
+    hcloud_network_subnet.network-subnet
+  ]
+}
 
 resource "hcloud_ssh_key" "scoletti" {
   name = "MacBook Pro Sandro"
