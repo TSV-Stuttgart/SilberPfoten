@@ -24,7 +24,7 @@ services:
       JWT_SECRET: MYSECRET # $JWT_SECRET
       NEXT_PUBLIC_HOST: mein.silberpfoten.stigits.com # $NEXT_PUBLIC_HOST
       NEXTAUTH_SECRET: 123456787 # $NEXTAUTH_SECRET
-      NEXTAUTH_URL: mein.silberpfoten.stigits.com $NEXTAUTH_URL
+      NEXTAUTH_URL: mein.silberpfoten.stigits.com # $NEXTAUTH_URL
     restart: always
     networks:
       - silberpfoten

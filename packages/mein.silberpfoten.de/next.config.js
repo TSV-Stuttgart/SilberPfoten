@@ -3,7 +3,10 @@ const runtimeCaching = require('next-pwa/cache')
 
 module.exports = withPWA({
   env: {
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXT_PUBLIC_VERSION: package.version,
+  },
+  experimental: {
+    outputStandalone: true,
   },
   pwa: {
     dest: 'public',
