@@ -15,7 +15,7 @@ services:
 
   silberpfoten-app:
     build: ./packages/mein.silberpfoten.de
-    image: ${CI_REGISTRY}/tierschutzverein-stuttgart/silberpfoten:${CI_COMMIT_REF_SLUG}
+    image: ${CI_REGISTRY}/tierschutzverein-stuttgart/silberpfoten:${CI_COMMIT_TAG}
     deploy:
       replicas: 3
     environment:
