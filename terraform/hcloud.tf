@@ -40,6 +40,16 @@ resource "hcloud_firewall" "firewall-web" {
       "::/0"
     ]
   }
+
+  rule {
+    direction = "in"
+    protocol = "tcp"
+    port = "443"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
 }
 
 data "hcloud_image" "docker_ce" {
