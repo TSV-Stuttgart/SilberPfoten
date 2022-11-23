@@ -1,0 +1,129 @@
+@font-face {
+  font-family: 'TitilliumWeb';
+  src: url('/fonts/TitilliumWeb-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: lighter;
+}
+
+@font-face {
+  font-family: 'TitilliumWeb';
+  src: url('/fonts/TitilliumWeb-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: light;
+}
+
+@font-face {
+  font-family: 'TitilliumWeb';
+  src: url('/fonts/TitilliumWeb-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'TitilliumWeb';
+  src: url('/fonts/TitilliumWeb-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: bold;
+}
+
+@font-face {
+  font-family: 'TitilliumWeb';
+  src: url('/fonts/TitilliumWeb-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: bolder;
+}
+
+$font-family-sans-serif: "TitilliumWeb", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+$enable-gradients: true;
+$enable-negative-margins: true;
+
+$blue: #0E71B8;
+$gray-100: #f2f4f7;
+$green: #0B8E36;
+$info: #B7CAE5;
+$orange: #F9B233;
+
+$light: #fee1e3;
+$primary: #fdc4c8;
+$secondary: #010101;
+
+$h1-font-size: 32px;
+$h2-font-size: 26px;
+$h3-font-size: 24px;
+$h4-font-size: 20px;
+$h5-font-size: 14px;
+$h6-font-size: 12px;
+  
+$font-weight-lighter: 200;
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-bold: 600;
+$font-weight-bolder: 700;
+
+$link-color: $primary;
+$link-hover-color: $secondary;
+
+$offcanvas-vertical-height: 45vh;
+$offcanvas-horizontal-width: 260px;
+
+// $body-bg: $light;
+
+$font-size-base: 0.8rem;
+
+p, .p {
+  font-size: 14px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover-white:hover {
+  background: white;
+}
+
+.hover-light:hover {
+  background: #f2f4f7;
+}
+
+.logo {
+  width: 200px;
+}
+
+.hover:hover {
+  background-color: var(--light);
+}
+
+@import "~bootstrap/scss/bootstrap";
+// @import "~@fortawesome/fontawesome-free/scss/solid";
+// @import "~@fortawesome/fontawesome-free/scss/regular";
+// @import "~@fortawesome/fontawesome-free/scss/brands";
+// @import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~bootstrap-icons/font/bootstrap-icons.scss";
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .border#{$infix}-top { border-top: $border-width solid $border-color !important; }
+    .border#{$infix}-end { border-right: $border-width solid $border-color !important; }
+    .border#{$infix}-bottom { border-bottom: $border-width solid $border-color !important; }
+    .border#{$infix}-start { border-left: $border-width solid $border-color !important; }
+
+    .border#{$infix}-top-0 { border-top: 0 !important; }
+    .border#{$infix}-end-0 { border-right: 0 !important; }
+    .border#{$infix}-bottom-0 { border-bottom: 0 !important; }
+    .border#{$infix}-start-0 { border-left: 0 !important; }
+
+    .border#{$infix}-x {
+      border-left: $border-width solid $border-color !important;
+      border-right: $border-width solid $border-color !important;
+    }
+
+    .border#{$infix}-y {
+      border-top: $border-width solid $border-color !important;
+      border-bottom: $border-width solid $border-color !important;
+    }
+  }
+}
