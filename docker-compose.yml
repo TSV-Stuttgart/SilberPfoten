@@ -24,10 +24,6 @@ services:
       NEXTAUTH_URL: mein.silberpfoten.stigits.com # $NEXTAUTH_URL
     networks:
       - silberpfoten
-    # expose:
-    #   - "3000"
-    # ports:
-    #   - 3000:3000
 
 networks:
   silberpfoten: {}
