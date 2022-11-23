@@ -1,0 +1,6 @@
+<!-- header.mjml -->
+<mj-section padding-bottom="20px" padding-top="20px">
+  <mj-column width="100%">
+    <mj-image align="left" src="https://silberpfoten.de/images/logo-silberpfoten_full.png" alt="" border="none" width="75px" padding-left="0px" padding-right="0px" padding-bottom="10px" padding-top="10px"></mj-image>
+  </mj-column>
+</mj-section>

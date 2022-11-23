@@ -28,9 +28,9 @@ deploy:
     # - docker compose up --detach
     - docker system prune --all --force
 
-    # - docker exec silberpfoten-nginx apk update
-    # - docker exec silberpfoten-nginx apk add certbot certbot-nginx
-    # - docker exec silberpfoten-nginx certbot run --nginx --agree-tos -d mein.silberpfoten.stigits.com -m info@stigits.com --noninteractive --no-redirect
+    - docker exec $(docker ps -q -f name=silberpfoten_silberpfoten-nginx) apk update
+    - docker exec $(docker ps -q -f name=silberpfoten_silberpfoten-nginx) apk add certbot certbot-nginx
+    - docker exec $(docker ps -q -f name=silberpfoten_silberpfoten-nginx) certbot run --nginx --agree-tos -d mein.silberpfoten.stigits.com -m info@stigits.com --noninteractive --no-redirect
   tags:
     - "silberpfoten-shell"
   only:
