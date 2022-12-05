@@ -17,11 +17,13 @@ export default async function handler(request, response) {
     logger.info(`api | helpers | db request`)
 
     const dbRequest = await db.query(`
-      SELECT 
+      SELECT
+        user_id,
         lastname,
         firstname,
         array_to_string(experience_with_animal::text[], ',') as experience_with_animal,
         experience_with_animal_other,
+        activated_at,
         created_at
       FROM 
         dbo.user u
