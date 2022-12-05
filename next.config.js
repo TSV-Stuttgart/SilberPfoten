@@ -8,6 +8,10 @@ const withPWA = require('next-pwa')({
 module.exports = withPWA({
   env: {
     NEXT_PUBLIC_VERSION: package.version,
+    PGDATABASE: process.env.PGDATABASE,
+    PGPASSWORD: process.env.PGPASSWORD,
+    PGPORT: process.env.PGPORT,
+    PGUSER: process.env.PGUSER,
   },
   output: 'standalone',
 })
