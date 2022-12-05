@@ -12,7 +12,7 @@ Build:
     - docker compose build
     - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:${CI_COMMIT_REF_SLUG}
   tags:
-    - "mein-silberpfoten-web-01"
+    - "mein-silberpfoten-web-01-shell"
   only:
     - tags
 
@@ -32,7 +32,7 @@ deploy:
     - docker exec $(docker ps -q -f name=silberpfoten_silberpfoten-nginx) apk add certbot certbot-nginx
     - docker exec $(docker ps -q -f name=silberpfoten_silberpfoten-nginx) certbot run --nginx --agree-tos -d mein.silberpfoten.stigits.com -m info@stigits.com --noninteractive --no-redirect
   tags:
-    - "mein-silberpfoten-web-01"
+    - "mein-silberpfoten-web-01-shell"
   only:
     - tags
   # when: manual
