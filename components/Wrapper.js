@@ -9,7 +9,7 @@ export default function Wrapper({children}) {
   return <React.Fragment>
     <Header />
 
-    <div className="container user-select-none">
+    <div className="container">
       <div className="row">
         <div className="col-12 col-md-2 col-lg-3 d-none d-md-block text-md-center text-lg-start"><Navigation /></div>
         <div className="col-12 col-md-10 col-lg-9 border-md-start">
