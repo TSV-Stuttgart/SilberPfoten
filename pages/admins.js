@@ -54,8 +54,8 @@ export default function Helpers() {
             <div className="col-12">
               <div className="bg-light rounded p-2">
                 <div className="row">
-                  <div className="col-3 border-end fw-bold">Name</div>
-                  <div className="col-3 text-end fw-bold">Erstellt am</div>
+                  <div className="col-10 border-end fw-bold">Name</div>
+                  <div className="col-2 text-end fw-bold">Erstellt am</div>
                 </div>
               </div>
             </div>
@@ -64,8 +64,8 @@ export default function Helpers() {
             <div className="col-12">
               <div className="px-2 py-1">
                 <div className="row">
-                  <div className="col-3">{helper.lastname}, {helper.firstname}</div>
-                  <div className="col-3 text-end">{new Date(helper.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: '2-digit'})}</div>
+                  <div className="col-10">{helper.lastname}, {helper.firstname}</div>
+                  <div className="col-2 text-end">{new Date(helper.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric'})}</div>
                 </div>
               </div>
             </div>
