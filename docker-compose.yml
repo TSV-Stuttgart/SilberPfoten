@@ -13,6 +13,7 @@ services:
       - 443:443
 
   silberpfoten-app:
+    build: .
     image: ${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}
     restart: always
     environment:
