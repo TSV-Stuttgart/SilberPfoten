@@ -4,18 +4,18 @@ import db from '../../../lib/db'
 
 export default async function handler(request, response) {
 
-  logger.info(`api | helpers`)
+  logger.info(`api | members`)
 
   try {
     const token = await getToken(request)
 
     if (!token) {
-      logger.info(`api | helpers | user | not authorized`)
+      logger.info(`api | members | user | not authorized`)
       response.status(401).send({})
       return
     }
 
-    logger.info(`api | helpers | db request`)
+    logger.info(`api | members | db request`)
 
     const dbRequest = await db.query(`
       SELECT
@@ -49,14 +49,14 @@ export default async function handler(request, response) {
         u.lastname, u.firstname
     `, [request.query.userId])
 
-    logger.info(`api | helpers | response`)
+    logger.info(`api | members | response`)
 
     response.status(200).json(dbRequest.rows[0])
 
     return
 
   } catch(e) {
-    logger.info(`api | helpers | error | ${e}`)
+    logger.info(`api | members | error | ${e}`)
 
     response.status(500).send({})
   }

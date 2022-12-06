@@ -16,7 +16,7 @@ export default function Navigation() {
         <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light"><i className={`${router.pathname === '/' ? 'bi-house-fill' : 'bi-house'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Neuigkeiten</span></div></Link>
         <div className="text-secondary mt-4 border-top">
           {isAdmin ? <>
-            <Link href="/helpers" className="text-decoration-none"><div className="cursor-pointer mt-3 text-dark d-block h4 fw-light"><i className={`${router.pathname === '/helpers' ? 'bi bi-person-heart' : 'bi bi-person-heart'} me-2`} style={{fontSize: 24}} /><span className="d-none d-lg-inline">Helfer</span></div></Link>
+            <Link href="/members" className="text-decoration-none"><div className="cursor-pointer mt-3 text-dark d-block h4 fw-light"><i className={`${router.pathname === '/members' ? 'bi bi-person-heart' : 'bi bi-person-heart'} me-2`} style={{fontSize: 24}} /><span className="d-none d-lg-inline">Mitglieder</span></div></Link>
             <Link href="/admins" className="text-decoration-none"><div className="cursor-pointer mt-2 text-dark d-block h4 fw-light"><i className={`${router.pathname === '/admins' ? 'bi bi-person-fill-gear' : 'bi bi-person-gear'} me-2`} style={{fontSize: 24}} /><span className="d-none d-lg-inline">Admins</span></div></Link>
           </> : null}
           <Link href="/signout" className="text-decoration-none"><div className="cursor-pointer text-secondary d-block h4 fw-light mt-3"><i className="bi bi-box-arrow-left me-2" style={{fontSize: 24}} /><span className="d-none d-lg-inline">Abmelden</span></div></Link>

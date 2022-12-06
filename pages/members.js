@@ -14,7 +14,7 @@ export async function getServerSideProps(context) {
     const token = await getToken(context.req)
 
     if (!token) {
-      logger.info(`helpers | user | unauthorized`)
+      logger.info(`members | user | unauthorized`)
 
       return {
         redirect: {
@@ -27,17 +27,17 @@ export async function getServerSideProps(context) {
     return {props: {}}
 
   } catch(e) {
-    logger.info(`helpers | error | ${e}`)
+    logger.info(`members | error | ${e}`)
 
     return {props: {}}
   }
 }
 
-export default function Helpers() {
-  const {data: helpers, error} = useSWR(`/api/helpers`, (url) => fetch(url).then(r => r.json()))
+export default function Members() {
+  const {data: members, error} = useSWR(`/api/members`, (url) => fetch(url).then(r => r.json()))
 
   if (error) return <Error />
-  if (!helpers && !error) return <Loading />
+  if (!members && !error) return <Loading />
   
   return <>
     <Wrapper>
@@ -45,12 +45,12 @@ export default function Helpers() {
       <div className="container mt-3">
         <div className="row">
           <div className="col">
-            <div className="fw-bold h3">Helfer</div>
+            <div className="fw-bold h3">Mitglieder</div>
           </div>
         </div>
       </div>
 
-      {helpers?.length > 0 ? <>
+      {members?.length > 0 ? <>
         <div className="container mt-2">
           <div className="row mb-1">
             <div className="col-12">
@@ -65,22 +65,22 @@ export default function Helpers() {
               </div>
             </div>
           </div>
-          {helpers?.map(helper => <div className="row" key={`${helper.user_id}`}>
+          {members?.map(member => <div className="row" key={`${member.user_id}`}>
             <div className="col-12">
               <div className="px-2 py-1">
                 <div className="row mb-1">
-                  <div className="col-1">{helper.user_id}</div>
-                  <div className="col-3"><Link href={`/helper/${helper.user_id}/${slugify(`${helper.lastname}-${helper.firstname}`, {lower: true})}`}><a className="text-secondary">{helper.lastname}, {helper.firstname}</a></Link></div>
-                  <div className="col-5 text-break">{helper.experience_with_animal?.split(',').map(e => <React.Fragment key={e}>
+                  <div className="col-1">{member.user_id}</div>
+                  <div className="col-3"><Link href={`/member/${member.user_id}/${slugify(`${member.lastname}-${member.firstname}`, {lower: true})}`}><a className="text-secondary">{member.lastname}, {member.firstname}</a></Link></div>
+                  <div className="col-5 text-break">{member.experience_with_animal?.split(',').map(e => <React.Fragment key={e}>
                     {e === 'dog' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Hund</span> : null}
                     {e === 'cat' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Katze</span> : null}
                     {e === 'bird' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Vogel</span> : null}
                     {e === 'small_animal' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Kleintiere</span> : null}
-                    {e === 'other' ? <span className="bg-light me-1 rounded px-2 small text-secondary">{helper.experience_with_animal_other}</span> : null}
+                    {e === 'other' ? <span className="bg-light me-1 rounded px-2 small text-secondary">{member.experience_with_animal_other}</span> : null}
                   </React.Fragment>)}</div>
-                  <div className="col-1 text-center">{helper.activated_at ? <i className="bi bi-patch-check-fill text-secondary"></i> : null}</div>
-                  {/* // new Date(helper.activated_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: '2-digit'}) : <>nein</>} */}
-                  <div className="col-2 text-end">{new Date(helper.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric'})}</div>
+                  <div className="col-1 text-center">{member.activated_at ? <i className="bi bi-patch-check-fill text-secondary"></i> : null}</div>
+                  {/* // new Date(member.activated_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: '2-digit'}) : <>nein</>} */}
+                  <div className="col-2 text-end">{new Date(member.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric'})}</div>
                 </div>
               </div>
             </div>
