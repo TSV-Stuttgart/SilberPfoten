@@ -38,7 +38,7 @@ export async function getServerSideProps(context) {
 }
 
 export default function Members({userId}) {
-  const {data: member, error} = useSWR(`/api/member/${userId}`, (url) => fetch(url).then(r => r.json()))
+  const {data: member, error} = useSWR(`/api/admin/member/${userId}`, (url) => fetch(url).then(r => r.json()))
 
   if (error) return <Error />
   if (!member && !error) return <Loading />

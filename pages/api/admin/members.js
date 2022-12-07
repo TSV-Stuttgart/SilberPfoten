@@ -1,6 +1,6 @@
-import getToken from '../../lib/auth/getToken'
-import logger from '../../lib/logger'
-import db from '../../lib/db'
+import getToken from '../../../lib/auth/getToken'
+import logger from '../../../lib/logger'
+import db from '../../../lib/db'
 
 export default async function handler(request, response) {
   logger.info(`api | members`)
@@ -12,6 +12,15 @@ export default async function handler(request, response) {
       logger.info(`api | members | user | not authorized`)
       response.status(401).send({})
       return
+    }
+
+    logger.info(`api | members | query params`)
+    const {filter} = request.query
+
+    logger.info(`api | members | query params | filter | ${filter}`)
+
+    if (filter === 'active') {
+      
     }
 
     logger.info(`api | members | db request`)
@@ -29,6 +38,10 @@ export default async function handler(request, response) {
         dbo.user u
       WHERE
         status = 'USER'
+      
+      ${filter === 'active' ? 'AND activated_at IS NOT NULL' : ''}
+      ${filter === 'pending' ? 'AND activated_at IS NULL' : ''}
+      
       ORDER BY 
         u.lastname, u.firstname
     `, [])

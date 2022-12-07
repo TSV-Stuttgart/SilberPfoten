@@ -3,33 +3,6 @@ import useSWR from 'swr'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
 import Wrapper from '../components/Wrapper'
-import logger from '../lib/logger'
-import getToken from '../lib/auth/getToken'
-
-export async function getServerSideProps(context) {
-
-  try {
-    const token = await getToken(context.req)
-
-    if (!token) {
-      logger.info(`admins | user | unauthorized`)
-
-      return {
-        redirect: {
-          destination: `/signin`,
-          statusCode: 302,
-        },
-      }
-    }
-    
-    return {props: {}}
-
-  } catch(e) {
-    logger.info(`admins | error | ${e}`)
-
-    return {props: {}}
-  }
-}
 
 export default function Helpers() {
   const {data: helpers, error} = useSWR(`/api/admins`, (url) => fetch(url).then(r => r.json()))

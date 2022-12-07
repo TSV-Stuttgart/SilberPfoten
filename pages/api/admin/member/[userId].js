@@ -1,6 +1,6 @@
-import getToken from '../../../lib/auth/getToken'
-import logger from '../../../lib/logger'
-import db from '../../../lib/db'
+import getToken from '../../../../lib/auth/getToken'
+import logger from '../../../../lib/logger'
+import db from '../../../../lib/db'
 
 export default async function handler(request, response) {
 
