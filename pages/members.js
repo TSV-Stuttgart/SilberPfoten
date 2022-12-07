@@ -1,51 +1,42 @@
-import React from 'react'
-import useSWR from 'swr'
+import React, { useState } from 'react'
+import useSWR, {useSWRConfig} from 'swr'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
 import Wrapper from '../components/Wrapper'
-import logger from '../lib/logger'
-import getToken from '../lib/auth/getToken'
 import slugify from 'slugify'
 import Link from 'next/link'
 
-export async function getServerSideProps(context) {
-
-  try {
-    const token = await getToken(context.req)
-
-    if (!token) {
-      logger.info(`members | user | unauthorized`)
-
-      return {
-        redirect: {
-          destination: `/signin`,
-          statusCode: 302,
-        },
-      }
-    }
-    
-    return {props: {}}
-
-  } catch(e) {
-    logger.info(`members | error | ${e}`)
-
-    return {props: {}}
-  }
-}
-
 export default function Members() {
-  const {data: members, error} = useSWR(`/api/members`, (url) => fetch(url).then(r => r.json()))
+  const {mutate} = useSWRConfig()
+  const [formFilter, setFormFilter] = useState('active')
+  const {data: members, error} = useSWR(`/api/admin/members?filter=${formFilter}`, (url) => fetch(url).then(r => r.json()))
+  const {data: pendingMembers, error: pendingError} = useSWR(`/api/admin/members?filter=pending`, (url) => fetch(url).then(r => r.json()))
+
+  const handleActivation = async (memberId) => {
+    await fetch(`/api/admin/member/activation?userId=${memberId}`)
+  
+    mutate(`/api/admin/members?filter=pending`)
+  }
 
   if (error) return <Error />
   if (!members && !error) return <Loading />
+  if (!pendingMembers && !pendingError) return <Loading />
   
   return <>
     <Wrapper>
 
       <div className="container mt-3">
         <div className="row">
-          <div className="col">
+          <div className="col-6">
             <div className="fw-bold h3">Mitglieder</div>
+          </div>
+          <div className="col-6 text-end">
+            <div className="fw-bold h3">
+              <div className="btn-group" role="group" aria-label="Basic example">
+                <button type="button" className={`btn btn-light ${formFilter === 'active' ? 'active' : ''}`} onClick={() => setFormFilter('active')}>Aktive Mitglieder</button>
+                <button type="button" className={`btn btn-light ${formFilter === 'pending' ? 'active' : ''}`} onClick={() => setFormFilter('pending')}>Nicht bestätigt {pendingMembers.length > 0 ? <span className="small bg-secondary text-white fw-bold rounded px-2">{pendingMembers.length}</span> : null}</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -78,7 +69,12 @@ export default function Members() {
                     {e === 'small_animal' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Kleintiere</span> : null}
                     {e === 'other' ? <span className="bg-light me-1 rounded px-2 small text-secondary">{member.experience_with_animal_other}</span> : null}
                   </React.Fragment>)}</div>
-                  <div className="col-1 text-center">{member.activated_at ? <i className="bi bi-patch-check-fill text-secondary"></i> : null}</div>
+                  <div className="col-1 text-center">
+                    {member.activated_at ? 
+                      <i className="bi bi-patch-check-fill text-secondary"></i> : 
+                      <div onClick={() => handleActivation(member.user_id)}>Aktivieren</div>
+                    }
+                  </div>
                   {/* // new Date(member.activated_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: '2-digit'}) : <>nein</>} */}
                   <div className="col-2 text-end">{new Date(member.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric'})}</div>
                 </div>

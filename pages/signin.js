@@ -48,7 +48,8 @@ export async function getServerSideProps(context) {
       const userEmailExists = await db.query(
         `SELECT 
           user_id, 
-          firstname 
+          firstname,
+          activated_at
         FROM 
           dbo.user 
         WHERE 
@@ -71,6 +72,19 @@ export async function getServerSideProps(context) {
         return {
           redirect: {
             destination: `/signin/verify/code?token=${placeboToken}`,
+            statusCode: 302,
+          },
+        }
+      }
+
+      logger.info(`signin | account | activated`)
+      
+      if (!userEmailExists.activated_at) {
+        logger.info(`signin | account | not activated | redirect`)
+        
+        return {
+          redirect: {
+            destination: `/pending`,
             statusCode: 302,
           },
         }
