@@ -49,7 +49,8 @@ export async function getServerSideProps(context) {
         `SELECT 
           user_id, 
           firstname,
-          activated_at
+          activated_at,
+          blocked_at
         FROM 
           dbo.user 
         WHERE 
@@ -77,9 +78,22 @@ export async function getServerSideProps(context) {
         }
       }
 
+      logger.info(`signin | account | blocked`)
+      
+      if (userEmailExists.rows[0].blocked_at) {
+        logger.info(`signin | account | blocked | redirect`)
+        
+        return {
+          redirect: {
+            destination: `/blocked`,
+            statusCode: 302,
+          },
+        }
+      }
+
       logger.info(`signin | account | activated`)
       
-      if (!userEmailExists.activated_at) {
+      if (!userEmailExists.rows[0].activated_at) {
         logger.info(`signin | account | not activated | redirect`)
         
         return {

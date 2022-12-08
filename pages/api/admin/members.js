@@ -33,7 +33,9 @@ export default async function handler(request, response) {
         array_to_string(experience_with_animal::text[], ',') as experience_with_animal,
         experience_with_animal_other,
         activated_at,
-        created_at
+        created_at,
+        blocked_at,
+        deactivated_at
       FROM 
         dbo.user u
       WHERE
@@ -41,6 +43,8 @@ export default async function handler(request, response) {
       
       ${filter === 'active' ? 'AND activated_at IS NOT NULL' : ''}
       ${filter === 'pending' ? 'AND activated_at IS NULL' : ''}
+      ${filter === 'blocked' ? 'AND blocked_at IS NOT NULL' : 'AND blocked_at IS NULL'}
+      ${filter === 'deactivated' ? 'AND deactivated_at IS NOT NULL' : 'AND deactivated_at IS NULL'}
       
       ORDER BY 
         u.lastname, u.firstname

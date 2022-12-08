@@ -5,7 +5,7 @@ import Loading from '../components/Loading'
 import Wrapper from '../components/Wrapper'
 
 export default function Helpers() {
-  const {data: helpers, error} = useSWR(`/api/admins`, (url) => fetch(url).then(r => r.json()))
+  const {data: helpers, error} = useSWR(`/api/admin/admins`, (url) => fetch(url).then(r => r.json()))
 
   if (error) return <Error />
   if (!helpers && !error) return <Loading />

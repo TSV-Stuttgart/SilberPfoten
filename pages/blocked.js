@@ -1,7 +1,7 @@
 import React from 'react'
 import Copyright from '../components/Copyright'
 
-export default function Pending() {
+export default function Blocked() {
   
   return <>
 
@@ -13,7 +13,7 @@ export default function Pending() {
       </div>
       <div className="row mt-3">
         <div className="col-12 text-center">
-          <div className="fw-bold h3">Warten auf Freischaltung</div>
+          <div className="fw-bold h3">Account gesperrt</div>
         </div>
       </div>
     </div>
@@ -21,8 +21,7 @@ export default function Pending() {
     <div className="container mt-2">
       <div className="row mb-1">
         <div className="col-12 text-center">
-          Dein Profil wird überprüft. <br/>
-          Sobald wir dich freigeschaltet haben, wirst du informiert.
+          Dein Profil wurde gesperrt.
         </div>
       </div>
       <div className="row mt-5">
