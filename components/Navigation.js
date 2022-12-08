@@ -13,7 +13,8 @@ export default function Navigation() {
     <div className="mt-4 d-none d-md-block">
       <img src="/logo-silberpfoten.png" alt="SilberPfoten Logo" style={{width:70}} />
       <div className="mt-4">
-        <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light"><i className={`${router.pathname === '/' ? 'bi-house-fill' : 'bi-house'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Neuigkeiten</span></div></Link>
+        <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/' ? 'bi-house-fill' : 'bi-house'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Neuigkeiten</span></div></Link>
+        <Link href="/profile" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/profile' ? 'bi-person-vcard-fill' : 'bi-person-vcard'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Meine Daten</span></div></Link>
         <div className="text-secondary mt-4 border-top">
           {isAdmin ? <>
             <Link href="/members" className="text-decoration-none"><div className="cursor-pointer mt-3 text-dark d-block h4 fw-light"><i className={`${router.pathname === '/members' ? 'bi bi-person-heart' : 'bi bi-person-heart'} me-2`} style={{fontSize: 24}} /><span className="d-none d-lg-inline">Mitglieder</span></div></Link>
