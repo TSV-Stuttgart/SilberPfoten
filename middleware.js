@@ -15,21 +15,21 @@ export async function middleware(request) {
   const status = sessionRequest.status
   const session = await sessionRequest.json()
 
-  logger.info(`${session.user.session_id} | middleware | fetch session | ${process.env.NEXT_PUBLIC_HOST}/api/auth/session | status | ${status}`)
-  logger.info(`${session.user.session_id} | middleware | fetch session | ${process.env.NEXT_PUBLIC_HOST}/api/auth/session | data | object values | ${Object.values(session).length}`)
+  logger.info(`middleware | fetch session | ${process.env.NEXT_PUBLIC_HOST}/api/auth/session | status | ${status}`)
+  logger.info(`middleware | fetch session | ${process.env.NEXT_PUBLIC_HOST}/api/auth/session | data | object values | ${Object.values(session).length}`)
 
   if (status !== 200 || Object.values(session).length <= 0) {
-    logger.info(`${session.user.session_id} | middleware | fetch session | ${process.env.NEXT_PUBLIC_HOST}/api/auth/session | not authenticated | redirect`)
+    logger.info(`middleware | fetch session | ${process.env.NEXT_PUBLIC_HOST}/api/auth/session | not authenticated | redirect`)
 
     return NextResponse.redirect(new URL('/signin', request.url))
   }
 
-  logger.info(`${session.user.session_id} | middleware | fetch session | ${process.env.NEXT_PUBLIC_HOST}/api/auth/session | authenticated | do nothing`)
+  logger.info(`middleware | fetch session | ${process.env.NEXT_PUBLIC_HOST}/api/auth/session | authenticated | do nothing`)
 }
 
 export const config = {
   matcher: [
-    '/api/:path*',
+    '/api/admin/:path*',
     '/members/:path*',
     '/member/:path*',
   ],
