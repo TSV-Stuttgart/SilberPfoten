@@ -17,11 +17,6 @@ BEGIN
     zipcode,
     city,
     job,
-    became_aware_through,
-    became_aware_through_other,
-    experience_with_animal,
-    experience_with_animal_other,
-    support_activity,
     status,
     activated_at
   ) VALUES (
@@ -36,11 +31,6 @@ BEGIN
     '73760',
     'Ostfildern',
     'ADAC Fahrer',
-    '',
-    '',
-    '',
-    '',
-    '',
     'ADMIN',
     'now()'
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoAdmin1UserId;
