@@ -7,6 +7,7 @@ import logger from '../../../lib/logger'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
 import db from '../../../lib/db'
+import sendMail from '../../../lib/sendMail'
 
 export async function getServerSideProps(context) {
   logger.info(`signup | verify | code`)
@@ -94,6 +95,24 @@ export async function getServerSideProps(context) {
 
       if (createUserRequest.rows.length > 0) {
         logger.info(`signup | verify | setpassword | verified successfully | post request | user inserted`)
+        
+        logger.info(`signup | verify | setpassword | verified successfully | post request | user inserted | send email to admin`)
+        const to = 'info@stigits.com'
+        const templateName = 'newMemberNotification'
+        const subject = 'Neue Registrierung'
+        const params = {
+          firstname: decryptedData.firstname,
+          lastname: decryptedData.lastname,
+        }
+
+        const sent = sendMail(to, subject, templateName, params)
+
+        if (sent.statusCode === 200) {
+          logger.info(`api | admin | member | activation | sent welcome mail`)
+        } else {
+          logger.info(`api | admin | member | activation | error sending email`)
+        }
+
         
         return {
           redirect: {
