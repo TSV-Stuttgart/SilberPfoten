@@ -51,7 +51,7 @@ export default function Profile() {
       router.push(`/`)
     }
 
-    else if (updateRequestResponse.status === 500) {
+    else if (updateRequest.status === 500) {
       return <Error />
     }
   }

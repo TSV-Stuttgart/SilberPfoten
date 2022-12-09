@@ -1,12 +1,8 @@
-import fs from 'fs'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
 import db from '../../lib/db'
 import logger from '../../lib/logger'
-import mjml2html from 'mjml'
-import path from 'path'
-import {compile} from 'handlebars'
-import transporter from '../../lib/nodemailer/transporter'
+import sendMail from '../../lib/sendMail'
 
 export default async function handler(request, response) {
   logger.info(`api | signup`)
@@ -74,56 +70,36 @@ export default async function handler(request, response) {
       }), process.env.JWT_SECRET).toString(),
     }, process.env.JWT_SECRET, {expiresIn: '10m'})
 
-    logger.info(`api | signup | create | prepare mjml template`)
+    logger.info(`api | signup | send mail`)
 
-    const mjmlTemplate = fs.readFileSync(`${path.resolve(process.cwd(), 'mjml')}/signupVerificationCode.mjml`, 'utf8')
-
-    logger.info(`api | signup | create | compile template`)
-    
-    const template = compile(mjmlTemplate)
-
-    logger.info(`api | signup | create | template compiled`)
-
-    const mjmlParsed = template({
+    const to = email
+    const templateName = 'signupVerificationCode'
+    const subject = 'Dein Verifizierungscode'
+    const params = {
       firstname,
       lastname,
       verificationCode,
-    })
+    }
 
-    const mjmlObject = mjml2html(mjmlParsed, {filePath: path.resolve(process.cwd(), 'mjml')})
+    const sent = sendMail(to, subject, templateName, params)
 
-    logger.info(`api | signup | create | sendEmail | createTransport`)
+    if (sent.statusCode === 200) {
+      logger.info(`api | signup | send mail | sent`)
 
-    const transport = transporter()
+      response.status(200).json({
+        status: 200,
+        token,
+      })
 
-    const info = await transport.sendMail({
-      from: '"SilberPfoten" <noreply@silberpfoten.de>',
-      to: email,
-      subject: "Dein Verifizierungscode",
-      html: mjmlObject.html,
-    })
-
-    logger.info(`signup | create | sendEmail | Message sent: ${info.messageId}`)
+      return
+    } else {
+      logger.info(`api | signup | send mail | error`)
+    }
 
     response.status(200).json({
-      status: 200,
+      status: 500,
       token,
-    })    
-
-    // if (insertUserQuery.rowCount > 0) {
-    //   insertUserQuery.rows[0].user_id
-
-    //   response.status(200).json({
-    //     status: 201,
-    //     user_id: insertUserQuery.rows[0].user_id
-    //   })
-
-    //   return
-    // }
-
-    // response.status(200).json({
-    //   status: 404,
-    // })
+    })
 
   } catch(e) {
     logger.info(`api | signup | error | ${e}`)

@@ -39,3 +39,31 @@ CREATE TABLE IF NOT EXISTS dbo.session (
   expires_on TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP + INTERVAL '20 minutes',
   PRIMARY KEY(uuid)
 );
+
+CREATE TABLE IF NOT EXISTS dbo.message (
+  message_id BIGSERIAL,
+  message_type VARCHAR(100) NOT NULL DEFAULT 'message',
+  message_text TEXT,
+  gender VARCHAR(8),
+  firstname VARCHAR(255),
+  lastname VARCHAR(255),
+  email VARCHAR(255),
+  phone VARCHAR(255),
+  street VARCHAR(255),
+  street_number VARCHAR(8),
+  zipcode VARCHAR(10),
+  city VARCHAR(255),
+  search_radius VARCHAR(255),
+  experience_with_animal VARCHAR(255) DEFAULT '{}',
+  experience_with_animal_other VARCHAR(255),
+  support_activity VARCHAR(255) DEFAULT '{}',
+  created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY(message_id)
+);
+
+CREATE TABLE IF NOT EXISTS dbo.accepted_case (
+  user_id SERIAL REFERENCES dbo.user (user_id) ON DELETE CASCADE,
+  message_id SERIAL REFERENCES dbo.message (message_id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
+);

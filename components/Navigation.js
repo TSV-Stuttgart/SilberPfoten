@@ -28,7 +28,7 @@ export default function Navigation() {
         <div className="row align-items-center">
           <div className="col-10">
             <div className="p text-muted">Angemeldet als</div>
-            <div className="h4 fw-bold">{session?.user.firstname} {session?.user.lastname}</div>
+            <div className="h4 fw-bold">{session?.user?.firstname} {session?.user?.lastname}</div>
           </div>
         </div>
       </div>

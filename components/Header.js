@@ -18,7 +18,7 @@ export default function Header() {
             {getCurrentHours >= 18 && getCurrentHours <= 22 ? <>N&apos;abend,</> : null}
             {getCurrentHours >= 22 && getCurrentHours <= 4 ? <>Hi,</> : null}
           </span>
-          <span className="ms-1 small">{session?.user.firstname}</span>
+          <span className="ms-1 small">{session?.user?.firstname}</span>
         </div>
         <div className="col-3 text-end">
           {/* <i className="bi-person-circle text-primary" style={{fontSize: 30}}></i> */}
