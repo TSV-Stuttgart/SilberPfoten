@@ -4,6 +4,7 @@ import useSession from '../lib/auth/useSession'
 import Wrapper from '../components/Wrapper'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
+import SessionExpired from '../components/SessionExpired'
 import dynamic from 'next/dynamic'
 import ReactHtmlParser from 'react-html-parser'
 
@@ -58,7 +59,7 @@ export default function Home() {
 
   if (messagesError) return <Error />
   if (!messages && !messagesError) return <Loading />
-  if (!session) return <Loading />
+  if (!session) return <SessionExpired />
 
   const handleSubmit = async (e) => {
     e.preventDefault()

@@ -18,7 +18,7 @@ export default async function handler(request, response) {
 
 		logger.info(`api | auth | session | not found`)
 
-		response.status(200).send({})
+		response.status(404).send()
   } catch(e) {
     logger.info(`api | auth | session | error | ${e}`)
 
