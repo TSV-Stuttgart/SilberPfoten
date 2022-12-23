@@ -29,7 +29,7 @@ deploy:
 
     - docker exec silberpfoten-nginx apk update
     - docker exec silberpfoten-nginx apk add certbot certbot-nginx
-    - docker exec silberpfoten-nginx certbot run --nginx --agree-tos -d mein.silberpfoten.de -m info@stigits.com --noninteractive --no-redirect
+    - docker exec silberpfoten-nginx certbot run --nginx --agree-tos -d mein.silberpfoten.de -m info@stigits.com --noninteractive --redirect
   tags:
     - "mein-silberpfoten-web-01-shell"
   only:
