@@ -20,7 +20,7 @@ deploy:
   stage: deploy
   environment:
     name: production
-    url: https://mein.silberpfoten.stigits.com
+    url: https://mein.silberpfoten.de
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker compose pull
@@ -29,9 +29,8 @@ deploy:
 
     - docker exec silberpfoten-nginx apk update
     - docker exec silberpfoten-nginx apk add certbot certbot-nginx
-    - docker exec silberpfoten-nginx certbot run --nginx --agree-tos -d mein.silberpfoten.stigits.com -m info@stigits.com --noninteractive --no-redirect
+    - docker exec silberpfoten-nginx certbot run --nginx --agree-tos -d mein.silberpfoten.de -m info@stigits.com --noninteractive --no-redirect
   tags:
     - "mein-silberpfoten-web-01-shell"
   only:
     - tags
-  # when: manual
