@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
+import {useRouter} from 'next/router'
 import useSession from '../lib/auth/useSession'
 import Wrapper from '../components/Wrapper'
 import Error from '../components/Error'
@@ -13,6 +14,7 @@ import 'react-quill/dist/quill.snow.css'
 const ReactQuill = dynamic(() => import('react-quill'), {ssr: false})
 
 export default function Home() {
+  const router = useRouter()
   const {mutate} = useSWRConfig()
   const {data: messages, error: messagesError} = useSWR(`/api/messages`, (url) => fetch(url).then(r => r.json()))
   const {session} = useSession()
@@ -59,7 +61,9 @@ export default function Home() {
 
   if (messagesError) return <Error />
   if (!messages && !messagesError) return <Loading />
-  if (!session) return <SessionExpired />
+  if (!session) {
+    router.push('/signin')
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()

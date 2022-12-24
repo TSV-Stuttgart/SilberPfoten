@@ -6,10 +6,10 @@ import Wrapper from '../components/Wrapper'
 import useSession from '../lib/auth/useSession'
 
 export default function Profile() {
-  const token = useSession()
+  const {session} = useSession()
   const router = useRouter()
   
-  const member = token?.session?.user
+  const member = session?.user
 
   const [formEmail, setFormEmail] = useState('')
   const [formPhone, setFormPhone] = useState('')
@@ -57,6 +57,10 @@ export default function Profile() {
   }
 
   if (!member) return <Loading />
+
+  if (!session) {
+    router.push('/signin')
+  }
   
   return <>
     <Wrapper>

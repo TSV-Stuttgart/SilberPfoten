@@ -1,14 +1,22 @@
 import React from 'react'
 import useSWR from 'swr'
+import {useRouter} from 'next/router'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
 import Wrapper from '../components/Wrapper'
+import useSession from '../lib/auth/useSession'
 
 export default function Helpers() {
+  const {session} = useSession()
+  const router = useRouter()
   const {data: helpers, error} = useSWR(`/api/admin/admins`, (url) => fetch(url).then(r => r.json()))
 
   if (error) return <Error />
   if (!helpers && !error) return <Loading />
+
+  if (!session) {
+    router.push('/signin')
+  }
   
   return <>
     <Wrapper>

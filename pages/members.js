@@ -1,13 +1,17 @@
 import React, {useEffect, useState} from 'react'
+import {useRouter} from 'next/router'
 import useSWR, {useSWRConfig} from 'swr'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
 import Wrapper from '../components/Wrapper'
 import slugify from 'slugify'
 import Link from 'next/link'
+import useSession from '../lib/auth/useSession'
 
 export default function Members() {
   const {mutate} = useSWRConfig()
+  const {session} = useSession()
+  const router = useRouter()
   const [formFilter, setFormFilter] = useState('active')
   const {data: members, error} = useSWR(`/api/admin/members?filter=${formFilter}`, (url) => fetch(url).then(r => r.json()))
   const {data: pendingMembers, error: pendingError} = useSWR(`/api/admin/members?filter=pending`, (url) => fetch(url).then(r => r.json()))
@@ -61,6 +65,10 @@ export default function Members() {
   if (!pendingMembers && !pendingError) return <Loading />
   if (!blockedMembers && !blockedError) return <Loading />
   if (!deactivatedMembers && !deactivatedError) return <Loading />
+
+  if (!session) {
+    router.push('/signin')
+  }
   
   return <>
     <Wrapper>
