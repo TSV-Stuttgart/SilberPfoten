@@ -2,6 +2,7 @@ import useSession from '../lib/auth/useSession'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 import Copyright from './Copyright'
+import Image from 'next/image'
 
 export default function Navigation() {
   const router = useRouter()
@@ -11,7 +12,7 @@ export default function Navigation() {
   return <>
 
     <div className="mt-4 d-none d-md-block">
-      <img src="/logo-silberpfoten.png" alt="SilberPfoten Logo" style={{width:70}} />
+      <Image src="/logo-silberpfoten.png" alt="SilberPfoten Logo" width="70" height="70" />
       <div className="mt-4">
         <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/' ? 'bi-house-fill' : 'bi-house'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Neuigkeiten</span></div></Link>
         <Link href="/profile" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/profile' ? 'bi-person-vcard-fill' : 'bi-person-vcard'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Meine Daten</span></div></Link>

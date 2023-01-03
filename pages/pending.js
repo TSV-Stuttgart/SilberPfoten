@@ -1,5 +1,6 @@
 import React from 'react'
 import Copyright from '../components/Copyright'
+import Image from 'next/image'
 
 export default function Pending() {
   
@@ -8,7 +9,7 @@ export default function Pending() {
     <div className="container mt-5">
       <div className="row">
         <div className="col-12 text-center">
-          <img src="/logo-silberpfoten.png" alt="SilberPfoten Logo" style={{width:70}} />
+          <Image src="/logo-silberpfoten.png" alt="SilberPfoten Logo" width="70" height="70" />
         </div>
       </div>
       <div className="row mt-3">
