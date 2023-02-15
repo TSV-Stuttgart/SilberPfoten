@@ -1,22 +1,6 @@
 version: "3.8"
 services:
 
-  silberpfoten-db:
-    container_name: silberpfoten-db
-    image: postgres:13.1-alpine
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: $PGPASSWORD
-      POSTGRES_DB: silberpfoten
-    ports:
-      - 5432:5432
-    networks:
-      - silberpfoten
-    volumes:
-      - ./config/postgres/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
-      - ./config/postgres/010_fixtures.sql:/docker-entrypoint-initdb.d/010_fixtures.sql
-      - postgres-data:/var/lib/postgresql/data
-
   silberpfoten-nginx:
     container_name: silberpfoten-nginx
     image: nginx:1.17.6-alpine
