@@ -43,7 +43,7 @@ export default async function handler(request, response) {
         created_at,
         updated_at
       FROM 
-        user u
+        public.user u
       WHERE
         user_id = $1
       ORDER BY 

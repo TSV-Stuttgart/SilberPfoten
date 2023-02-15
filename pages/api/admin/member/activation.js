@@ -14,7 +14,7 @@ export default async function handler(request, response) {
     logger.info(`api | admin | member | activation | db request`)
 
     const dbRequest = await db.query(
-      `UPDATE user SET activated_at = 'now()', activated_from_user = $1 WHERE user_id = $2 RETURNING user_id, email, firstname, lastname`, 
+      `UPDATE public.user SET activated_at = 'now()', activated_from_user = $1 WHERE user_id = $2 RETURNING user_id, email, firstname, lastname`, 
       [token.user.user_id, request.query.userId]
     )
 

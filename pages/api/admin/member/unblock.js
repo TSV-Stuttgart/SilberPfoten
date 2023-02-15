@@ -13,7 +13,7 @@ export default async function handler(request, response) {
     logger.info(`api | admin | member | unblock | db request`)
 
     const dbRequest = await db.query(
-      `UPDATE user SET blocked_at = NULL, blocked_from_user = NULL, activated_at = 'now()', activated_from_user = $1, updated_at = 'now()' WHERE user_id = $2`, 
+      `UPDATE public.user SET blocked_at = NULL, blocked_from_user = NULL, activated_at = 'now()', activated_from_user = $1, updated_at = 'now()' WHERE user_id = $2`, 
       [token.user.user_id, request.query.userId]
     )
 

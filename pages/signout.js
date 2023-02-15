@@ -13,7 +13,7 @@ export async function getServerSideProps(context) {
 
     if (token?.user?.user_id) {
       logger.info(`signout | delete session in database`)
-      const dbRequest = await db.query(`DELETE FROM session WHERE user_id = $1 RETURNING uuid`, [token.user.user_id])
+      const dbRequest = await db.query(`DELETE FROM public.session WHERE user_id = $1 RETURNING uuid`, [token.user.user_id])
       logger.info(`signout | delete session in database | deleted | ${dbRequest.rowCount}`)
     }
 

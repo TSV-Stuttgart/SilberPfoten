@@ -23,7 +23,7 @@ export default async function handler(request, response) {
         status,
         created_at
       FROM 
-        user u
+        public.user u
       WHERE
         status = 'ADMIN'
       ORDER BY 

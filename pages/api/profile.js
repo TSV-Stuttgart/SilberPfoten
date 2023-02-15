@@ -31,7 +31,7 @@ export default async function handler(request, response) {
 
     const dbRequest = await db.query(`
       UPDATE
-        user 
+        public.user 
       SET
         birthdate = $1,
         phone = $2,

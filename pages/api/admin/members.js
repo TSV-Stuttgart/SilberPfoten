@@ -37,7 +37,7 @@ export default async function handler(request, response) {
         blocked_at,
         deactivated_at
       FROM 
-        user u
+        public.user u
       WHERE
         status = 'USER'
       

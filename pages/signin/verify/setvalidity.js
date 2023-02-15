@@ -66,7 +66,7 @@ export async function getServerSideProps(context) {
       logger.info(`signin | verify | setvalidity | verified successfully | post request | param | permanent | ${permanent}`)
 
       const dbSession = await db.query(
-        `INSERT INTO session (user_id, expires_on) VALUES ($1, CURRENT_TIMESTAMP + INTERVAL ${permanent === 'true' ? "'30 days'" : "'20 minutes'"}) RETURNING uuid`, 
+        `INSERT INTO public.session (user_id, expires_on) VALUES ($1, CURRENT_TIMESTAMP + INTERVAL ${permanent === 'true' ? "'30 days'" : "'20 minutes'"}) RETURNING uuid`, 
         [userId]
       )
 

@@ -31,7 +31,7 @@ export default async function handler(request, response) {
     logger.info(`api | signup | decode jwt | csrf check`)
     jwt.verify(csrf, process.env.JWT_SECRET)
 
-    const userEmailExists = await db.query(`SELECT user_id FROM user WHERE email = $1`, [email])
+    const userEmailExists = await db.query(`SELECT user_id FROM public.user WHERE email = $1`, [email])
 
     if (userEmailExists.rows.length > 0) {
       logger.info(`api | signup | email | conflict`, 409)
@@ -81,7 +81,7 @@ export default async function handler(request, response) {
       verificationCode,
     }
 
-    const sent = sendMail(to, subject, templateName, params)
+    const sent = await sendMail(to, subject, templateName, params)
 
     if (sent.statusCode === 200) {
       logger.info(`api | signup | send mail | sent`)

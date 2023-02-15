@@ -178,7 +178,7 @@ export default function Registrieren({csrf}) {
             <input type="text" name="city" className="form-control mt-1" placeholder="Stadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
           </div>
         </div>
-        <div className="row justify-content-center">
+        {/* <div className="row justify-content-center">
           <div className="col-12 col-md-6 col-lg-4 text-center">
             <div className="">
               {formAutoCompleteValues || autoCompleteIsLoading ? <>
@@ -189,7 +189,7 @@ export default function Registrieren({csrf}) {
               </> : null}
             </div>
           </div>
-        </div>
+        </div> */}
         <div className="row justify-content-center mt-4">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="mt-3 ms-1 fw-bold">Folgende unterstützende Tätigkeiten<br/>kann ich anbieten</div>

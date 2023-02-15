@@ -54,7 +54,7 @@ export async function getServerSideProps(context) {
 
       const createUserRequest = await db.query(`
         INSERT INTO 
-          user 
+          public.user
         (
           gender,
           firstname,
