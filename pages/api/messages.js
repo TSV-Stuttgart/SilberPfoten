@@ -20,9 +20,9 @@ export default async function handler(request, response) {
         m.experience_with_animal_other,
         array_to_string(m.support_activity::text[], ',') as support_activity,
         m.created_at,
-        (SELECT array_agg(user_id) FROM dbo.accepted_case WHERE message_id = m.message_id) as accepted_case_memers
+        (SELECT array_agg(user_id) FROM accepted_case WHERE message_id = m.message_id) as accepted_case_memers
       FROM
-        dbo.message m
+        message m
       ORDER BY 
         created_at 
       DESC

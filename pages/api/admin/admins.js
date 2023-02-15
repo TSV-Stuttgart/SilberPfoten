@@ -23,7 +23,7 @@ export default async function handler(request, response) {
         status,
         created_at
       FROM 
-        dbo.user u
+        user u
       WHERE
         status = 'ADMIN'
       ORDER BY 

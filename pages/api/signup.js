@@ -31,7 +31,7 @@ export default async function handler(request, response) {
     logger.info(`api | signup | decode jwt | csrf check`)
     jwt.verify(csrf, process.env.JWT_SECRET)
 
-    const userEmailExists = await db.query(`SELECT user_id FROM dbo.user WHERE email = $1`, [email])
+    const userEmailExists = await db.query(`SELECT user_id FROM user WHERE email = $1`, [email])
 
     if (userEmailExists.rows.length > 0) {
       logger.info(`api | signup | email | conflict`, 409)

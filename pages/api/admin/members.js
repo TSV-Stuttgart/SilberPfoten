@@ -37,7 +37,7 @@ export default async function handler(request, response) {
         blocked_at,
         deactivated_at
       FROM 
-        dbo.user u
+        user u
       WHERE
         status = 'USER'
       

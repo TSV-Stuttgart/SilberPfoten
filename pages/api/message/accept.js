@@ -15,7 +15,7 @@ export default async function handler(request, response) {
       logger.info(`api | message | accept | DELETE | db request`)
 
       const dbRequest = await db.query(
-        `DELETE FROM dbo.accepted_case WHERE user_id = $1 AND message_id = $2 RETURNING user_id, message_id`, 
+        `DELETE FROM accepted_case WHERE user_id = $1 AND message_id = $2 RETURNING user_id, message_id`, 
         [token.user.user_id, request.query.messageId]
       )
 
@@ -33,7 +33,7 @@ export default async function handler(request, response) {
       logger.info(`api | message | accept | POST | db request`)
 
       const dbRequest = await db.query(
-        `INSERT INTO dbo.accepted_case (user_id, message_id) VALUES ($1,$2) RETURNING user_id, message_id`, 
+        `INSERT INTO accepted_case (user_id, message_id) VALUES ($1,$2) RETURNING user_id, message_id`, 
         [token.user.user_id, request.query.messageId]
       )
 

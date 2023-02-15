@@ -9,7 +9,7 @@ export default async function handler(request, response) {
       logger.info(`api | admin | message | DELETE`)
       logger.info(`api | admin | message | DELETE | database request`)
 
-      const dbDeleteMessageRequest = await db.query(`DELETE FROM dbo.message WHERE message_id = $1 RETURNING message_id`, [request.query.messageId])
+      const dbDeleteMessageRequest = await db.query(`DELETE FROM message WHERE message_id = $1 RETURNING message_id`, [request.query.messageId])
 
       if (dbDeleteMessageRequest.rowCount > 0) {
         logger.info(`api | admin | message | DELETE | deleted`)
@@ -53,7 +53,7 @@ export default async function handler(request, response) {
 
       const dbInsertMessageRequest = await db.query(`
         INSERT INTO 
-          dbo.message (
+          message (
             message_type,
             message_text,
             gender,

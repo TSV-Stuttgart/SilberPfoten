@@ -52,7 +52,7 @@ export async function getServerSideProps(context) {
           activated_at,
           blocked_at
         FROM 
-          dbo.user 
+          user 
         WHERE 
           email = $1`, 
         [email]
