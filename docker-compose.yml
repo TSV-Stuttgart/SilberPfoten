@@ -22,6 +22,11 @@ services:
     environment:
       JWT_SECRET: $JWT_SECRET
       NEXT_PUBLIC_HOST: $NEXT_PUBLIC_HOST
+      PGDATABASE: postgres
+      PGHOST: $PGHOST
+      PGPASSWORD: $PGPASSWORD
+      PGPORT: 5432
+      PGUSER: postgres
     networks:
       - silberpfoten
 
