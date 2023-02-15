@@ -5,7 +5,7 @@ DECLARE
     demoHelper2NotActivatedUserId int;
 BEGIN
 
-  INSERT INTO user (
+  INSERT INTO public.user (
     gender,
     firstname,
     lastname,
@@ -35,7 +35,7 @@ BEGIN
     'now()'
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoAdmin1UserId;
 
-  INSERT INTO user (
+  INSERT INTO public.user (
     gender,
     firstname,
     lastname,
@@ -77,7 +77,7 @@ BEGIN
     demoAdmin1UserId
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoHelper1UserId;
 
-  INSERT INTO user (
+  INSERT INTO public.user (
     gender,
     firstname,
     lastname,

@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: silberpfoten
+      POSTGRES_DB: postgres
     ports:
       - 5432:5432
     networks:

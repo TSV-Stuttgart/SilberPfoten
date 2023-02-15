@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS public.user (
   user_id BIGSERIAL,
   gender VARCHAR(8),
   firstname VARCHAR(255),
@@ -30,15 +30,15 @@ CREATE TABLE IF NOT EXISTS user (
   PRIMARY KEY(user_id)
 );
 
-CREATE TABLE IF NOT EXISTS session (
+CREATE TABLE IF NOT EXISTS public.session (
   uuid uuid DEFAULT uuid_generate_v4(),
-  user_id SERIAL REFERENCES user (user_id) ON DELETE CASCADE,
+  user_id SERIAL REFERENCES public.user (user_id) ON DELETE CASCADE,
   created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
   expires_on TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP + INTERVAL '20 minutes',
   PRIMARY KEY(uuid)
 );
 
-CREATE TABLE IF NOT EXISTS message (
+CREATE TABLE IF NOT EXISTS public.message (
   message_id BIGSERIAL,
   message_type VARCHAR(100) NOT NULL DEFAULT 'message',
   message_text TEXT,
@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS message (
   PRIMARY KEY(message_id)
 );
 
-CREATE TABLE IF NOT EXISTS accepted_case (
-  user_id SERIAL REFERENCES user (user_id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS public.accepted_case (
+  user_id SERIAL REFERENCES public.user (user_id) ON DELETE CASCADE,
   message_id SERIAL REFERENCES message (message_id) ON DELETE CASCADE,
   created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
 );
