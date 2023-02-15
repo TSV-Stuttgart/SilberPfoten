@@ -152,12 +152,6 @@ export async function getServerSideProps(context) {
       }
     }
   }
-
-  return {
-    props: {
-      verificationToken,
-    },
-  }
 }
 
 export default function SignupVerifyCode({verificationToken}) {
