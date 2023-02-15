@@ -71,7 +71,7 @@ export default function SignupVerifySuccess({firstname}) {
           <div className="">
             <div className="p fw-bold">Herzlich Willkommen {firstname}! &#127881;</div>
             <div className="p mt-2">Wir freuen uns sehr, dass du zu uns gefunden hast.</div>
-            <Link href="/auth/anmelden"><a className="btn btn-primary mt-4">Jetzt anmelden</a></Link>
+            <Link href="/auth/anmelden"><div className="btn btn-primary mt-4">Jetzt anmelden</div></Link>
           </div>
         </div>
       </div>

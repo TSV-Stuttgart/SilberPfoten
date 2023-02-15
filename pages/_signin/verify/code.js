@@ -116,7 +116,7 @@ export default function SigninVerifyCode({verificationToken}) {
           <input type="tel" name="verificationCode" className="form-control form-control-lg mt-4" placeholder="Verifizierungscode" value={formVerificationCode} onChange={(e) => setFormVerificationCode(e.target.value)} required autoFocus />
           <button type="submit" className="btn btn-primary form-control form-control-lg mt-4" placeholder="Verifizierungscode">Absenden</button>
 
-          <div className="p fw-normal mt-3">Du hast keine E-Mail erhalten? <Link href="/signin"><a>Dann versuche es erneut</a></Link>.</div>
+          <div className="p fw-normal mt-3">Du hast keine E-Mail erhalten? <Link href="/signin">Dann versuche es erneut</Link>.</div>
         </div>
       </div>
     </form>
@@ -125,7 +125,7 @@ export default function SigninVerifyCode({verificationToken}) {
     <div className="container mt-4">
       <div className="row justify-content-center">
         <div className="col-12 col-md-6 text-center">
-          <Link href="/"><a className="p">Abbrechen</a></Link>
+          <Link href="/"><div className="p">Abbrechen</div></Link>
         </div>
       </div>
     </div>

@@ -219,7 +219,7 @@ export default function SignIn({csrfToken}) {
         </div>
         <div className="row justify-content-center mt-3">
           <div className="col-12 col-md-6 col-lg-4 border-top">
-            <Link href="/signup"><a className="mt-2 d-block text-secondary">Anmeldung als ehrenamtlicher Helfer</a></Link>
+            <Link href="/signup"><div className="mt-2 d-block text-secondary">Anmeldung als ehrenamtlicher Helfer</div></Link>
           </div>
         </div>
       </div>

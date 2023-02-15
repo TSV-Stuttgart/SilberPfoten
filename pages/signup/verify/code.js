@@ -187,7 +187,7 @@ export default function SignupVerifyCode({verificationToken}) {
           <input type="tel" name="verificationCode" className="form-control form-control-lg mt-4" placeholder="Verifizierungscode" value={formVerificationCode} onChange={(e) => setFormVerificationCode(e.target.value)} required autoFocus />
           <button type="submit" className="btn btn-primary form-control form-control-lg mt-4" placeholder="Verifizierungscode">Absenden</button>
 
-          <div className="p fw-normal mt-3">Du hast keine E-Mail erhalten? Dann <Link href="/signup"><a>registriere</a></Link> dich einfach erneut.</div>
+          <div className="p fw-normal mt-3">Du hast keine E-Mail erhalten? Dann <Link href="/signup">registriere</Link> dich einfach erneut.</div>
         </div>
       </div>
     </form>
@@ -196,7 +196,7 @@ export default function SignupVerifyCode({verificationToken}) {
     <div className="container mt-4">
       <div className="row justify-content-center">
         <div className="col-12 col-md-6 text-center">
-          <Link href="/"><a className="p">Registrierung abbrechen</a></Link>
+          <Link href="/"><div className="p">Registrierung abbrechen</div></Link>
         </div>
       </div>
     </div>

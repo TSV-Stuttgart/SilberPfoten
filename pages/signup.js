@@ -430,7 +430,7 @@ export default function Registrieren({csrf}) {
     <div className="container mt-4">
       <div className="row justify-content-center">
         <div className="col-12 col-md-6 text-center">
-          <Link href="/"><a className="p">Vorgang abbrechen</a></Link>
+          <Link href="/"><div className="p">Vorgang abbrechen</div></Link>
         </div>
       </div>
     </div>

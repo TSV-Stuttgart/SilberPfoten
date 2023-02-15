@@ -13,7 +13,7 @@ export default function SignupVerifyErrorIncorrect() {
           <div className="">
             <div className="p fw-bold">Verifizierungscode fehlerhaft</div>
             <div className="p mt-2">Dein Verifizierungscode ist fehlerhaft. <br/>Registriere dich erneut und gebe den Verifizierungscode ein.</div>
-            <Link href="/signup"><a className="btn btn-primary mt-4">Noch ein Versuch ...</a></Link>
+            <Link href="/signup"><div className="btn btn-primary mt-4">Noch ein Versuch ...</div></Link>
           </div>
         </div>
       </div>
@@ -22,7 +22,7 @@ export default function SignupVerifyErrorIncorrect() {
     <div className="container mt-4">
       <div className="row justify-content-center">
         <div className="col-12 col-md-6 text-center">
-          <Link href="/"><a className="p">Registrierung abbrechen</a></Link>
+          <Link href="/"><div className="p">Registrierung abbrechen</div></Link>
         </div>
       </div>
     </div>
