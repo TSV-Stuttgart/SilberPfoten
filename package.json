@@ -27,7 +27,8 @@
     "react-quill": "^2.0.0",
     "sharp": "^0.31.3",
     "slugify": "^1.6.5",
-    "swr": "^2.0.3"
+    "swr": "^2.0.3",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz"
   },
   "devDependencies": {
     "eslint": "8.34.0",

@@ -19,6 +19,7 @@ export default function Home() {
   const {data: messages, error: messagesError} = useSWR(`/api/messages`, (url) => fetch(url).then(r => r.json()))
   const {session} = useSession()
 
+  const [formSubject, setFormSubject] = useState('')
   const [formDescription, setFormDescription] = useState('')
   const [formMessageType, setFormMessageType] = useState('message')
   const [formGender, setFormGender] = useState('')
@@ -63,6 +64,8 @@ export default function Home() {
   if (!messages && !messagesError) return <Loading />
   if (!session) {
     router.push('/signin')
+
+    return
   }
 
   const handleSubmit = async (e) => {
@@ -75,6 +78,7 @@ export default function Home() {
       },
       body: JSON.stringify({
         type: formMessageType,
+        subject: formSubject,
         description: formDescription,
         gender: formGender,
         lastname: formLastname,
@@ -360,6 +364,12 @@ export default function Home() {
                 </> : null}
                 <div className="row mt-3 align-items-center">
                   <div className="col-12 col-md-11 offset-md-1">
+                    <span className="p small ms-1">Betreff</span>
+                    <input type="text" name="formSubject" className="form-control mt-2" placeholder="" value={formSubject} onChange={(e) => setFormSubject(e.target.value)} required />
+                  </div>
+                </div>
+                <div className="row mt-3 align-items-center">
+                  <div className="col-12 col-md-11 offset-md-1">
                     <span className="p small ms-1">Beschreibung</span>
                     <ReactQuill 
                       theme="snow" 
@@ -402,7 +412,7 @@ export default function Home() {
                     {message.message_type === 'case' ? <i className="bi bi-search-heart" style={{fontSize:18, color: '#748da6'}}></i> : null}
                   </div>
                   <div className="col-8">
-                    {message.message_type === 'message' ? <span className="p fw-bold">Information</span> : null}
+                    {message.message_type === 'message' ? <span className="p fw-bold">{message.subject}</span> : null}
                     {message.message_type === 'case' ? <span className="p fw-bold rounded bg-white px-1">Suchauftrag in {message.zipcode} {message.city}</span> : null}
                   </div>
                   <div className="col-3 text-end">

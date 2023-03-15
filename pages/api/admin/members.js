@@ -30,7 +30,7 @@ export default async function handler(request, response) {
         user_id,
         lastname,
         firstname,
-        array_to_string(experience_with_animal::text[], ',') as experience_with_animal,
+        CASE WHEN experience_with_animal != '' THEN array_to_string(experience_with_animal::text[], ',') ELSE '' END as experience_with_animal,
         experience_with_animal_other,
         activated_at,
         created_at,

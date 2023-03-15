@@ -12,6 +12,7 @@ export default async function handler(request, response) {
       SELECT
         m.message_id,
         m.message_type,
+        m.subject,
         m.message_text,
         m.search_radius,
         m.city,
@@ -20,9 +21,9 @@ export default async function handler(request, response) {
         m.experience_with_animal_other,
         array_to_string(m.support_activity::text[], ',') as support_activity,
         m.created_at,
-        (SELECT array_agg(user_id) public.FROM accepted_case WHERE message_id = m.message_id) as accepted_case_memers
+        (SELECT array_agg(user_id) FROM public.accepted_case WHERE message_id = m.message_id) as accepted_case_memers
       FROM
-      public.message m
+        public.message m
       ORDER BY 
         created_at 
       DESC

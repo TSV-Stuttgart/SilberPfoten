@@ -68,6 +68,8 @@ export default function Members() {
 
   if (!session) {
     router.push('/signin')
+
+    return
   }
   
   return <>
@@ -113,9 +115,9 @@ export default function Members() {
                   <div className="col-1">{member.user_id}</div>
                   <div className="col-3">
                     <Link href={`/member/${member.user_id}/${slugify(`${member.lastname}-${member.firstname}`, {lower: true})}`}>
-                      <a className="text-secondary">{member.lastname}, {member.firstname}</a>
+                      <div className="text-secondary">{member.lastname}, {member.firstname}</div>
                     </Link>
-                    {member.activated_at ? <i className="ms-1 bi bi-patch-check-fill text-secondary"></i> : null}
+                    {/* {member.activated_at ? <i className="ms-1 bi bi-patch-check-fill text-secondary"></i> : null} */}
                   </div>
                   <div className="col-5 text-break">{member.experience_with_animal?.split(',').map(e => <React.Fragment key={e}>
                     {e === 'dog' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Hund</span> : null}

@@ -35,6 +35,7 @@ export default async function handler(request, response) {
 
       const {
         type,
+        subject,
         description,
         gender,
         lastname,
@@ -55,6 +56,7 @@ export default async function handler(request, response) {
         INSERT INTO 
           message (
             message_type,
+            subject,
             message_text,
             gender,
             firstname,
@@ -69,10 +71,11 @@ export default async function handler(request, response) {
             support_activity,
             experience_with_animal,
             experience_with_animal_other
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
         `, 
         [
           type,
+          subject,
           description,
           gender,
           firstname,

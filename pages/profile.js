@@ -60,6 +60,8 @@ export default function Profile() {
 
   if (!session) {
     router.push('/signin')
+
+    return
   }
   
   return <>
