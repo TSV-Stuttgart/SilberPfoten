@@ -1,12 +1,17 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import slugify from 'slugify'
+import useSession from '../../lib/auth/useSession'
+import Wrapper from '../../components/Wrapper'
+import Error from '../../components/Error'
+import Loading from '../../components/Loading'
+import SessionExpired from '../../components/SessionExpired'
+import dynamic from 'next/dynamic'
+import ReactHtmlParser from 'react-html-parser'
+
+import 'react-quill/dist/quill.snow.css'
 import Link from 'next/link'
-import useSession from '../lib/auth/useSession'
-import Wrapper from '../components/Wrapper'
-import Error from '../components/Error'
-import Loading from '../components/Loading'
 
 export default function Home() {
   const router = useRouter()
@@ -14,8 +19,24 @@ export default function Home() {
   const {data: messages, error: messagesError} = useSWR(`/api/messages`, (url) => fetch(url).then(r => r.json()))
   const {session} = useSession()
 
+  useEffect(() => {
+    import('bootstrap/js/dist/dropdown')
+  }, [])
+
   const deleteMessage = async (messageId) => {
     await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
+  
+    mutate(`/api/messages`)
+  }
+
+  const acceptCase = async (messageId) => {
+    await fetch(`/api/message/accept?messageId=${messageId}`, {method: 'POST'})
+  
+    mutate(`/api/messages`)
+  }
+
+  const cancelAcceptedCase = async (messageId) => {
+    await fetch(`/api/message/accept?messageId=${messageId}`, {method: 'DELETE'})
   
     mutate(`/api/messages`)
   }
@@ -34,57 +55,45 @@ export default function Home() {
 
         <div className="container mt-3 mb-3">
           <div className="row">
-            <div className="col-12">
+            <div className="col-7">
               <div className="fw-bold h3">Nachrichten</div>
+            </div>
+            <div className="col-5 text-end">
+              <div className="btn-group" role="group" aria-label="Basic example">
+                <Link href="/admin/message/add" className="btn btn-secondary">Neue Nachricht</Link>
+              </div>
             </div>
           </div>
         </div>
 
-        {messages.filter(m => m.message_type === 'case').length > 0 ? <div className="mt-3 mb-4">
-          <div className="ms-4">Wir haben einen passenden Suchauftrag für dich!</div>
-          {messages.filter(m => m.message_type === 'case').map(message => <React.Fragment key={message.message_id}>
-          <Link href={`/message/${message.message_id}/${slugify(message.subject, {lower: true})}`} className="text-decoration-none text-secondary">
-          <div className="container mt-2">
-            <div className="row align-items-center">
-              <div className="col-12">
-                <div className="border p-2 rounded-3 bg-light">
-                  <div className="row align-items-center">
-                    <div className="col-2 text-center border-end">
-                      <i className="bi bi-megaphone-fill text-danger" style={{fontSize:18}}></i>
-                    </div>
-                    <div className="col-10">
-                      <div className="small">
-                        {new Date(message.created_at).toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})} Uhr
-                      </div>
-                      <div className="p fw-bold">{message.subject} | {message.zipcode}</div>
-                    </div>
-                  </div>
+        <div className="container mt-1 mb-3">
+          <div className="row mt-2">
+            <div className="col-12">
+              <div className="p-3 bg-light rounded">
+                <div className="row">
+                  <div className="col-9 fw-bold border-end">Betreff</div>
+                  <div className="col-3 fw-bold">Erstellt am</div>
                 </div>
               </div>
             </div>
           </div>
-          </Link>
-          </React.Fragment>)}
-        </div> : null}
-
-        {messages.filter(m => m.message_type === 'message').map(message => <React.Fragment key={message.message_id}>
-        <Link href={`/message/${message.message_id}/${slugify(message.subject, {lower: true})}`} className="text-decoration-none text-secondary">
-        <div className="container mt-2">
-          <div className="row align-items-center">
+          {messages.filter(m => m.message_type === 'message').map(message => <React.Fragment key={message.message_id}>
+          <div className="row">
             <div className="col-12">
-              <div className="border p-2 rounded-3">
+              <div className="px-3 py-1">
                 <div className="row align-items-center">
-                  <div className="col-2 text-center border-end">
-                    <i className="bi bi-envelope-fill" style={{fontSize:18, color: '#904684'}}></i>
-                  </div>
-                  <div className="col-10">
-                    <div className="small">
-                      {new Date(message.created_at).toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})} Uhr
-                    </div>
-                    <div className="p fw-bold">{message.subject}</div>
-                  </div>
+                  <div className="col-9 border-end">{message.subject}</div>
+                  <div className="col-3">{new Date(message.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})} Uhr</div>
                 </div>
               </div>
+            </div>
+          </div>
+          </React.Fragment>)}
+        </div>
+
+        
+
+
 
               {/* {message.message_type === 'case' ? <>
               <div className="border-bottom pb-4 p-2 bg-light rounded-3">
@@ -204,11 +213,6 @@ export default function Home() {
               </div>
               </> : null} */}
 
-            </div>
-          </div>
-        </div>
-        </Link>
-        </React.Fragment>)}
 
       </Wrapper>
     </>

@@ -5,6 +5,7 @@ import Loading from '../../../components/Loading'
 import Wrapper from '../../../components/Wrapper'
 import logger from '../../../lib/logger'
 import getToken from '../../../lib/auth/getToken'
+import NavigationHeader from '../../../components/NavigationHeader'
 
 export async function getServerSideProps(context) {
 
@@ -38,13 +39,18 @@ export async function getServerSideProps(context) {
 }
 
 export default function Members({userId}) {
-  const {data: member, error} = useSWR(`/api/admin/member/${userId}`, (url) => fetch(url).then(r => r.json()))
+  const {data: member, error} = useSWR(`/api/admin/user/${userId}`, (url) => fetch(url).then(r => r.json()))
 
   if (error) return <Error />
   if (!member && !error) return <Loading />
   
   return <>
     <Wrapper>
+
+      <NavigationHeader 
+        goBack={`/users`} 
+        title={`Benutzer`}
+      />
 
       <div className="container mt-3">
         <div className="row">

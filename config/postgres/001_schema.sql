@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS public.message (
   zipcode VARCHAR(10),
   city VARCHAR(255),
   search_radius VARCHAR(255),
+  status VARCHAR(255),
   experience_with_animal VARCHAR(255) DEFAULT '{}',
   experience_with_animal_other VARCHAR(255),
   support_activity VARCHAR(255) DEFAULT '{}',
@@ -65,45 +66,15 @@ CREATE TABLE IF NOT EXISTS public.message (
   PRIMARY KEY(message_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.accepted_case (
+CREATE TABLE IF NOT EXISTS public.case_has_user (
+  case_has_user_id BIGSERIAL,
   user_id SERIAL REFERENCES public.user (user_id) ON DELETE CASCADE,
   message_id SERIAL REFERENCES message (message_id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
-);
-
-
-
-
-CREATE TABLE IF NOT EXISTS public.import (
-  Kommentare VARCHAR(255),
-  Freie_Spalte VARCHAR(255),
-  Anmeldenummer VARCHAR(255),
-  Anrede VARCHAR(255),
-  Vorname VARCHAR(255),
-  Name VARCHAR(255),
-  Geburtsdatum VARCHAR(255),
-  Beruf VARCHAR(255),
-  Strasse VARCHAR(255),
-  PLZ VARCHAR(255),
-  Ort VARCHAR(255),
-  Handy VARCHAR(255),
-  Festnetz VARCHAR(255),
-  E_Mail_Adresse VARCHAR(255),
-  Ich_bin_Gassigeher VARCHAR(255),
-  Gassigeher VARCHAR(255),
-  Tierarztfahrten VARCHAR(255),
-  Hilfe_bei_der_Tierpflege VARCHAR(255),
-  Hilfe_bei_der_Vorbereitung_Durchfuehrung_von_Veranstaltungen VARCHAR(255),
-  Backen_und_Kochen VARCHAR(255),
-  Kreativworkshops VARCHAR(255),
-  Grafiker VARCHAR(255),
-  Oeffentlichkeitsarbeit VARCHAR(255),
-  leichte_bueroarbeiten VARCHAR(255),
-  Sonstiges VARCHAR(255),
-  Newsletter VARCHAR(255),
-  Alter VARCHAR(255),
-  x2 VARCHAR(255),
-  x3 VARCHAR(255),
-  x4 VARCHAR(255),
-  x5 VARCHAR(255)
+  accepted_at TIMESTAMP WITHOUT TIME ZONE,
+  accepted_from_user BIGINT,
+  rejected_at TIMESTAMP WITHOUT TIME ZONE,
+  rejected_from_user BIGINT,
+  created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, message_id),
+  PRIMARY KEY(case_has_user_id)
 );

@@ -37,7 +37,7 @@ export default async function handler(request, response) {
         experience_with_animal_other,
         array_to_string(support_activity::text[], ',') as support_activity,
         status,
-        blocked,
+        --blocked,
         activated_at,
         activated_from_user,
         created_at,

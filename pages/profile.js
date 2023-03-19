@@ -295,6 +295,14 @@ export default function Profile() {
             <button className="btn btn-primary w-100 mt-4" type="submit">Änderungen speichern</button>
           </div>
         </div>
+        <div className="row justify-content-center mt-5">
+          <div className="col-12">
+            <div className="bg-white border border-danger rounded p-2">
+              <div className="fw-bold">Account löschen?</div>
+              <div className="fw-normal">Bitte sende uns dazu eine E-Mail an <a href="mailto:info@silberpfoten.de" className="text-dark">info@silberpfoten.de</a></div>
+            </div>
+          </div>
+        </div>
       </form>
 
     </Wrapper>

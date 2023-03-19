@@ -30,16 +30,20 @@ export default async function handler(request, response) {
         user_id,
         lastname,
         firstname,
+        zipcode,
+        street,
+        city,
         CASE WHEN experience_with_animal != '' THEN array_to_string(experience_with_animal::text[], ',') ELSE '' END as experience_with_animal,
         experience_with_animal_other,
         activated_at,
         created_at,
         blocked_at,
-        deactivated_at
+        deactivated_at,
+        status
       FROM 
         public.user u
       WHERE
-        status = 'USER'
+        status = ANY(ARRAY['ADMIN', 'USER'])
       
       ${filter === 'active' ? 'AND activated_at IS NOT NULL' : ''}
       ${filter === 'pending' ? 'AND activated_at IS NULL' : ''}

@@ -14,15 +14,18 @@ export default function Navigation() {
     <div className="mt-4 d-none d-md-block">
       <Image src="/logo-silberpfoten.png" alt="SilberPfoten Logo" width="70" height="70" />
       <div className="mt-4">
-        <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/' ? 'bi-house-fill' : 'bi-house'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Neuigkeiten</span></div></Link>
+        <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/' ? 'bi-envelope-fill' : 'bi-envelope'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Neuigkeiten</span></div></Link>
         <Link href="/profile" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/profile' ? 'bi-person-vcard-fill' : 'bi-person-vcard'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Meine Daten</span></div></Link>
         <div className="text-secondary mt-4 border-top">
-          {isAdmin ? <>
-            <Link href="/members" className="text-decoration-none"><div className="cursor-pointer mt-3 text-dark d-block h4 fw-light"><i className={`${router.pathname === '/members' ? 'bi bi-person-heart' : 'bi bi-person-heart'} me-2`} style={{fontSize: 24}} /><span className="d-none d-lg-inline">Mitglieder</span></div></Link>
-            <Link href="/admins" className="text-decoration-none"><div className="cursor-pointer mt-2 text-dark d-block h4 fw-light"><i className={`${router.pathname === '/admins' ? 'bi bi-person-fill-gear' : 'bi bi-person-gear'} me-2`} style={{fontSize: 24}} /><span className="d-none d-lg-inline">Admins</span></div></Link>
-          </> : null}
           <Link href="/signout" className="text-decoration-none"><div className="cursor-pointer text-secondary d-block h4 fw-light mt-3"><i className="bi bi-box-arrow-left me-2" style={{fontSize: 24}} /><span className="d-none d-lg-inline">Abmelden</span></div></Link>
         </div>
+
+        {session?.user?.status === 'ADMIN' ? <>
+          <div className="fw-bold mt-4">Administration</div>
+          <Link href="/admin/messages" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/messages' ? 'bi-envelope-fill' : 'bi-envelope'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Nachrichten</span></div></Link>
+          <Link href="/admin/cases" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/cases' ? 'bi-megaphone-fill' : 'bi-megaphone'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Suchaufträge</span></div></Link>
+        </> : null}
+
       </div>
       
       <div className="d-none d-lg-block bg-light rounded-pill mt-5 py-2 px-3 cursor-pointer">

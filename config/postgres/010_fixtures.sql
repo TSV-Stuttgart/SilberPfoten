@@ -21,16 +21,16 @@ BEGIN
     activated_at
   ) VALUES (
     'male',
-    'Karl',
-    'Kralle',
-    'demo-silberpfoten-admin@stigits.com',
-    '1980-12-30',
-    '01770000000',
+    'Sandro',
+    'Coletti',
+    'sandro@stigits.com',
+    '1985-08-05',
+    '01631643769',
     'Neuhauser Straße',
     '31',
     '73760',
     'Ostfildern',
-    'ADAC Fahrer',
+    'Developer',
     'ADMIN',
     'now()'
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoAdmin1UserId;
