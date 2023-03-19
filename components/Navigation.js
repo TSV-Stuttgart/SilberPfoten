@@ -22,6 +22,7 @@ export default function Navigation() {
 
         {session?.user?.status === 'ADMIN' ? <>
           <div className="fw-bold mt-4">Administration</div>
+          <Link href="/admin/users" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/users' ? 'bi-people-fill' : 'bi-people'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Benutzer</span></div></Link>
           <Link href="/admin/messages" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/messages' ? 'bi-envelope-fill' : 'bi-envelope'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Nachrichten</span></div></Link>
           <Link href="/admin/cases" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/cases' ? 'bi-megaphone-fill' : 'bi-megaphone'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Suchaufträge</span></div></Link>
         </> : null}

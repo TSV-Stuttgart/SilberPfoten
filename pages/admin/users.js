@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
 import useSWR, {useSWRConfig} from 'swr'
-import Error from '../components/Error'
-import Loading from '../components/Loading'
-import Wrapper from '../components/Wrapper'
+import Error from '../../components/Error'
+import Loading from '../../components/Loading'
+import Wrapper from '../../components/Wrapper'
 import slugify from 'slugify'
 import Link from 'next/link'
-import useSession from '../lib/auth/useSession'
+import useSession from '../../lib/auth/useSession'
 
 export default function Users() {
   const {mutate} = useSWRConfig()
