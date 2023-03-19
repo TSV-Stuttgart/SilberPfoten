@@ -131,7 +131,7 @@ export default function AdminCaseDetail({query}) {
           <div className="row mt-5">
             <div className="col-12 fw-bold">Helfer die sich gemeldet haben</div>
           </div>
-          {message?.accepted_case_users?.map(caseUser => <React.Fragment>
+          {message?.accepted_case_users?.map(caseUser => <React.Fragment key={caseUser.user_id}>
           <div className="row mt-3">
             <div className="col-7 fw-bold border-end">Name, Vorname</div>
             <div className="col-4 fw-bold">Status</div>
