@@ -81,7 +81,7 @@ export default async function handler(request, response) {
           firstname,
           lastname,
           phone,
-          email,
+          email ? email : null,
           street,
           streetNumber,
           zipcode,

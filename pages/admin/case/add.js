@@ -165,7 +165,7 @@ export default function AdminCaseAdd() {
             <div className="row mt-1">
               <div className="col-12 col-md-6">
                 <span className="p small ms-1">E-Mail</span>
-                <input type="email" className="form-control" placeholder="max@mustermann.de" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} required />
+                <input type="email" className="form-control" placeholder="max@mustermann.de" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} />
               </div>
               <div className="col-12 col-md-6">
                 <span className="p small ms-1">Telefon</span>
