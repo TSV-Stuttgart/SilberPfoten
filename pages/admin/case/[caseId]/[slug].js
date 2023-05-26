@@ -7,6 +7,8 @@ import Error from '../../../../components/Error'
 import Loading from '../../../../components/Loading'
 import ReactHtmlParser from 'react-html-parser'
 import NavigationHeader from '../../../../components/NavigationHeader'
+import Link from 'next/link'
+import slugify from 'slugify'
 
 export async function getServerSideProps(context) {
 
@@ -77,6 +79,7 @@ export default function AdminCaseDetail({query}) {
             <div className="col-5 text-end">
               <div className="btn-group" role="group">
                 <button className="btn btn-danger" onClick={() => deleteMessage()}>Löschen</button>
+                <Link href={`/admin/case/edit/${query.caseId}/${slugify(message.subject, {lower: true})}`} className="btn btn-primary">Bearbeiten</Link>
               </div>
             </div>
           </div>

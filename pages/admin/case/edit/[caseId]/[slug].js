@@ -1,20 +1,31 @@
 import React, {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
+import useSWR from 'swr'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import useSession from '../../../lib/auth/useSession'
-import Wrapper from '../../../components/Wrapper'
-import Error from '../../../components/Error'
-import NavigationHeader from '../../../components/NavigationHeader'
-
+import useSession from '../../../../../lib/auth/useSession'
+import Wrapper from '../../../../../components/Wrapper'
+import Error from '../../../../../components/Error'
+import NavigationHeader from '../../../../../components/NavigationHeader'
 import 'react-quill/dist/quill.snow.css'
-import Loading from '../../../components/Loading'
+import Loading from '../../../../../components/Loading'
+import slugify from 'slugify'
 
 const ReactQuill = dynamic(() => import('react-quill'), {ssr: false})
 
-export default function AdminCaseAdd() {
+export async function getServerSideProps(context) {
+
+  return {
+    props: {
+      query: context.query
+    },
+  }
+}
+
+export default function AdminCaseAdd({query}) {
   const router = useRouter()
   const {session, error: sessionError} = useSession()
+  const {data: message, error: messageError} = useSWR(`/api/admin/case?caseId=${query.caseId}`, (url) => fetch(url).then(r => r.json()))
 
   const [formSubject, setFormSubject] = useState('')
   const [formDescription, setFormDescription] = useState('')
@@ -28,30 +39,46 @@ export default function AdminCaseAdd() {
   const [formZipcode, setFormZipcode] = useState('')
   const [formCity, setFormCity] = useState('')
   const [formSearchRadius, setFormSearchRadius] = useState('')
-  
+
   const [formSupportingActivity, setFormSupportingActivity] = useState([])
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
 
-  if (!session && !sessionError) return <Loading />
+  useEffect(() => {
 
-  // if (!session) {
-  //   console.log("session", session)
-  //   // router.push('/signin')
-    
-  //   return
-  // }
+    if (message) {
+
+      setFormSubject(message.subject)
+      setFormDescription(message.message_text)
+      setFormGender(message.gender)
+      setFormFirstname(message.firstname)
+      setFormLastname(message.lastname)
+      message.email ? setFormEmail(message.email) : null
+      setFormPhone(message.phone)
+      setFormStreet(message.street)
+      setFormStreetNumber(message.street_number)
+      setFormZipcode(message.zipcode)
+      setFormCity(message.city)
+      setFormSearchRadius(message.search_radius)
+      setFormSupportingActivity(message.support_activity?.split(','))
+      setFormExperienceWithAnimal(message.experience_with_animal?.split(','))
+      setFormExperienceWithAnimalOther(message.experience_with_animal_other)
+    }
+
+  }, [message])
+
+  if ((!session && !sessionError) || !message && !messageError) return <Loading />
+  if (sessionError || messageError) return <Error />
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const postRequest = await fetch(`/api/admin/message`, {
-      method: 'PUT', 
+    const patchRequest = await fetch(`/api/admin/message?messageId=${message.message_id}`, {
+      method: 'PATCH', 
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        type: 'case',
         subject: formSubject,
         description: formDescription,
         gender: formGender,
@@ -70,11 +97,15 @@ export default function AdminCaseAdd() {
       })
     })
 
-    if (postRequest.status === 200) {
-      router.push('/admin/cases')
+    if (patchRequest.status === 200) {
+      router.push(`/admin/case/${query.caseId}/${slugify(message.subject, {lower: true})}`)
     }
 
-    else if (postRequest.status === 500) {
+    else if (patchRequest.status === 401) {
+      return <Error />
+    }
+
+    else if (patchRequest.status === 500) {
       return <Error />
     }
   }
@@ -84,7 +115,7 @@ export default function AdminCaseAdd() {
       <Wrapper>
 
         <NavigationHeader
-          goBack="/admin/cases"
+          goBack={`/admin/case/${query.caseId}/${slugify(message.subject, {lower: true})}`}
           title="Suchaufträge"
         />
 
@@ -97,8 +128,8 @@ export default function AdminCaseAdd() {
               </div>
               <div className="col-6">
                 <div className="btn-group float-end" role="group">
-                  <Link href="/admin/messages" className="btn btn-secondary">Abbrechen</Link>
-                  <button className="btn btn-success text-white" type="submit">Veröffentlichen</button>
+                  <Link href="/admin/cases" className="btn btn-secondary">Abbrechen</Link>
+                  <button className="btn btn-success text-white" type="submit">Speichern</button>
                 </div>
               </div>
             </div>
