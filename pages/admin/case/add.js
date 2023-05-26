@@ -46,7 +46,7 @@ export default function AdminCaseAdd() {
     e.preventDefault()
 
     const postRequest = await fetch(`/api/admin/message`, {
-      method: 'POST', 
+      method: 'PUT', 
       headers: {
         'Content-Type': 'application/json'
       },
@@ -281,9 +281,9 @@ export default function AdminCaseAdd() {
             <div className="row mt-2">
               <div className="col-12">
                 <div className="bg-light rounded p-2">
-                  <div className="row cursor-pointer align-items-center">
+                  <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('dog') ? [...formExperienceWithAnimal, ...['dog']] : formExperienceWithAnimal.filter(i => i !== 'dog'))}>
                     <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('dog') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                    <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('dog') ? [...formExperienceWithAnimal, ...['dog']] : formExperienceWithAnimal.filter(i => i !== 'dog'))}>Hund</div>
+                    <div className="col-10 border-start">Hund</div>
                   </div>
                 </div>
               </div>
@@ -291,9 +291,9 @@ export default function AdminCaseAdd() {
             <div className="row mt-2">
               <div className="col-12">
                 <div className="bg-light rounded p-2">
-                  <div className="row cursor-pointer align-items-center">
+                  <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('cat') ? [...formExperienceWithAnimal, ...['cat']] : formExperienceWithAnimal.filter(i => i !== 'cat'))}>
                     <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('cat') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                    <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('cat') ? [...formExperienceWithAnimal, ...['cat']] : formExperienceWithAnimal.filter(i => i !== 'cat'))}>Katze</div>
+                    <div className="col-10 border-start">Katze</div>
                   </div>
                 </div>
               </div>
@@ -301,9 +301,9 @@ export default function AdminCaseAdd() {
             <div className="row mt-2">
               <div className="col-12">
                 <div className="bg-light rounded p-2">
-                  <div className="row cursor-pointer align-items-center">
+                  <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('small_animal') ? [...formExperienceWithAnimal, ...['small_animal']] : formExperienceWithAnimal.filter(i => i !== 'small_animal'))}>
                     <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('small_animal') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                    <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('small_animal') ? [...formExperienceWithAnimal, ...['small_animal']] : formExperienceWithAnimal.filter(i => i !== 'small_animal'))}>Kleintiere</div>
+                    <div className="col-10 border-start">Kleintiere</div>
                   </div>
                 </div>
               </div>
@@ -311,9 +311,9 @@ export default function AdminCaseAdd() {
             <div className="row mt-2">
               <div className="col-12">
                 <div className="bg-light rounded p-2">
-                  <div className="row cursor-pointer align-items-center">
+                  <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('bird') ? [...formExperienceWithAnimal, ...['bird']] : formExperienceWithAnimal.filter(i => i !== 'bird'))}>
                     <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('bird') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                    <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('bird') ? [...formExperienceWithAnimal, ...['bird']] : formExperienceWithAnimal.filter(i => i !== 'bird'))}>Vögel</div>
+                    <div className="col-10 border-start">Vögel</div>
                   </div>
                 </div>
               </div>
@@ -321,9 +321,9 @@ export default function AdminCaseAdd() {
             <div className="row mt-2">
               <div className="col-12">
                 <div className="bg-light rounded p-2">
-                  <div className="row cursor-pointer align-items-center">
+                  <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('other') ? [...formExperienceWithAnimal, ...['other']] : formExperienceWithAnimal.filter(i => i !== 'other'))}>
                     <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('other') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                    <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('other') ? [...formExperienceWithAnimal, ...['other']] : formExperienceWithAnimal.filter(i => i !== 'other'))}>Sonstiges</div>
+                    <div className="col-10 border-start">Sonstiges</div>
                   </div>
                   {formExperienceWithAnimal.includes('other') ? <>
                   <div className="row cursor-pointer align-items-center">
