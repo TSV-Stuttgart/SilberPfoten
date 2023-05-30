@@ -78,3 +78,19 @@ CREATE TABLE IF NOT EXISTS public.case_has_user (
   UNIQUE(user_id, message_id),
   PRIMARY KEY(case_has_user_id)
 );
+
+CREATE TABLE IF NOT EXISTS public.message_has_media (
+  message_has_media_id BIGSERIAL,
+  uuid uuid DEFAULT uuid_generate_v4(),
+  message_id SERIAL REFERENCES public.message (message_id) ON DELETE CASCADE,
+  mimetype VARCHAR(50) NOT NULL,
+  filename VARCHAR(255) NOT NULL,
+  file BYTEA NOT NULL,
+  thumbnail BYTEA,
+  width VARCHAR(20),
+  height VARCHAR(20),
+  size VARCHAR(20),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY(message_has_media_id)
+);
