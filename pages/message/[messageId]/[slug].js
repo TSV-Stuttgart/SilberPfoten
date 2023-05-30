@@ -97,7 +97,7 @@ export default function Home({query}) {
         <div className="container mt-2">
           <div className="row">
             <div className="col-12">
-              {ReactHtmlParser(message.message_text)}
+              {ReactHtmlParser(message.message_text.replaceAll("<p><br></p>", ""))}
             </div>
           </div>
         </div>
