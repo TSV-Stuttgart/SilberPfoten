@@ -213,7 +213,7 @@ export default async function handler(request, response) {
             experience_with_animal,
             experience_with_animal_other
           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
-            RETURNING message_id
+            RETURNING message_id, subject
         `, 
         [
           type,
@@ -238,18 +238,20 @@ export default async function handler(request, response) {
       if (dbPutMessageRequest.rowCount > 0) {
 
         // Upload Images
-        for(const upload of formUploads) {
-          const messageId = dbPutMessageRequest.rows[0].message_id
-          const file = upload
+        if (formUploads) {
+          for(const upload of formUploads) {
+            const messageId = dbPutMessageRequest.rows[0].message_id
+            const file = upload
 
-          const uploadedImage = await uploadImage(messageId, file)
+            const uploadedImage = await uploadImage(messageId, file)
+          }
         }
 
         logger.info(`${request.url} | ${request.method} | putRequest | success | ${JSON.stringify(dbPutMessageRequest.rows[0])}`)
 
         response.status(200).json({
           statusCode: 200,
-          body: {}
+          body: {caseId: dbPutMessageRequest.rows[0].message_id, subject: dbPutMessageRequest.rows[0].subject}
         })
 
         return

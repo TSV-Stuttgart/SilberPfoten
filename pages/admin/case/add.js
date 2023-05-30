@@ -46,7 +46,7 @@ export default function AdminCaseAdd() {
 
     setLoading(true)
 
-    const postRequest = await fetch(`/api/admin/message`, {
+    const putRequest = await fetch(`/api/admin/message`, {
       method: 'PUT', 
       headers: {
         'Content-Type': 'application/json'
@@ -72,11 +72,12 @@ export default function AdminCaseAdd() {
       })
     })
 
-    if (postRequest.status === 200) {
-      router.push('/admin/cases')
+    if (putRequest.status === 200) {
+      const data = await putRequest.json()
+      router.push(`/admin/case/${data.body.caseId}/${slugify(data.body.subject, {lower: true})}`)
     }
 
-    else if (postRequest.status === 500) {
+    else if (putRequest.status === 500) {
       return <Error />
     }
   }
@@ -157,7 +158,6 @@ export default function AdminCaseAdd() {
               <div className="col-12">
                 <span className="p small ms-1">Beschreibung</span>
                 <ReactQuill 
-                  //className="form-control"
                   theme="snow" 
                   modules={{toolbar: [['bold', 'italic', 'underline']]}}
                   formats={['bold', 'italic', 'underline']} 

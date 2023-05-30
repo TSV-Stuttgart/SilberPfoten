@@ -6,7 +6,7 @@ import Wrapper from '../../../components/Wrapper'
 import Error from '../../../components/Error'
 import Loading from '../../../components/Loading'
 import NavigationHeader from '../../../components/NavigationHeader'
-
+//import slugify from 'slugify'
 import 'react-quill/dist/quill.snow.css'
 import Link from 'next/link'
 
@@ -24,7 +24,7 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const postRequest = await fetch(`/api/admin/message`, {
+    const putRequest = await fetch(`/api/admin/message`, {
       method: 'PUT', 
       headers: {
         'Content-Type': 'application/json'
@@ -36,11 +36,13 @@ export default function Home() {
       })
     })
 
-    if (postRequest.status === 200) {
-      router.push('/admin/messages')
+    if (putRequest.status === 200) {
+      router.push(`/admin/messages`)
+      //const data = await putRequest.json()
+      //router.push(`/admin/case/${data.body.caseId}/${slugify(data.body.subject, {lower: true})}`)
     }
 
-    else if (postRequest.status === 500) {
+    else if (putRequest.status === 500) {
       return <Error />
     }
   }
