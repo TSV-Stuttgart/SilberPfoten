@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
-import useSWR from 'swr'
+import useSWR, {useSWRConfig} from 'swr'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import useSession from '../../../../../lib/auth/useSession'
@@ -10,6 +10,8 @@ import NavigationHeader from '../../../../../components/NavigationHeader'
 import 'react-quill/dist/quill.snow.css'
 import Loading from '../../../../../components/Loading'
 import slugify from 'slugify'
+import Image from 'next/image'
+import {filesize} from 'filesize'
 
 const ReactQuill = dynamic(() => import('react-quill'), {ssr: false})
 
@@ -24,8 +26,11 @@ export async function getServerSideProps(context) {
 
 export default function AdminCaseAdd({query}) {
   const router = useRouter()
+  const {mutate} = useSWRConfig()
   const {session, error: sessionError} = useSession()
   const {data: message, error: messageError} = useSWR(`/api/admin/case?caseId=${query.caseId}`, (url) => fetch(url).then(r => r.json()))
+
+  const [loading, setLoading] = useState(false)
 
   const [formSubject, setFormSubject] = useState('')
   const [formDescription, setFormDescription] = useState('')
@@ -39,6 +44,8 @@ export default function AdminCaseAdd({query}) {
   const [formZipcode, setFormZipcode] = useState('')
   const [formCity, setFormCity] = useState('')
   const [formSearchRadius, setFormSearchRadius] = useState('')
+
+  const [formUploads, setFormUploads] = useState([])
 
   const [formSupportingActivity, setFormSupportingActivity] = useState([])
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
@@ -63,15 +70,19 @@ export default function AdminCaseAdd({query}) {
       setFormSupportingActivity(message.support_activity?.split(','))
       setFormExperienceWithAnimal(message.experience_with_animal?.split(','))
       setFormExperienceWithAnimalOther(message.experience_with_animal_other)
+
     }
 
   }, [message])
 
   if ((!session && !sessionError) || !message && !messageError) return <Loading />
   if (sessionError || messageError) return <Error />
+  if (loading) return <Loading />
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    setLoading(true)
 
     const patchRequest = await fetch(`/api/admin/message?messageId=${message.message_id}`, {
       method: 'PATCH', 
@@ -94,6 +105,7 @@ export default function AdminCaseAdd({query}) {
         supportActivity: formSupportingActivity,
         experienceWithAnimal: formExperienceWithAnimal,
         experienceWithAnimalOther: formExperienceWithAnimalOther,
+        formUploads,
       })
     })
 
@@ -110,6 +122,56 @@ export default function AdminCaseAdd({query}) {
     }
   }
 
+  const readAsDataURL = async (reader, upload) => {
+    try {
+      return new Promise((resolve, reject) => {
+        reader.onload = (e) => {
+          resolve(e.target.result)
+        }
+  
+        reader.readAsDataURL(upload)
+      })
+    } catch (e) {
+      console.log(`error reading files`, e)
+      reject(e)
+    }
+  }
+
+  const handleUpload = async () => {
+    const uploads = document.querySelector('input[type=file]').files
+
+    setLoading(true)
+    
+    for (const upload of uploads) {      
+      const reader = new FileReader()
+
+      upload['id'] = self?.crypto?.randomUUID()
+      upload['filename'] = slugify(upload.name, {lower: true})
+      upload['base64'] = await readAsDataURL(reader, upload)
+    }
+
+    setFormUploads([...formUploads, ...Array.from(uploads)])
+
+    setLoading(false)
+  }
+
+  const deleteMedia = async (mediaId) => {
+    const confirmed = confirm("Wirklich löschen?")
+
+    if (confirmed) {
+      const deleteMediaRequest = await fetch(`/api/admin/message/media?mediaId=${mediaId}`, {method: 'DELETE'})
+
+      if (deleteMediaRequest.status === 200) {
+
+        mutate(`/api/admin/case?caseId=${query.caseId}`)
+      }
+    }
+  }
+
+  const calculateUploadedTotalSize = () => {
+    return formUploads?.reduce((accumulator, currentValue) => accumulator + currentValue?.size, 0)
+  }
+
   return (
     <>
       <Wrapper>
@@ -124,12 +186,15 @@ export default function AdminCaseAdd({query}) {
           <div className="container mt-3 mb-3">
             <div className="row">
               <div className="col-6">
-                <div className="fw-bold h3">Neuer Suchauftrag</div>
+                <div className="fw-bold h3">Suchauftrag bearbeiten</div>
               </div>
               <div className="col-6">
                 <div className="btn-group float-end" role="group">
                   <Link href="/admin/cases" className="btn btn-secondary">Abbrechen</Link>
-                  <button className="btn btn-success text-white" type="submit">Speichern</button>
+                  {calculateUploadedTotalSize() >= 10485760 
+                  ? <button className="btn btn-success text-white" type="submit" disabled>Speichern</button>
+                  : <button className="btn btn-success text-white" type="submit">Speichern</button>
+                  }
                 </div>
               </div>
             </div>
@@ -154,6 +219,55 @@ export default function AdminCaseAdd({query}) {
                 />
               </div>
             </div>
+
+            <div className="row mt-3">
+              <div className="col-12">
+                {/* max 10 mb upload */}
+                {/* https://www.online-rechner.net/datenmenge/#Rechner */}
+                {calculateUploadedTotalSize() >= 10485760 ? <>
+                  <div className="mb-2 bg-danger rounded text-white p-2">
+                    <div className="fw-bold">Maximal 10 MB erlaubt <span className="fw-normal">(Hochgeladen: {filesize(calculateUploadedTotalSize())})</span></div>
+                    <div className="">Die hochgeladenen Dateien überschreiten das Limit von 10 MB.</div>
+                  </div>
+                </> : null}
+                {message.has_media?.length > 0 ? <>
+                {message.has_media?.map(media => <React.Fragment key={media.message_has_media_id}>
+                <div className="border mb-1 p-1 rounded">
+                  <div className="row align-items-center">
+                    <div className="col-2">
+                      {['png', 'jpeg', 'gif'].includes(media.mimetype) ? <Image src={`data:image/webp;base64,${media.thumbnail}`} className="rounded-end" width="50" height="50" alt={media.filename} style={{objectFit: 'cover'}}></Image> : null}
+                    </div>
+                    <div className="col-6 border-end">{media.filename}</div>
+                    <div className="col-2 border-end">{filesize(media.size)}</div>
+                    <div className="col-2 text-center"><i className="bi bi-x-circle-fill cursor-pointer" onClick={() => deleteMedia(media.message_has_media_id)} style={{fontSize: 14}}></i></div>
+                  </div>
+                </div>
+                </React.Fragment>)}
+                </> : null}
+                {formUploads.length > 0 ? <>
+                {formUploads.map(upload => <React.Fragment key={upload.id}>
+                <div className="border mb-1 p-1 rounded">
+                  <div className="row align-items-center">
+                    <div className="col-2">
+                      {['image/png', 'image/jpeg', 'image/gif'].includes(upload.type) ? <div className="rounded border" style={{backgroundImage: `url(${upload.base64})`, backgroundSize: 'cover', backgroundPosition: 'center', width: 50, height: 50}}></div> : null}
+                    </div>
+                    <div className="col-6 border-end">{upload.filename}</div>
+                    <div className="col-2 border-end">{filesize(upload.size)}</div>
+                    <div className="col-2 text-center"><i className="bi bi-x-circle-fill cursor-pointer" style={{fontSize: 14}} onClick={() => setFormUploads([...formUploads.filter(u => u.id !== upload.id)])}></i></div>
+                  </div>
+                </div>
+                </React.Fragment>)}
+                </> : null }
+              </div>
+              <div className="col-12 align-items-center ">
+                <label className="d-block p-2 text-center cursor-pointer border rounded bg-light">
+                  <i className="bi bi-cloud-arrow-up-fill" style={{fontSize: 20}}></i>
+                  <input type="file" id="upload" name="upload" accept="image/png, image/jpeg, image/gif" multiple onChange={() => handleUpload()} style={{display: 'none'}} />
+                  <div className="">Bilder hinzufügen</div>
+                </label>
+              </div>
+            </div>
+
             <div className="row mt-3">
               <div className="col-12 col-md-4">
                 <span className="p small ms-1">Anrede</span>

@@ -25,7 +25,7 @@ export default function Home() {
     e.preventDefault()
 
     const postRequest = await fetch(`/api/admin/message`, {
-      method: 'POST', 
+      method: 'PUT', 
       headers: {
         'Content-Type': 'application/json'
       },
