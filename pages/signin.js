@@ -106,7 +106,13 @@ export async function getServerSideProps(context) {
 
       logger.info(`signin | create | verificationcode`)
       
-      const verificationCode = Math.floor(100000 + Math.random() * 900000)
+      let verificationCode
+      
+      if (process.env.NODE_ENV === 'development') {
+        verificationCode = 123456
+      } else {
+        verificationCode = Math.floor(100000 + Math.random() * 900000)
+      }
 
       logger.info(`signin | create | verificationcode | ${verificationCode}`)
 

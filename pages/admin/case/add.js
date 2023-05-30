@@ -6,15 +6,18 @@ import useSession from '../../../lib/auth/useSession'
 import Wrapper from '../../../components/Wrapper'
 import Error from '../../../components/Error'
 import NavigationHeader from '../../../components/NavigationHeader'
-
 import 'react-quill/dist/quill.snow.css'
 import Loading from '../../../components/Loading'
+import slugify from 'slugify'
+import {filesize} from 'filesize'
 
 const ReactQuill = dynamic(() => import('react-quill'), {ssr: false})
 
 export default function AdminCaseAdd() {
   const router = useRouter()
   const {session, error: sessionError} = useSession()
+
+  const [loading, setLoading] = useState(false)
 
   const [formSubject, setFormSubject] = useState('')
   const [formDescription, setFormDescription] = useState('')
@@ -28,24 +31,22 @@ export default function AdminCaseAdd() {
   const [formZipcode, setFormZipcode] = useState('')
   const [formCity, setFormCity] = useState('')
   const [formSearchRadius, setFormSearchRadius] = useState('')
+
+  const [formUploads, setFormUploads] = useState([])
   
   const [formSupportingActivity, setFormSupportingActivity] = useState([])
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
 
   if (!session && !sessionError) return <Loading />
-
-  // if (!session) {
-  //   console.log("session", session)
-  //   // router.push('/signin')
-    
-  //   return
-  // }
+  if (loading) return <Loading />
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const postRequest = await fetch(`/api/admin/message`, {
+    setLoading(true)
+
+    const putRequest = await fetch(`/api/admin/message`, {
       method: 'PUT', 
       headers: {
         'Content-Type': 'application/json'
@@ -67,16 +68,55 @@ export default function AdminCaseAdd() {
         supportActivity: formSupportingActivity,
         experienceWithAnimal: formExperienceWithAnimal,
         experienceWithAnimalOther: formExperienceWithAnimalOther,
+        formUploads,
       })
     })
 
-    if (postRequest.status === 200) {
-      router.push('/admin/cases')
+    if (putRequest.status === 200) {
+      const data = await putRequest.json()
+      router.push(`/admin/case/${data.body.caseId}/${slugify(data.body.subject, {lower: true})}`)
     }
 
-    else if (postRequest.status === 500) {
+    else if (putRequest.status === 500) {
       return <Error />
     }
+  }
+
+  const readAsDataURL = async (reader, upload) => {
+    try {
+      return new Promise((resolve, reject) => {
+        reader.onload = (e) => {
+          resolve(e.target.result)
+        }
+  
+        reader.readAsDataURL(upload)
+      })
+    } catch (e) {
+      console.log(`error reading files`, e)
+      reject(e)
+    }
+  }
+
+  const handleUpload = async () => {
+    const uploads = document.querySelector('input[type=file]').files
+
+    setLoading(true)
+    
+    for (const upload of uploads) {      
+      const reader = new FileReader()
+
+      upload['id'] = self?.crypto?.randomUUID()
+      upload['filename'] = slugify(upload.name, {lower: true})
+      upload['base64'] = await readAsDataURL(reader, upload)
+    }
+
+    setFormUploads([...formUploads, ...Array.from(uploads)])
+
+    setLoading(false)
+  }
+
+  const calculateUploadedTotalSize = () => {
+    return formUploads?.reduce((accumulator, currentValue) => accumulator + currentValue?.size, 0)
   }
 
   return (
@@ -98,7 +138,10 @@ export default function AdminCaseAdd() {
               <div className="col-6">
                 <div className="btn-group float-end" role="group">
                   <Link href="/admin/messages" className="btn btn-secondary">Abbrechen</Link>
-                  <button className="btn btn-success text-white" type="submit">Veröffentlichen</button>
+                  {calculateUploadedTotalSize() >= 10485760 
+                  ? <button className="btn btn-success text-white" type="submit" disabled>Veröffentlichen</button>
+                  : <button className="btn btn-success text-white" type="submit">Veröffentlichen</button>
+                  }
                 </div>
               </div>
             </div>
@@ -123,6 +166,42 @@ export default function AdminCaseAdd() {
                 />
               </div>
             </div>
+
+            <div className="row mt-3">
+            {formUploads.length > 0 ? <>
+              <div className="col-12">
+                {/* max 10 mb upload */}
+                {/* https://www.online-rechner.net/datenmenge/#Rechner */}
+                {calculateUploadedTotalSize() >= 10485760 ? <>
+                  <div className="mb-2 bg-danger rounded text-white p-2">
+                    <div className="fw-bold">Maximal 10 MB erlaubt <span className="fw-normal">(Hochgeladen: {filesize(calculateUploadedTotalSize())})</span></div>
+                    <div className="">Die hochgeladenen Dateien überschreiten das Limit von 10 MB.</div>
+                  </div>
+                </> : null}
+                {formUploads.map(upload => <React.Fragment key={upload.id}>
+                <div className="border mb-1 p-1 rounded">
+                  <div className="row align-items-center">
+                    <div className="col-2">
+                      {upload.type === 'application/pdf' ? <div className="rounded border text-center pt-1 bg-light" style={{width: 50, height: 50}}><i className="bi bi-filetype-pdf" style={{fontSize: 24}}></i></div> : null}
+                      {['image/png', 'image/jpeg', 'image/gif'].includes(upload.type) ? <div className="rounded border" style={{backgroundImage: `url(${upload.base64})`, backgroundSize: 'cover', backgroundPosition: 'center', width: 50, height: 50}}></div> : null}
+                    </div>
+                    <div className="col-6 border-end">{upload.filename}</div>
+                    <div className="col-2 border-end">{filesize(upload.size)}</div>
+                    <div className="col-2 text-center"><i className="bi bi-x-circle-fill cursor-pointer" style={{fontSize: 14}} onClick={() => setFormUploads([...formUploads.filter(u => u.id !== upload.id)])}></i></div>
+                  </div>
+                </div>
+                </React.Fragment>)}
+              </div>
+            </> : null }
+              <div className="col-12 align-items-center">
+                <label className="d-block p-2 text-center cursor-pointer border rounded bg-light">
+                  <i className="bi bi-cloud-arrow-up-fill" style={{fontSize: 20}}></i>
+                  <input type="file" id="upload" name="upload" accept="image/png, image/jpeg, image/gif" multiple onChange={() => handleUpload()} style={{display: 'none'}} />
+                  <div className="">Bilder hinzufügen</div>
+                </label>
+              </div>
+            </div>
+
             <div className="row mt-3">
               <div className="col-12 col-md-4">
                 <span className="p small ms-1">Anrede</span>
