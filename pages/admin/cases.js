@@ -14,7 +14,6 @@ import 'react-quill/dist/quill.snow.css'
 import Link from 'next/link'
 
 export default function Home() {
-  const router = useRouter()
   const {mutate} = useSWRConfig()
   const {data: messages, error: messagesError} = useSWR(`/api/admin/cases`, (url) => fetch(url).then(r => r.json()))
   const {session} = useSession()
@@ -22,6 +21,8 @@ export default function Home() {
   useEffect(() => {
     import('bootstrap/js/dist/dropdown')
   }, [])
+
+  if (!session) return <Loading />
 
   const deleteMessage = async (messageId) => {
     await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
@@ -31,11 +32,6 @@ export default function Home() {
 
   if (messagesError) return <Error />
   if (!messages && !messagesError) return <Loading />
-  if (!session) {
-    router.push('/signin')
-
-    return
-  }
 
   return (
     <>

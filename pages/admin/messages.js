@@ -23,6 +23,8 @@ export default function Home() {
     import('bootstrap/js/dist/dropdown')
   }, [])
 
+  if (!session) return <Loading />
+
   const deleteMessage = async (messageId) => {
     await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
   
@@ -43,11 +45,6 @@ export default function Home() {
 
   if (messagesError) return <Error />
   if (!messages && !messagesError) return <Loading />
-  if (!session) {
-    router.push('/signin')
-
-    return
-  }
 
   return (
     <>
