@@ -110,6 +110,8 @@ export default function AdminCaseAdd({query}) {
     })
 
     if (patchRequest.status === 200) {
+      mutate(`/api/admin/case?caseId=${query.caseId}`)
+
       router.push(`/admin/case/${query.caseId}/${slugify(message.subject, {lower: true})}`)
     }
 
