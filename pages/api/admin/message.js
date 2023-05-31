@@ -11,109 +11,110 @@ export const config = {
   },
 }
 
-const uploadImage = async (messageId, file) => {
+export default async function handler(request, response) {
 
-  logger.info(`admin | message | case | putImage`)
+  const uploadImage = async (messageId, file) => {
 
-  try {
-    logger.info(`admin | message | case | putImage | base64 | ${file.base64?.slice(0,40)}`)
-
-    let thumbnail
-    let thumbnailMeta
-    let processedFile
-    
-    let processedFileMeta = {
-      width: undefined,
-      height: undefined,
-      size: undefined,
-    }
-
-    let fileMeta = {
-      format: undefined,
-      width: undefined,
-      height: undefined,
-    }
-
-    logger.info(`admin | message | case | putImage | base64 | buffer | create`)
-
-    const base64Media = file.base64.split(';base64,').pop()
-    const bufferedMedia = Buffer.from(base64Media, 'base64')
-
-    if (file.base64.includes('data:image/')) {
-      fileMeta = await sharp(bufferedMedia).metadata()
-
-      logger.info(`admin | message | case | putImage | sharp | image metadata | original | format | ${fileMeta.format}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | original | size | ${fileMeta.size}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | original | width | ${fileMeta.width}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | original | height | ${fileMeta.height}`)
-
-      processedFile = await sharp(bufferedMedia).resize(425).toFormat('webp').toBuffer()
-      processedFileMeta = await sharp(processedFile).metadata()
-
-      logger.info(`admin | message | case | putImage | sharp | image metadata | resized | big | format | ${processedFileMeta.format}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | resized | big | size | ${processedFileMeta.size}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | resized | big | width | ${processedFileMeta.width}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | resized | big | height | ${processedFileMeta.height}`)
-
-      thumbnail = await sharp(bufferedMedia).resize(320).toFormat('webp').toBuffer()
-      thumbnailMeta = await sharp(thumbnail).metadata()
-
-      logger.info(`admin | message | case | putImage | sharp | image metadata | resized | thumbnail | format | ${thumbnailMeta.format}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | resized | thumbnail | size | ${thumbnailMeta.size}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | resized | thumbnail | width | ${thumbnailMeta.width}`)
-      logger.info(`admin | message | case | putImage | sharp | image metadata | resized | thumbnail | height | ${thumbnailMeta.height}`)
-    }
-
-    if (!fileMeta.format) {
-      logger.info(`admin | message | case | putImage | abort | no match found for media type`)
-
-      return {
-        error: true,
-        message: 'nothing fits this file format',
+    logger.info(`admin | message | case | putImage`)
+  
+    try {
+      logger.info(`admin | message | case | putImage | base64 | ${file.base64?.slice(0,40)}`)
+  
+      let thumbnail
+      let thumbnailMeta
+      let processedFile
+      
+      let processedFileMeta = {
+        width: undefined,
+        height: undefined,
+        size: undefined,
       }
-    }
-
-    logger.info(`admin | message | case | putImage | database request`)
-
-    const dbRequest = await db.query(`
-      INSERT INTO public.message_has_media (
-        message_id,
-        mimetype,
-        filename,
-        file,
+  
+      let fileMeta = {
+        format: undefined,
+        width: undefined,
+        height: undefined,
+      }
+  
+      logger.info(`admin | message | case | putImage | base64 | buffer | create`)
+  
+      const base64Media = file.base64.split(';base64,').pop()
+      const bufferedMedia = Buffer.from(base64Media, 'base64')
+  
+      if (file.base64.includes('data:image/')) {
+        fileMeta = await sharp(bufferedMedia).metadata()
+  
+        logger.info(`admin | message | case | putImage | sharp | image metadata | original | format | ${fileMeta.format}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | original | size | ${fileMeta.size}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | original | width | ${fileMeta.width}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | original | height | ${fileMeta.height}`)
+  
+        processedFile = await sharp(bufferedMedia).resize(425).toFormat('webp').toBuffer()
+        processedFileMeta = await sharp(processedFile).metadata()
+  
+        logger.info(`admin | message | case | putImage | sharp | image metadata | resized | big | format | ${processedFileMeta.format}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | resized | big | size | ${processedFileMeta.size}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | resized | big | width | ${processedFileMeta.width}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | resized | big | height | ${processedFileMeta.height}`)
+  
+        thumbnail = await sharp(bufferedMedia).resize(320).toFormat('webp').toBuffer()
+        thumbnailMeta = await sharp(thumbnail).metadata()
+  
+        logger.info(`admin | message | case | putImage | sharp | image metadata | resized | thumbnail | format | ${thumbnailMeta.format}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | resized | thumbnail | size | ${thumbnailMeta.size}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | resized | thumbnail | width | ${thumbnailMeta.width}`)
+        logger.info(`admin | message | case | putImage | sharp | image metadata | resized | thumbnail | height | ${thumbnailMeta.height}`)
+      }
+  
+      if (!fileMeta.format) {
+        logger.info(`admin | message | case | putImage | abort | no match found for media type`)
+  
+        return {
+          error: true,
+          message: 'nothing fits this file format',
+        }
+      }
+  
+      logger.info(`admin | message | case | putImage | database request`)
+  
+      const dbRequest = await db.query(`
+        INSERT INTO public.message_has_media (
+          message_id,
+          mimetype,
+          filename,
+          file,
+          thumbnail,
+          width,
+          height,
+          size
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING message_has_media_id, uuid
+      `, [
+        messageId, 
+        fileMeta.format,
+        file.filename,
+        processedFile,
         thumbnail,
-        width,
-        height,
-        size
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING message_has_media_id, uuid
-    `, [
-      messageId, 
-      fileMeta.format,
-      file.filename,
-      processedFile,
-      thumbnail,
-      processedFileMeta.width,
-      processedFileMeta.height,
-      processedFileMeta.size,
-    ])
-
-    if (dbRequest.rowCount > 0) {
-      logger.info(`admin | message | case | putImage | database request | rowCount | ${dbRequest.rowCount}`)
-    
-      return dbRequest.rows[0] || {}
+        processedFileMeta.width,
+        processedFileMeta.height,
+        processedFileMeta.size,
+      ])
+  
+      if (dbRequest.rowCount > 0) {
+        logger.info(`admin | message | case | putImage | database request | rowCount | ${dbRequest.rowCount}`)
+      
+        return dbRequest.rows[0] || {}
+      }
+  
+      return
+      
+    } catch(e) {
+      logger.info(`${request.url} | ${request.method} | putImage | error | ${e}`)
+  
+      return
     }
-
-    return
-    
-  } catch(e) {
-    logger.info(`${request.url} | ${request.method} | putImage | error | ${e}`)
-
-    return
+  
   }
 
-}
-
-export default async function handler(request, response) {
   logger.info(`${request.url} | ${request.method}`)
 
   try {
