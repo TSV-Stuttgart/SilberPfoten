@@ -4,7 +4,7 @@
     <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
       <mj-column width="100%">
         <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
-          Ein Fall wurde übernommen.<br/>
+          Jemand hat soeben seine Hilfe für den Fall <strong>{{caseTitle}}</strong> angeboten.<br/>
           <br/>
           Vorname: {{firstname}}<br/>
           Nachname: {{lastname}}<br/>
