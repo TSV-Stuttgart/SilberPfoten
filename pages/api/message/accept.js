@@ -30,6 +30,13 @@ export default async function handler(request, response) {
       logger.info(`api | message | accept | POST | get token`)
       const token = await getToken(request)
 
+      logger.info(`api | message | accept | POST | db getCaseRequest`)
+
+      const dbGetCaseRequest = await db.query(
+        `SELECT subject FROM public.message WHERE message_id = $1`, 
+        [request.query.messageId]
+      )
+
       logger.info(`api | message | accept | POST | db request`)
 
       const dbRequest = await db.query(
@@ -37,17 +44,27 @@ export default async function handler(request, response) {
         [token.user.user_id, request.query.messageId]
       )
 
+      logger.info(`api | message | accept | POST | db getAdminsRequest`)
+
+      const dbGetAdminsRequest = await db.query(
+        `SELECT email FROM public.user WHERE status = 'ADMIN'`
+      )
+
       logger.info(`api | signup | send mail`)
 
-      const to = 'scoletti@stigits.com'
       const templateName = 'acceptedCaseNotification'
       const subject = 'Fallübernahme'
       const params = {
+        caseTitle: dbGetCaseRequest.rows[0].subject,
         firstname: token.user.firstname,
         lastname : token.user.lastname,
       }
 
-      const sent = sendMail(to, subject, templateName, params)
+      let sent
+      for (const admin of dbGetAdminsRequest.rows) {
+
+        sent = sendMail(admin.email, subject, templateName, params)
+      }
 
       if (sent.statusCode === 200) {
         logger.info(`api | signup | send mail | sent`)
