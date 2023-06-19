@@ -186,9 +186,7 @@ export default function Home({query}) {
               </div>
             </div>
           </div>
-          </> : <>
-            <button type="button" className="btn btn-success text-white mt-3" onClick={() => acceptCase(message.message_id)}><i className="bi bi-hearts text-white"></i> Hilfe anbieten</button>
-          </>}
+          </> : null}
 
           {message?.case_status && message?.case_status?.accepted_at ? <>
           <div className="row mt-3">
@@ -205,6 +203,26 @@ export default function Home({query}) {
               </div>
             </div>
           </div>
+          </> : null}
+
+          {message?.case_status && message?.case_status?.rejected_at ? <>
+          <div className="row mt-3">
+            <div className="col-12">
+              <div className="bg-light p-2 rounded">
+                <div className="row align-items-center">
+                  <div className="col-2 border-end text-center"><i className="bi bi-x-circle-fill" style={{fontSize: 18}}></i></div>
+                  <div className="col-10">
+                    <div className="fw-bold">Vielen dank für deine Hilfe!</div>
+                    <div className="fw-normal">Leider wurde dein Angebot nicht angenommen.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </> : null}
+
+          {!message?.case_status ? <>
+            <button type="button" className="btn btn-success text-white mt-3" onClick={() => acceptCase(message.message_id)}><i className="bi bi-hearts text-white"></i> Hilfe anbieten</button>
           </> : null}
 
         </div>
