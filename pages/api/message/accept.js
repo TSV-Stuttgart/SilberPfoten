@@ -50,7 +50,7 @@ export default async function handler(request, response) {
         `SELECT email FROM public.user WHERE status = 'ADMIN'`
       )
 
-      logger.info(`api | signup | send mail`)
+      logger.info(`api | message | accept | POST | send mail`)
 
       const templateName = 'acceptedCaseNotification'
       const subject = 'Fallübernahme'
@@ -63,11 +63,11 @@ export default async function handler(request, response) {
       let sent
       for (const admin of dbGetAdminsRequest.rows) {
 
-        sent = sendMail(admin.email, subject, templateName, params)
+        sent = await sendMail(admin.email, subject, templateName, params)
       }
 
       if (sent.statusCode === 200) {
-        logger.info(`api | signup | send mail | sent`)
+        logger.info(`api | message | accept | POST | send mail | sent`)
 
         response.status(200).json({
           status: 200,
@@ -76,7 +76,7 @@ export default async function handler(request, response) {
 
         return
       } else {
-        logger.info(`api | signup | send mail | error`)
+        logger.info(`api | message | accept | POST | send mail | error`)
       }
 
       logger.info(`api | message | accept | POST | response`)

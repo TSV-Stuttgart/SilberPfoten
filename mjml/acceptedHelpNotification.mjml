@@ -1,0 +1,17 @@
+<mjml>
+  <mj-body background-color="#fee1e3">
+    <mj-include path="./components/header.mjml" />
+    <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
+      <mj-column width="100%">
+        <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
+          Hallo {{firstname}},
+          <br/><br/>
+          dein Hilfsangebot für den Fall <strong>{{caseTitle}}</strong> wurde soeben angenommen.
+          <br/><br/>
+          In der Detailansicht zum Fall werden dir nun Kontaktmöglichkeiten angezeigt.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-include path="./components/footer.mjml" />
+  </mj-body>
+</mjml>
