@@ -1,6 +1,7 @@
 import getToken from '../../../../lib/auth/getToken'
 import logger from '../../../../lib/logger'
 import db from '../../../../lib/db'
+import sendMail from '../../../../lib/sendMail'
 
 export default async function handler(request, response) {
 
@@ -34,6 +35,49 @@ export default async function handler(request, response) {
           request.query.caseId,
         ]
       )
+
+      const helperRequest = await db.query(`
+        SELECT
+          firstname, email
+        FROM
+          public.user
+        WHERE 
+          user_id = $1
+      `, 
+        [
+          request.query.userId,
+        ]
+      )
+
+      const caseRequest = await db.query(`
+        SELECT
+          subject
+        FROM
+          public.message
+        WHERE 
+          message_id = $1
+      `, 
+        [
+          request.query.caseId,
+        ]
+      )
+
+      logger.info(`api | admin | case | accept | PATCH | send mail`)
+
+      const templateName = 'acceptedHelpNotification'
+      const subject = 'Hilfe angenommen'
+      const params = {
+        caseTitle: caseRequest.rows[0].subject,
+        firstname: helperRequest.rows[0].firstname,
+      }
+
+      const sent = await sendMail(helperRequest.rows[0].email, subject, templateName, params)
+
+      if (sent.statusCode === 200) {
+        logger.info(`api | admin | case | accept | PATCH | send mail | sent`)
+      } else {
+        logger.info(`api | admin | case | accept | PATCH | send mail | error`)
+      }
 
       response.status(200).json(dbRequest.rows[0] || {})
 
