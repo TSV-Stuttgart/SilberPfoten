@@ -166,11 +166,15 @@ export default function Home({query}) {
               </React.Fragment>)}</div>
             </div>
           </div>
+          
+          {!message?.case_status || (!message?.case_status?.accepted_at && !message?.case_status?.rejected_at) ? <>
           <div className="row mt-3">
             <div className="col-12">
               <div className="">Die vollen Kontaktangaben werden dir angezeigt wenn du als Helfer akzeptiert wirst.</div>
             </div>
           </div>
+          </> : null}
+
           {message?.case_status && !message?.case_status?.accepted_at && !message?.case_status?.rejected_at ? <>
           <div className="row mt-3">
             <div className="col-12">
@@ -195,9 +199,11 @@ export default function Home({query}) {
                 <div className="row align-items-center">
                   <div className="col-2 border-end text-center"><i className="bi bi-check-circle-fill text-success" style={{fontSize: 18}}></i></div>
                   <div className="col-10">
-                    <div className="fw-bold">Danke für deine Hilfe</div>
+                    <div className="fw-bold">Danke für deine Hilfe!</div>
                     <div className="fw-normal">Du bist aktiv an diesem Auftrag dran.</div>
-                    <div className="fw-normal text-decoration-underline mt-2 cursor-pointer" onClick={() => cancelAcceptedCase(message.message_id)}>Hilfe stornieren</div>
+                    <div className="fw-bold mt-2">Kontaktdaten</div>
+                    <div className="fw-normal"><i className="bi bi-telephone"></i> Telefonnummer: {message.phone}</div>
+                    <div className="fw-normal text-decoration-underline mt-3 cursor-pointer" onClick={() => cancelAcceptedCase(message.message_id)}>Hilfe stornieren</div>
                   </div>
                 </div>
               </div>
