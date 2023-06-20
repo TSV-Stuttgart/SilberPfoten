@@ -39,7 +39,8 @@ export default async function handler(request, response) {
           'user_id', user_id,
           'accepted_at', accepted_at,
           'rejected_at', rejected_at
-        ) FROM public.case_has_user WHERE message_id = m.message_id AND user_id = $2) as case_status
+        ) FROM public.case_has_user WHERE message_id = m.message_id AND user_id = $2) as case_status,
+        CASE WHEN EXISTS(SELECT 1 FROM public.case_has_user WHERE message_id = m.message_id AND user_id = $2 AND accepted_at IS NOT NULL) THEN (m.phone) ELSE (NULL) END as phone
       FROM
         public.message m
       WHERE
