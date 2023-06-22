@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import slugify from 'slugify'
@@ -7,26 +7,118 @@ import useSession from '../lib/auth/useSession'
 import Wrapper from '../components/Wrapper'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
+import Notice from '../components/Notice'
+import jwt from 'jsonwebtoken'
+import CryptoJS from 'crypto-js'
 
-export default function Home() {
+export async function getServerSideProps(context) {
+
+  const {token} = context.query
+
+  let decryptedData
+  if (token) {
+
+    try {
+
+      const jwtDecoded = jwt.verify(token, process.env.JWT_SECRET)
+      const bytes = CryptoJS.AES.decrypt(jwtDecoded.encryptedData, process.env.JWT_SECRET)
+      decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
+    
+    } catch(e) {
+
+      if (e.name === 'TokenExpiredError') {
+        decryptedData = {type: 'TokenExpiredError'}
+      }
+    }
+
+  }
+
+  return {
+    props: {
+      query: context.query,
+      tokenType: decryptedData ? decryptedData.type : null
+    }
+  }
+}
+
+export default function Home({query, tokenType}) {
   const router = useRouter()
   const {mutate} = useSWRConfig()
   const {data: messages, error: messagesError} = useSWR(`/api/messages`, (url) => fetch(url).then(r => r.json()))
-  const {session} = useSession()
+  const {session, isError} = useSession()
+  const {token} = query
 
-  const deleteMessage = async (messageId) => {
-    await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
+  const [tokenHandling, setTokenHandling] = useState(false)
+  const [noticeText, setNoticeText] = useState('')
+
+  //const deleteMessage = async (messageId) => {
+  //  await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
   
-    mutate(`/api/messages`)
-  }
+  //  mutate(`/api/messages`)
+  //}
 
   if (messagesError) return <Error />
   if (!messages && !messagesError) return <Loading />
-  if (!session) {
+  if (!session && !isError) return <Loading />
+
+  if (!session && isError) {
     router.push('/signin')
 
     return
   }
+
+  if (noticeText) {
+    return <Notice 
+        icon={<i className="bi bi-patch-exclamation-fill text-white" style={{fontSize: 100}} />}
+        title={<span className="text-uppercase">{noticeText}</span>}
+        description={<span></span>}
+        reload={true}
+        hrefTitle={<>&laquo; zurück zur Startseite</>}
+      />
+  }
+
+  const handleToken = async () => {
+
+    if (tokenType === 'patchUserEmail') {
+      patchUserEmail()
+      return
+    }
+
+    else if (tokenType === 'TokenExpiredError') {
+
+      setNoticeText('Fehler: Gültigkeitsdauer des Links ist bereits abgelaufen!')
+    }
+
+    else {
+      setNoticeText('Fehler: Ungültiger Link!')
+      return
+    }
+  }
+
+  const patchUserEmail = async () => {
+
+    const sendUserChangeEmailRequest = await fetch(`/api/profile?token=${token}`, {method: 'PATCH'})
+
+    if (sendUserChangeEmailRequest.status === 200) {
+      mutate(`/api/auth/session`)
+
+      router.push({
+        pathname: '/profile',
+        query: {emailSuccess: '1'},
+      }, '/profile')
+    }
+    else {
+      setNoticeText('Ups! Irgendetwas ist schief gelaufen!')
+    }
+  }
+
+  if(session && token && !tokenHandling) {
+    setTokenHandling(true)
+    handleToken()
+    return
+  }
+
+  if (token) return <Loading />
 
   return (
     <>

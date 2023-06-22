@@ -1,0 +1,21 @@
+<mjml>
+  <mj-body background-color="#f2f4f7">
+    <mj-include path="./components/header.mjml" />
+    <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
+      <mj-column width="100%">
+        <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
+          Hi {{firstname}},
+          <br/>
+          <br/>
+          du möchtest deine E-Mail Adresse in {{newEmail}} ändern?
+          Logge dich in deinen Silberpfoten Account ein und klicke dann auf den Bestätigungslink, um die Änderung auszuführen.
+          <br/>
+          <br/>
+          <a href="{{changeEmailLink}}" target="_blank">E-Mail-Adresse jetzt ändern</a> (Dieser Link hat eine Gültigkeitsdauer von 10 Minuten.)
+        </mj-text>
+        <mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-include path="./components/footer.mjml" />
+  </mj-body>
+</mjml>

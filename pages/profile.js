@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import Error from '../components/Error'
 import Loading from '../components/Loading'
@@ -8,6 +9,9 @@ import useSession from '../lib/auth/useSession'
 export default function Profile() {
   const {session} = useSession()
   const router = useRouter()
+  const {emailSuccess} = router.query
+
+  const {mutate} = useSWRConfig()
   
   const member = session?.user
 
@@ -15,32 +19,53 @@ export default function Profile() {
   const [formPhone, setFormPhone] = useState('')
   const [formBirthdate, setFormBirthdate] = useState('')
   const [formJobTitle, setFormJobTitle] = useState('')
+  const [formStreet, setFormStreet] = useState('')
+  const [formStreetNumber, setFormStreetNumber] = useState('')
+  const [formZipcode, setFormZipcode] = useState('')
+  const [formCity, setFormCity] = useState('')
   const [formSupportingActivity, setFormSupportingActivity] = useState([])
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
+
+  const [isSavedSuccess, setIsSavedSuccess] = useState(false)
+  const [isEmailChangeStarted, setIsEmailChangeStarted] = useState(false)
+  const [isEmailChangedSuccess, setIsEmailChangedSuccess] = useState(false)
 
   useEffect(() => {
     setFormEmail(member?.email || '')
     setFormPhone(member?.phone || '')
     setFormBirthdate(member?.birthdate || '')
     setFormJobTitle(member?.job || '')
+    setFormStreet(member?.street || '')
+    setFormStreetNumber(member?.street_number || '')
+    setFormZipcode(member?.zipcode || '')
+    setFormCity(member?.city || '')
     setFormSupportingActivity(member?.support_activity.split(',') || [])
     setFormExperienceWithAnimal(member?.experience_with_animal?.split(',') || [])
-    setFormExperienceWithAnimalOther(member?.experience_with_animal_other)
-  }, [member])
+    setFormExperienceWithAnimalOther(member?.experience_with_animal_other || '')
+    if (emailSuccess === '1') setIsEmailChangedSuccess(true)
+  }, [member, emailSuccess])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    setIsEmailChangeStarted(false)
+    setIsEmailChangedSuccess(false)
+
     const updateRequest = await fetch(`/api/profile`, {
-      method: 'POST', 
+      method: 'PATCH', 
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        email: formEmail,
         phone: formPhone,
         birthdate: formBirthdate,
         job: formJobTitle,
+        street: formStreet,
+        streetNumber: formStreetNumber,
+        zipcode: formZipcode,
+        city: formCity,
         support_activity: formSupportingActivity,
         experience_with_animal: formExperienceWithAnimal,
         experience_with_animal_other: formExperienceWithAnimalOther,
@@ -48,7 +73,16 @@ export default function Profile() {
     })
 
     if (updateRequest.status === 200) {
-      router.push(`/`)
+      mutate(`/api/auth/session`)
+      setIsSavedSuccess(true)
+
+      const data = await updateRequest.json()
+      if (data.changeEmail) {
+        setIsEmailChangeStarted(true)
+        window.scrollTo(0, 0)
+      }
+
+      return
     }
 
     else if (updateRequest.status === 500) {
@@ -90,7 +124,23 @@ export default function Profile() {
         </div>
         <div className="row mt-1">
           <div className="col-12">
-            {formEmail}
+            <input type="email" name="email" className="form-control" placeholder="E-Mail-Adresse" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} required />
+            {isEmailChangeStarted
+              ? <div className="ms-0">
+                  <span className="form-text text-warning fw-bold">
+                    <i class="bi bi-hourglass"></i> E-Mail Änderung muss separat in der E-Mail, die wir dir soeben gesandt haben, bestätigt werden.
+                  </span>
+                </div>
+              : null
+              }
+              {isEmailChangedSuccess
+              ? <div className="ms-0">
+                  <span className="form-text text-success fw-bold">
+                    <i class="bi bi-check-lg"></i>Deine E-Mail-Adresse wurde erfolgreich geändert. Verwende diese ab jetzt um dich einzuloggen.
+                  </span>
+                </div>
+              : null
+              }
           </div>
         </div>
         <div className="row mt-3">
@@ -120,7 +170,7 @@ export default function Profile() {
         </div>
         <div className="row mt-1">
           <div className="col-12">
-            <input type="text" name="jobtitle" className="form-control" placeholder="Beruf" value={formJobTitle} onChange={(e) => setFormJobTitle(e.target.value)} />
+            <input type="text" name="jobtitle" className="form-control" placeholder="Beruf" value={formJobTitle} onChange={(e) => setFormJobTitle(e.target.value)} required />
           </div>
         </div>
         <div className="row mt-3">
@@ -128,11 +178,24 @@ export default function Profile() {
             <span className="small">Anschrift</span>
           </div>
         </div>
+
         <div className="row mt-1">
-          <div className="col-12">
-            {member.street} {member.street_number}, {member.zipcode} {member.city}
+          <div className="col-9">
+            <input type="text" name="street" className="form-control" placeholder="Strasse" value={formStreet} onChange={(e) => setFormStreet(e.target.value)} required />
+          </div>
+          <div className="col-3">
+            <input type="text" name="streetnumber" className="form-control" placeholder="Hausnr." value={formStreetNumber} onChange={(e) => setFormStreetNumber(e.target.value)} required />
           </div>
         </div>
+        <div className="row mt-2">
+          <div className="col-4">
+            <input type="text" name="zipcode" className="form-control" placeholder="PLZ" value={formZipcode} onChange={(e) => setFormZipcode(e.target.value)} required />
+          </div>
+          <div className="col-8">
+            <input type="text" name="city" className="form-control" placeholder="Stadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
+          </div>
+        </div>
+
         <div className="row justify-content-center mt-4">
           <div className="col-12">
             <div className="mt-3 ms-1 fw-bold">Folgende unterstützende Tätigkeiten<br/>kann ich anbieten</div>
@@ -236,9 +299,9 @@ export default function Profile() {
         <div className="row justify-content-center mt-2">
           <div className="col-12">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('dog') ? [...formExperienceWithAnimal, ...['dog']] : formExperienceWithAnimal.filter(i => i !== 'dog'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('dog') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('dog') ? [...formExperienceWithAnimal, ...['dog']] : formExperienceWithAnimal.filter(i => i !== 'dog'))}>Hund</div>
+                <div className="col-10 border-start">Hund</div>
               </div>
             </div>
           </div>
@@ -246,9 +309,9 @@ export default function Profile() {
         <div className="row justify-content-center mt-2">
           <div className="col-12">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('cat') ? [...formExperienceWithAnimal, ...['cat']] : formExperienceWithAnimal.filter(i => i !== 'cat'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('cat') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('cat') ? [...formExperienceWithAnimal, ...['cat']] : formExperienceWithAnimal.filter(i => i !== 'cat'))}>Katze</div>
+                <div className="col-10 border-start">Katze</div>
               </div>
             </div>
           </div>
@@ -256,9 +319,9 @@ export default function Profile() {
         <div className="row justify-content-center mt-2">
           <div className="col-12">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('small_animal') ? [...formExperienceWithAnimal, ...['small_animal']] : formExperienceWithAnimal.filter(i => i !== 'small_animal'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('small_animal') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('small_animal') ? [...formExperienceWithAnimal, ...['small_animal']] : formExperienceWithAnimal.filter(i => i !== 'small_animal'))}>Kleintiere</div>
+                <div className="col-10 border-start">Kleintiere</div>
               </div>
             </div>
           </div>
@@ -266,9 +329,9 @@ export default function Profile() {
         <div className="row justify-content-center mt-2">
           <div className="col-12">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('bird') ? [...formExperienceWithAnimal, ...['bird']] : formExperienceWithAnimal.filter(i => i !== 'bird'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('bird') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('bird') ? [...formExperienceWithAnimal, ...['bird']] : formExperienceWithAnimal.filter(i => i !== 'bird'))}>Vögel</div>
+                <div className="col-10 border-start">Vögel</div>
               </div>
             </div>
           </div>
@@ -276,9 +339,9 @@ export default function Profile() {
         <div className="row justify-content-center mt-2">
           <div className="col-12">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('other') ? [...formExperienceWithAnimal, ...['other']] : formExperienceWithAnimal.filter(i => i !== 'other'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('other') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('other') ? [...formExperienceWithAnimal, ...['other']] : formExperienceWithAnimal.filter(i => i !== 'other'))}>Sonstiges</div>
+                <div className="col-10 border-start">Sonstiges</div>
               </div>
               {formExperienceWithAnimal.includes('other') ? <>
               <div className="row cursor-pointer align-items-center">
@@ -292,7 +355,10 @@ export default function Profile() {
         </div>
         <div className="row justify-content-end">
           <div className="col-12 col-md-6 col-lg-4 text-end">
-            <button className="btn btn-primary w-100 mt-4" type="submit">Änderungen speichern</button>
+            {isSavedSuccess
+              ? <button className="btn btn-primary w-100 mt-4" disabled>Erfolgreich gespeichert <i class="bi bi-check"></i></button>
+              : <button className="btn btn-primary w-100 mt-4" type="submit">Änderungen speichern</button>
+            }
           </div>
         </div>
         <div className="row justify-content-center mt-5">
