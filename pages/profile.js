@@ -170,7 +170,7 @@ export default function Profile() {
         </div>
         <div className="row mt-1">
           <div className="col-12">
-            <input type="text" name="jobtitle" className="form-control" placeholder="Beruf" value={formJobTitle} onChange={(e) => setFormJobTitle(e.target.value)} />
+            <input type="text" name="jobtitle" className="form-control" placeholder="Beruf" value={formJobTitle} onChange={(e) => setFormJobTitle(e.target.value)} required />
           </div>
         </div>
         <div className="row mt-3">
