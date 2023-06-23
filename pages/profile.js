@@ -128,7 +128,7 @@ export default function Profile() {
             {isEmailChangeStarted
               ? <div className="ms-0">
                   <span className="form-text text-warning fw-bold">
-                    <i class="bi bi-hourglass"></i> E-Mail Änderung muss separat in der E-Mail, die wir dir soeben gesandt haben, bestätigt werden.
+                    <i className="bi bi-hourglass"></i> E-Mail Änderung muss separat in der E-Mail, die wir dir soeben gesandt haben, bestätigt werden.
                   </span>
                 </div>
               : null
@@ -136,7 +136,7 @@ export default function Profile() {
               {isEmailChangedSuccess
               ? <div className="ms-0">
                   <span className="form-text text-success fw-bold">
-                    <i class="bi bi-check-lg"></i>Deine E-Mail-Adresse wurde erfolgreich geändert. Verwende diese ab jetzt um dich einzuloggen.
+                    <i className="bi bi-check-lg"></i>Deine E-Mail-Adresse wurde erfolgreich geändert. Verwende diese ab jetzt um dich einzuloggen.
                   </span>
                 </div>
               : null
@@ -356,7 +356,7 @@ export default function Profile() {
         <div className="row justify-content-end">
           <div className="col-12 col-md-6 col-lg-4 text-end">
             {isSavedSuccess
-              ? <button className="btn btn-primary w-100 mt-4" disabled>Erfolgreich gespeichert <i class="bi bi-check"></i></button>
+              ? <button className="btn btn-primary w-100 mt-4" disabled>Erfolgreich gespeichert <i className="bi bi-check"></i></button>
               : <button className="btn btn-primary w-100 mt-4" type="submit">Änderungen speichern</button>
             }
           </div>

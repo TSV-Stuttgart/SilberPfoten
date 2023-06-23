@@ -13,6 +13,24 @@ export const config = {
 
 export default async function handler(request, response) {
 
+  const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+    var R = 6371 // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1)  // deg2rad below
+    var dLon = deg2rad(lon2-lon1) 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    var d = R * c // Distance in km
+    return d
+  }
+  
+  const deg2rad = (deg) => {
+    return deg * (Math.PI/180)
+  }
+
   const uploadImage = async (messageId, file) => {
 
     logger.info(`admin | message | case | putImage`)
@@ -167,6 +185,8 @@ export default async function handler(request, response) {
         streetNumber,
         zipcode,
         city,
+        lat,
+        lon,
         searchRadius,
         supportActivity,
         experienceWithAnimal,
@@ -186,6 +206,8 @@ export default async function handler(request, response) {
       logger.info(`${request.url} | ${request.method} | body | streetNumber | ${streetNumber}`)
       logger.info(`${request.url} | ${request.method} | body | zipcode | ${zipcode}`)
       logger.info(`${request.url} | ${request.method} | body | city | ${city}`)
+      logger.info(`${request.url} | ${request.method} | body | lat | ${lat}`)
+      logger.info(`${request.url} | ${request.method} | body | lon | ${lon}`)
       logger.info(`${request.url} | ${request.method} | body | searchRadius | ${searchRadius}`)
       logger.info(`${request.url} | ${request.method} | body | supportActivity | ${supportActivity}`)
       logger.info(`${request.url} | ${request.method} | body | experienceWithAnimal | ${experienceWithAnimal}`)
@@ -209,11 +231,13 @@ export default async function handler(request, response) {
             street_number,
             zipcode,
             city,
+            lat,
+            lon,
             search_radius,
             support_activity,
             experience_with_animal,
             experience_with_animal_other
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
             RETURNING message_id, subject
         `, 
         [
@@ -229,6 +253,8 @@ export default async function handler(request, response) {
           streetNumber,
           zipcode,
           city,
+          lat,
+          lon,
           searchRadius,
           supportActivity,
           experienceWithAnimal,
