@@ -51,6 +51,12 @@ export default function AdminCaseAdd({query}) {
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
 
+  const [focusOut, setFocusOut] = useState(false)
+  const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
+  const [placeId, setPlaceId] = useState('')
+  const [coordLat, setCoordLat] = useState('')
+  const [coordLon, setCoordLon] = useState('')
+
   useEffect(() => {
 
     if (message) {
@@ -70,10 +76,33 @@ export default function AdminCaseAdd({query}) {
       setFormSupportingActivity(message.support_activity?.split(','))
       setFormExperienceWithAnimal(message.experience_with_animal?.split(','))
       setFormExperienceWithAnimalOther(message.experience_with_animal_other)
-
+      setCoordLat(message.lat)
+      setCoordLon(message.lon)
     }
 
   }, [message])
+
+  useEffect(() => {
+
+    if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
+      searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
+    }
+    else {
+      setFocusOut(false)
+    }
+
+  }, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
+
+  const searchAddress = async (value) => {
+    const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
+
+    setFormAutoCompleteValues(location)
+    setFocusOut(false)
+  }
+
+  const resetCoords = () => {
+    setPlaceId('')
+  }
 
   if ((!session && !sessionError) || !message && !messageError) return <Loading />
   if (sessionError || messageError) return <Error />
@@ -101,6 +130,8 @@ export default function AdminCaseAdd({query}) {
         streetNumber: formStreetNumber,
         zipcode: formZipcode,
         city: formCity,
+        lat: coordLat,
+        lon: coordLon,
         searchRadius: formSearchRadius,
         supportActivity: formSupportingActivity,
         experienceWithAnimal: formExperienceWithAnimal,
@@ -193,7 +224,7 @@ export default function AdminCaseAdd({query}) {
               <div className="col-6">
                 <div className="btn-group float-end" role="group">
                   <Link href="/admin/cases" className="btn btn-secondary">Abbrechen</Link>
-                  {calculateUploadedTotalSize() >= 10485760 
+                  {calculateUploadedTotalSize() >= 10485760 || (!placeId && formAutoCompleteValues)
                   ? <button className="btn btn-success text-white" type="submit" disabled>Speichern</button>
                   : <button className="btn btn-success text-white" type="submit">Speichern</button>
                   }
@@ -292,23 +323,46 @@ export default function AdminCaseAdd({query}) {
             <div className="row mt-1">
               <div className="col-12 col-md-9">
                 <span className="p small ms-1">Straße</span>
-                <input type="text" className="form-control" placeholder="Musterstraße" value={formStreet} onChange={(e) => setFormStreet(e.target.value)} required />
+                <input type="text" className="form-control" placeholder="Musterstraße" value={formStreet} onChange={(e) => { setFormStreet(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
               </div>
               <div className="col-12 col-md-3">
                 <span className="p small ms-1">Hausnummer</span>
-                <input type="tel" className="form-control" placeholder="28" value={formStreetNumber} onChange={(e) => setFormStreetNumber(e.target.value)} required />
+                <input type="tel" className="form-control" placeholder="28" value={formStreetNumber} onChange={(e) => { setFormStreetNumber(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
               </div>
             </div>
             <div className="row mt-1">
               <div className="col-12 col-md-4">
                 <span className="p small ms-1">Postleitzahl</span>
-                <input type="tel" className="form-control" placeholder="70199" value={formZipcode} onChange={(e) => setFormZipcode(e.target.value)} required />
+                <input type="tel" className="form-control" placeholder="70199" value={formZipcode} onChange={(e) => { setFormZipcode(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
               </div>
               <div className="col-12 col-md-8">
                 <span className="p small ms-1">Stadt</span>
-                <input type="text" className="form-control" placeholder="Musterstadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
+                <input type="text" className="form-control" placeholder="Musterstadt" value={formCity} onChange={(e) => { setFormCity(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
               </div>
             </div>
+
+            {formAutoCompleteValues ?
+              <div className="border rounded-bottom p-2 bg-light mb-3">
+              {formAutoCompleteValues?.length > 0 ? <>
+                {!placeId 
+                ? <div className="p-1 text-danger fw-bold"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                : <div className="p-1 text-success"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                }
+
+                {formAutoCompleteValues.map(item => 
+                  <div key={item.place_id} className={`p-1 cursor-pointer ${placeId && placeId != item.place_id ? 'text-muted' : null}`} 
+                    onClick={(e) => { setPlaceId(`${item.place_id}`); setCoordLat(`${item.lat}`); setCoordLon(`${item.lon}`) }}>
+                    {placeId == item.place_id ? <><i className="bi bi-check-lg"></i>&nbsp;</> : null} 
+                    <strong>{item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</strong> 
+                    <small>({item.display_name})</small>
+                  </div>)
+                }
+                </> : <div>Keine gültige Adresse gefunden</div>
+              }
+              </div> 
+              : null 
+            }
+
             <div className="row mt-1">
               <div className="col-12 col-md-6">
                 <span className="p small ms-1">E-Mail</span>

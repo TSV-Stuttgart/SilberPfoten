@@ -106,6 +106,8 @@ export default async function handler(request, response) {
         streetNumber,
         zipcode,
         city,
+        lat,
+        lon,
         support_activity,
         experience_with_animal,
         experience_with_animal_other,
@@ -124,12 +126,14 @@ export default async function handler(request, response) {
           street_number = $5,
           zipcode = $6,
           city = $7,
-          experience_with_animal = $8,
-          experience_with_animal_other = $9,
-          support_activity = $10,
+          lat = $8,
+          lon = $9,
+          experience_with_animal = $10,
+          experience_with_animal_other = $11,
+          support_activity = $12,
           updated_at = 'now()'
         WHERE
-          user_id = $11
+          user_id = $13
         RETURNING user_id
       `, [
           birthdate,
@@ -139,6 +143,8 @@ export default async function handler(request, response) {
           streetNumber,
           zipcode,
           city,
+          lat,
+          lon,
           experience_with_animal,
           experience_with_animal_other,
           support_activity,

@@ -62,6 +62,10 @@ export default function AdminCaseAdd() {
     setFocusOut(false)
   }
 
+  const resetCoords = () => {
+    setPlaceId('')
+  }
+
   if (!session && !sessionError) return <Loading />
   if (loading) return <Loading />
 
@@ -144,10 +148,6 @@ export default function AdminCaseAdd() {
 
   const calculateUploadedTotalSize = () => {
     return formUploads?.reduce((accumulator, currentValue) => accumulator + currentValue?.size, 0)
-  }
-
-  const resetCoords = () => {
-    setPlaceId('')
   }
 
   return (
@@ -276,7 +276,10 @@ export default function AdminCaseAdd() {
             {formAutoCompleteValues ?
               <div className="border rounded-bottom p-2 bg-light mb-3">
               {formAutoCompleteValues?.length > 0 ? <>
-                <div className="p-1"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                {!placeId 
+                ? <div className="p-1 text-danger fw-bold"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                : <div className="p-1 text-success"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                }
 
                 {formAutoCompleteValues.map(item => 
                   <div key={item.place_id} className={`p-1 cursor-pointer ${placeId && placeId != item.place_id ? 'text-muted' : null}`} 
@@ -288,7 +291,9 @@ export default function AdminCaseAdd() {
                 }
                 </> : <div>Keine gültige Adresse gefunden</div>
               }
-            </div> : null}
+              </div> 
+              : null
+            }
 
             <div className="row mt-1">
               <div className="col-12 col-md-6">

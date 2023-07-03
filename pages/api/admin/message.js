@@ -266,6 +266,8 @@ export default async function handler(request, response) {
 
         // Upload Images
         if (formUploads) {
+          logger.info(`${request.url} | ${request.method} | uploadingImages`)
+
           for(const upload of formUploads) {
             const messageId = dbPutMessageRequest.rows[0].message_id
             const file = upload
@@ -273,6 +275,46 @@ export default async function handler(request, response) {
             const uploadedImage = await uploadImage(messageId, file)
           }
         }
+
+        logger.info(`${request.url} | ${request.method} | sendEmails | calculate distances`)
+
+        let emailReceivers = []
+
+        const getUsersRequest = await db.query(`
+          SELECT 
+            lastname,
+            firstname,
+            email,
+            lat,
+            lon
+          FROM 
+            public.user
+          WHERE
+            status = 'USER'
+          AND
+            activated_at IS NOT NULL
+        `, [])
+
+        let distance
+        for (const user of getUsersRequest.rows) {
+          logger.info(`${request.url} | ${request.method} | user:${user.firstname},${user.lastname}`)
+
+          if(user.lat && user.lon) { 
+            distance = getDistanceFromLatLonInKm(lat, lon, user.lat, user.lon)
+
+            logger.info(`${request.url} | ${request.method} | distance:${distance}`)
+          }
+
+          if(distance <= searchRadius) {
+            logger.info(`${request.url} | ${request.method} | radius:${searchRadius}`)
+
+            emailReceivers.push(user)
+          }
+        }
+
+        logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius`)
+
+        // SEND NOW to all users in emailReceivers
 
         logger.info(`${request.url} | ${request.method} | putRequest | success | ${JSON.stringify(dbPutMessageRequest.rows[0])}`)
 
@@ -306,6 +348,8 @@ export default async function handler(request, response) {
         streetNumber,
         zipcode,
         city,
+        lat,
+        lon,
         searchRadius,
         supportActivity,
         experienceWithAnimal,
@@ -327,6 +371,8 @@ export default async function handler(request, response) {
       logger.info(`${request.url} | ${request.method} | body | streetNumber | ${streetNumber}`)
       logger.info(`${request.url} | ${request.method} | body | zipcode | ${zipcode}`)
       logger.info(`${request.url} | ${request.method} | body | city | ${city}`)
+      logger.info(`${request.url} | ${request.method} | body | lat | ${lat}`)
+      logger.info(`${request.url} | ${request.method} | body | lon | ${lon}`)
       logger.info(`${request.url} | ${request.method} | body | searchRadius | ${searchRadius}`)
       logger.info(`${request.url} | ${request.method} | body | supportActivity | ${supportActivity}`)
       logger.info(`${request.url} | ${request.method} | body | experienceWithAnimal | ${experienceWithAnimal}`)
@@ -350,12 +396,14 @@ export default async function handler(request, response) {
           street_number = $9,
           zipcode = $10,
           city = $11,
-          search_radius = $12,
-          support_activity = $13,
-          experience_with_animal = $14,
-          experience_with_animal_other = $15
+          lat = $12,
+          lon = $13,
+          search_radius = $14,
+          support_activity = $15,
+          experience_with_animal = $16,
+          experience_with_animal_other = $17
         WHERE
-          message_id = $16
+          message_id = $18
         RETURNING 
           message_id
         `, [
@@ -370,6 +418,8 @@ export default async function handler(request, response) {
           streetNumber,
           zipcode,
           city,
+          lat,
+          lon,
           searchRadius,
           supportActivity,
           experienceWithAnimal,
