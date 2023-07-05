@@ -27,7 +27,6 @@ export default function AdminCaseDetail({query}) {
   const {session} = useSession()
 
   const [selectedMedia, setSelectedMedia] = useState(undefined)
-  const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
 
   useEffect(() => {
     import('bootstrap/js/dist/dropdown')
@@ -70,46 +69,6 @@ export default function AdminCaseDetail({query}) {
     router.push('/signin')
 
     return
-  }
-
-  const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
-    var R = 6371 // Radius of the earth in km
-    var dLat = deg2rad(lat2-lat1)  // deg2rad below
-    var dLon = deg2rad(lon2-lon1) 
-    var a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-      
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-    var d = R * c // Distance in km
-    return d
-  }
-  
-  const deg2rad = (deg) => {
-    return deg * (Math.PI/180)
-  }
-
-  const searchAddress = async (value) => {
-    const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=0&limit=1&email=info@silberpfoten.de`)).json()
-
-    console.log(location[0].lat)
-    console.log(location[0].lon)
-
-    const location2 = await (await fetch(`https://nominatim.openstreetmap.org/search/${'Mergenthalerstr. 10, 73760 Ostfildern'}?format=json&addressdetails=0&limit=1&email=info@silberpfoten.de`)).json()
-
-    console.log(location2[0].lat)
-    console.log(location2[0].lon)
-
-    const distance = getDistanceFromLatLonInKm(location[0].lat, location[0].lon, location2[0].lat, location2[0].lon)
-
-    console.log(distance)
-
-    setFormAutoCompleteValues(location)
-  }
-
-  if(!formAutoCompleteValues) {
-    searchAddress(`${message.street} ${message.street_number}, ${message.zipcode} ${message.city}`)
   }
 
   return (
@@ -198,12 +157,6 @@ export default function AdminCaseDetail({query}) {
             <div className="col-12 fw-bold">Anschrift</div>
             <div className="col-12">
               {message.zipcode} {message.city}
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-12 fw-bold">Koordinaten</div>
-            <div className="col-12">
-              {/*{formAutoCompleteValues && formAutoCompleteValues?.map(item => <div key={item.place_id} className="p-1">{item.lat}, {item.lon} : {item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</div>)}*/}
             </div>
           </div>
           <div className="row mt-2">

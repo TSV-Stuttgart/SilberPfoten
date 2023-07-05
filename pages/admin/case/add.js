@@ -38,33 +38,33 @@ export default function AdminCaseAdd() {
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
 
-  const [focusOut, setFocusOut] = useState(false)
-  const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
-  const [placeId, setPlaceId] = useState('')
-  const [coordLat, setCoordLat] = useState('')
-  const [coordLon, setCoordLon] = useState('')
+  //const [focusOut, setFocusOut] = useState(false)
+  //const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
+  //const [placeId, setPlaceId] = useState('')
+  //const [coordLat, setCoordLat] = useState('')
+  //const [coordLon, setCoordLon] = useState('')
 
-  useEffect(() => {
+  //useEffect(() => {
 
-    if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
-      searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
-    }
-    else {
-      setFocusOut(false)
-    }
+  //  if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
+  //    searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
+  //  }
+  //  else {
+  //    setFocusOut(false)
+  //  }
 
-  }, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
+  //}, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
 
-  const searchAddress = async (value) => {
-    const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
+  //const searchAddress = async (value) => {
+  //  const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
 
-    setFormAutoCompleteValues(location)
-    setFocusOut(false)
-  }
+  //  setFormAutoCompleteValues(location)
+  //  setFocusOut(false)
+  //}
 
-  const resetCoords = () => {
-    setPlaceId('')
-  }
+  //const resetCoords = () => {
+  //  setPlaceId('')
+  //}
 
   if (!session && !sessionError) return <Loading />
   if (loading) return <Loading />
@@ -92,8 +92,6 @@ export default function AdminCaseAdd() {
         streetNumber: formStreetNumber,
         zipcode: formZipcode,
         city: formCity,
-        lat: coordLat,
-        lon: coordLon,
         searchRadius: formSearchRadius,
         supportActivity: formSupportingActivity,
         experienceWithAnimal: formExperienceWithAnimal,
@@ -169,7 +167,7 @@ export default function AdminCaseAdd() {
               <div className="col-6">
                 <div className="btn-group float-end" role="group">
                   <Link href="/admin/messages" className="btn btn-secondary">Abbrechen</Link>
-                  {calculateUploadedTotalSize() >= 10485760 || !placeId
+                  {calculateUploadedTotalSize() >= 10485760
                   ? <button className="btn btn-success text-white" type="submit" disabled>Veröffentlichen</button>
                   : <button className="btn btn-success text-white" type="submit">Veröffentlichen</button>
                   }
@@ -252,7 +250,29 @@ export default function AdminCaseAdd() {
                 <input type="text" className="form-control" placeholder="Maxine" value={formLastname} onChange={(e) => setFormLastname(e.target.value)} required />
               </div>
             </div>
+
             <div className="row mt-1">
+              <div className="col-12 col-md-9">
+                <span className="p small ms-1">Straße</span>
+                <input type="text" className="form-control" placeholder="Musterstraße" value={formStreet} onChange={(e) => setFormStreet(e.target.value)} required />
+              </div>
+              <div className="col-12 col-md-3">
+                <span className="p small ms-1">Hausnummer</span>
+                <input type="tel" className="form-control" placeholder="28" value={formStreetNumber} onChange={(e) => setFormStreetNumber(e.target.value)} required />
+              </div>
+            </div>
+            <div className="row mt-1">
+              <div className="col-12 col-md-4">
+                <span className="p small ms-1">Postleitzahl</span>
+                <input type="tel" className="form-control" placeholder="70199" value={formZipcode} onChange={(e) => setFormZipcode(e.target.value)} required />
+              </div>
+              <div className="col-12 col-md-8">
+                <span className="p small ms-1">Stadt</span>
+                <input type="text" className="form-control" placeholder="Musterstadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
+              </div>
+            </div>
+
+            {/*<div className="row mt-1">
               <div className="col-12 col-md-9">
                 <span className="p small ms-1">Straße</span>
                 <input type="text" className="form-control" placeholder="Musterstraße" value={formStreet} onChange={(e) => { setFormStreet(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
@@ -271,9 +291,9 @@ export default function AdminCaseAdd() {
                 <span className="p small ms-1">Stadt</span>
                 <input type="text" className="form-control" placeholder="Musterstadt" value={formCity} onChange={(e) => { setFormCity(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
               </div>
-            </div>
+            </div>*/}
             
-            {formAutoCompleteValues ?
+            {/*{formAutoCompleteValues ?
               <div className="border rounded-bottom p-2 bg-light mb-3">
               {formAutoCompleteValues?.length > 0 ? <>
                 {!placeId 
@@ -293,7 +313,7 @@ export default function AdminCaseAdd() {
               }
               </div> 
               : null
-            }
+            }*/}
 
             <div className="row mt-1">
               <div className="col-12 col-md-6">

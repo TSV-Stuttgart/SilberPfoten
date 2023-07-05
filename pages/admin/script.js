@@ -12,7 +12,6 @@ export default function Users() {
   const {mutate} = useSWRConfig()
   const {session} = useSession()
   const router = useRouter()
-  const [formFilter, setFormFilter] = useState('active')
   const {data: users, error} = useSWR(`/api/admin/users?filter=nocoords`, (url) => fetch(url).then(r => r.json()))
   
   const [isUpdatingCoords, setIsUpdatingCoords] = useState(false)
@@ -48,11 +47,11 @@ export default function Users() {
       setUpdateCounter(counterUpdates)
       setIsUpdatingCoordsOf(user.user_id)
 
-      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${user.street},${user.street_number},${user.zipcode},${user.city}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${user.zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
       
-      await new Promise(r => setTimeout(r, 5000))
+      await new Promise(r => setTimeout(r, 1000))
 
-      if (!location) continue
+      if (!location || location.length < 1 || !location[0].lat || !location[0].lon) continue
 
       const updateUserCoords = await fetch(`/api/admin/user/coords`, {
         method: 'POST', 
@@ -60,11 +59,13 @@ export default function Users() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userId: user.user_id,
+          zipcode: user.zipcode,
           lat: location[0].lat,
           lon: location[0].lon,
         })
       })
+
+      mutate(`/api/admin/users?filter=nocoords`)
       
     }
 
@@ -73,7 +74,6 @@ export default function Users() {
 
     setIsUpdatingCoords(false)   
 
-    mutate(`/api/admin/users?filter=nocoords`)
   }
   
   return <>
@@ -98,7 +98,7 @@ export default function Users() {
       <div className="container mt-3">
         <div className="row">
         {isUpdatingCoords ? <>
-            <div className="col-12">Updating: {isUpdatingCoordsOf} ({updateCounter}/{updateCounterMax})</div>
+            <div className="col-12">Updating: UserId: {isUpdatingCoordsOf} ({updateCounter}/{updateCounterMax})</div>
             </>
         : <>
         <div className="col-12">Updating: {updateCounterMax ? <>{success ? <>Successfully updated</> : <>Not successfully updated</>}</> : <>Not started</>}</div>
@@ -110,7 +110,7 @@ export default function Users() {
       <div className="container mt-3">
         <div className="row">
         {!isUpdatingCoords ? <>
-            <div className="col-3"><button onClick={() => updateCoords(3)} type="button" className="btn btn-light">Koordinaten für 1 User</button></div>
+            <div className="col-3"><button onClick={() => updateCoords(1)} type="button" className="btn btn-light">Koordinaten für 1 User</button></div>
             <div className="col-3"><button onClick={() => updateCoords(10)} type="button" className="btn btn-light">Koordinaten für 10 User</button></div>
             <div className="col-3"><button onClick={() => updateCoords(100)} type="button" className="btn btn-light">Koordinaten für 100 User</button></div>
             <div className="col-3"><button onClick={() => updateCoords(1000)} type="button" className="btn btn-light">Koordinaten für 1000 User</button></div>

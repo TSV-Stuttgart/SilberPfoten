@@ -19,12 +19,12 @@ export default async function handler(request, response) {
     if (request.method === 'POST') {
 
       const {
-        userId,
+        zipcode,
         lat,
         lon,
       } = request.body
 
-      logger.info(`${request.url} | ${request.method} | update Coords | ${userId}`)
+      logger.info(`${request.url} | ${request.method} | update Coords | ${zipcode}`)
 
       const updateCoordsRequest = await db.query(`
         UPDATE
@@ -33,18 +33,18 @@ export default async function handler(request, response) {
           lat = $1,
           lon = $2
         WHERE
-          user_id = $3
+          zipcode = $3
         RETURNING 
           user_id
         `, [
           lat,
           lon,
-          userId,
+          zipcode,
         ]
       )
 
       if (updateCoordsRequest.rowCount > 0) {
-        logger.info(`${request.url} | ${request.method} | update Coords | success | ${JSON.stringify(updateCoordsRequest.rows[0])}`)
+        logger.info(`${request.url} | ${request.method} | update Coords | success | ${updateCoordsRequest.rowCount} rows`)
 
         response.status(200).json({
           statusCode: 200,

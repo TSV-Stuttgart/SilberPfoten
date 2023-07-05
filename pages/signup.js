@@ -36,33 +36,33 @@ export default function Registrieren({csrf}) {
   const [formBecameAwareThrough, setFormBecameAwareThrough] = useState([])
   const [formBecameAwareThroughOther, setFormBecameAwareThroughOther] = useState('')
 
-  const [focusOut, setFocusOut] = useState(false)
-  const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
-  const [placeId, setPlaceId] = useState('')
-  const [coordLat, setCoordLat] = useState('')
-  const [coordLon, setCoordLon] = useState('')
+  //const [focusOut, setFocusOut] = useState(false)
+  //const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
+  //const [placeId, setPlaceId] = useState('')
+  //const [coordLat, setCoordLat] = useState('')
+  //const [coordLon, setCoordLon] = useState('')
 
-  useEffect(() => {
+  //useEffect(() => {
 
-    if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
-      searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
-    }
-    else {
-      setFocusOut(false)
-    }
+  //  if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
+  //    searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
+  //  }
+  //  else {
+  //    setFocusOut(false)
+  //  }
 
-  }, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
+  //}, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
 
-  const searchAddress = async (value) => {
-    const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
+  //const searchAddress = async (value) => {
+  //  const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
 
-    setFormAutoCompleteValues(location)
-    setFocusOut(false)
-  }
+  //  setFormAutoCompleteValues(location)
+  //  setFocusOut(false)
+  //}
 
-  const resetCoords = () => {
-    setPlaceId('')
-  }
+  //const resetCoords = () => {
+  //  setPlaceId('')
+  //}
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -85,8 +85,6 @@ export default function Registrieren({csrf}) {
         street_number: formStreetNumber,
         zipcode: formZipcode,
         city: formCity,
-        lat: coordLat,
-        lon: coordLon,
         support_activity: formSupportingActivity,
         experience_with_animal: formExperienceWithAnimal,
         experience_with_animal_other: formExperienceWithAnimalOther,
@@ -151,6 +149,23 @@ export default function Registrieren({csrf}) {
         </div>
         <div className="row justify-content-center">
           <div className="col-9 col-md-4 col-lg-3 text-center">
+            <input type="text" name="street" className="form-control mt-1" placeholder="Strasse" value={formStreet} onChange={(e) => setFormStreet(e.target.value)} required />
+          </div>
+          <div className="col-3 col-md-2 col-lg-1 text-center">
+            <input type="text" name="streetnumber" className="form-control mt-1" placeholder="Hausnr." value={formStreetNumber} onChange={(e) => setFormStreetNumber(e.target.value)} required />
+          </div>
+        </div>
+        <div className="row justify-content-center mt-2">
+          <div className="col-4 col-md-2 col-lg-1 text-center">
+            <input type="text" name="zipcode" className="form-control mt-1" placeholder="PLZ" value={formZipcode} onChange={(e) => setFormZipcode(e.target.value)} required />
+          </div>
+          <div className="col-8 col-md-4 col-lg-3 text-center">
+            <input type="text" name="city" className="form-control mt-1" placeholder="Stadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
+          </div>
+        </div>
+
+        {/*<div className="row justify-content-center">
+          <div className="col-9 col-md-4 col-lg-3 text-center">
             <input type="text" name="street" className="form-control mt-1" placeholder="Strasse" value={formStreet} onChange={(e) => { setFormStreet(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
           </div>
           <div className="col-3 col-md-2 col-lg-1 text-center">
@@ -164,33 +179,33 @@ export default function Registrieren({csrf}) {
           <div className="col-8 col-md-4 col-lg-3 text-center">
             <input type="text" name="city" className="form-control mt-1" placeholder="Stadt" value={formCity} onChange={(e) => { setFormCity(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
           </div>
-        </div>
+        </div>*/}
 
-        {formAutoCompleteValues ?
+        {/*{formAutoCompleteValues ?
           <div className="row justify-content-center mt-0">
-          <div className="col-12 col-md-6 col-lg-4">
-          <div className="border rounded-bottom p-2 bg-light">
-          {formAutoCompleteValues?.length > 0 ? <>
-            {!placeId 
-            ? <div className="p-1 text-danger fw-bold"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
-            : <div className="p-1 text-success"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
-            }
+            <div className="col-12 col-md-6 col-lg-4">
+              <div className="border rounded-bottom p-2 bg-light">
+              {formAutoCompleteValues?.length > 0 ? <>
+                {!placeId 
+                ? <div className="p-1 text-danger fw-bold"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                : <div className="p-1 text-success"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                }
 
-            {formAutoCompleteValues.map(item => 
-              <div key={item.place_id} className={`p-1 cursor-pointer ${placeId && placeId != item.place_id ? 'text-muted' : null}`} 
-                onClick={(e) => { setPlaceId(`${item.place_id}`); setCoordLat(`${item.lat}`); setCoordLon(`${item.lon}`) }}>
-                {placeId == item.place_id ? <><i className="bi bi-check-lg"></i>&nbsp;</> : null} 
-                <strong>{item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</strong> 
-                <small>({item.display_name})</small>
-              </div>)
-            }
-            </> : <div>Keine gültige Adresse gefunden</div>
-          }
-          </div> 
-          </div> 
+                {formAutoCompleteValues.map(item => 
+                  <div key={item.place_id} className={`p-1 cursor-pointer ${placeId && placeId != item.place_id ? 'text-muted' : null}`} 
+                    onClick={(e) => { setPlaceId(`${item.place_id}`); setCoordLat(`${item.lat}`); setCoordLon(`${item.lon}`) }}>
+                    {placeId == item.place_id ? <><i className="bi bi-check-lg"></i>&nbsp;</> : null} 
+                    <strong>{item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</strong> 
+                    <small>({item.display_name})</small>
+                  </div>)
+                }
+                </> : <div>Keine gültige Adresse gefunden</div>
+              }
+              </div> 
+            </div> 
           </div>
           : null
-        }
+        }*/}
 
         <div className="row justify-content-center mt-4">
           <div className="col-12 col-md-6 col-lg-4">
@@ -423,10 +438,7 @@ export default function Registrieren({csrf}) {
         </div>
         <div className="row justify-content-center">
           <div className="col-12 col-md-6 col-lg-4 text-end">
-            {!placeId
-            ? <button className="btn btn-primary w-100 mt-4" type="submit" disabled>Absenden</button>
-            : <button className="btn btn-primary w-100 mt-4" type="submit">Absenden</button>
-            }
+            <button className="btn btn-primary w-100 mt-4" type="submit">Absenden</button>
           </div>
         </div>
       </div>

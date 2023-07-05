@@ -130,8 +130,6 @@ export default function AdminCaseAdd({query}) {
         streetNumber: formStreetNumber,
         zipcode: formZipcode,
         city: formCity,
-        lat: coordLat,
-        lon: coordLon,
         searchRadius: formSearchRadius,
         supportActivity: formSupportingActivity,
         experienceWithAnimal: formExperienceWithAnimal,
