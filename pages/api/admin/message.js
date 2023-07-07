@@ -297,8 +297,9 @@ export default async function handler(request, response) {
               lon
             FROM 
               public.user
-
             WHERE
+              status = 'USER'
+            AND
               activated_at IS NOT NULL
           `, [])
 
