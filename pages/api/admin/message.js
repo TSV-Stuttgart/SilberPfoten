@@ -2,6 +2,8 @@ import getToken from '../../../lib/auth/getToken'
 import db from '../../../lib/db'
 import logger from '../../../lib/logger'
 import sharp from 'sharp'
+import sendMail from '../../../lib/sendMail'
+import slugify from 'slugify'
 
 export const config = {
   api: {
@@ -295,9 +297,8 @@ export default async function handler(request, response) {
               lon
             FROM 
               public.user
+
             WHERE
-              status = 'USER'
-            AND
               activated_at IS NOT NULL
           `, [])
 
@@ -306,7 +307,7 @@ export default async function handler(request, response) {
             logger.info(`${request.url} | ${request.method} | user:${user.firstname},${user.lastname}`)
 
             if(user.lat && user.lon) { 
-              distance = getDistanceFromLatLonInKm(lat, lon, user.lat, user.lon)
+              distance = getDistanceFromLatLonInKm(location[0].lat, location[0].lon, user.lat, user.lon)
 
               logger.info(`${request.url} | ${request.method} | distance:${distance}`)
             }
@@ -320,8 +321,26 @@ export default async function handler(request, response) {
 
           logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius`)
 
-          // SEND NOW to all users in emailReceivers
+          const templateName = 'newCaseNotification'
+          const emailSubject = 'Neuer möglicher Suchauftrag'
 
+          for (const receiver of emailReceivers) {
+
+            const params = {
+              firstname: receiver.firstname,
+              caseLink: `${process.env.NEXT_PUBLIC_HOST}/message/${dbPutMessageRequest.rows[0].message_id}/${slugify(`${subject}`, {lower: true})}`,
+              caseTitle: subject,
+            }
+
+            let sent = await sendMail(receiver.email, emailSubject, templateName, params)
+
+            if (sent.statusCode === 200) {
+              logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius | success`)
+            } else {
+              logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius | error`)
+            }
+          }
+          
         }
         else {
 

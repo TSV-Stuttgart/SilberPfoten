@@ -97,7 +97,6 @@ export default function AdminCaseAdd() {
         experienceWithAnimal: formExperienceWithAnimal,
         experienceWithAnimalOther: formExperienceWithAnimalOther,
         formUploads,
-
       })
     })
 
