@@ -159,7 +159,7 @@ export async function getServerSideProps(context) {
       const transporter = require('../lib/nodemailer/transporter')()
 
       const info = await transporter.sendMail({
-        from: '"SilberPfoten" <noreply@silberpfoten.de>',
+        from: '"SilberPfoten" <support@silberpfoten.de>',
         to: email,
         subject: "Dein Verifizierungscode",
         html: mjmlObject.html,
