@@ -191,6 +191,53 @@ export default async function handler(request, response) {
 
     }
 
+    else if (request.method === 'DELETE') {
+
+      logger.info(`api | profile | delete account`)
+
+      await db.query(`DELETE FROM public.user WHERE user_id = $1`, [token.user.user_id])
+
+      logger.info(`api | profile | delete account | response`)
+
+      logger.info(`api | profile | delete account | delete session in database`)
+      await db.query(`DELETE FROM public.session WHERE user_id = $1`, [token.user.user_id])
+      logger.info(`api | profile | delete account | delete session in database | deleted`)
+
+      logger.info(`api | profile | delete account | cookie | invalidate`)
+      
+      response.setHeader('set-cookie',`session=deleted; SameSite=Lax; HttpOnly; Path=/; Expires=${new Date('1970-01-01').toUTCString()}`)
+      
+      logger.info(`api | profile | delete account | db getAdminsRequest`)
+
+      const dbGetAdminsRequest = await db.query(
+        `SELECT email FROM public.user WHERE status = 'ADMIN'`
+      )
+
+      logger.info(`api | profile | delete account | send mail`)
+
+      const templateName = 'userDeletionNotification'
+      const subject = 'User Löschung'
+      const params = {
+        email: token.user.email,
+        firstname: token.user.firstname,
+        lastname: token.user.lastname,
+      }
+
+      let sent
+      for (const admin of dbGetAdminsRequest.rows) {
+
+        sent = await sendMail(admin.email, subject, templateName, params)
+      }
+
+      if (sent.statusCode === 200) {
+        logger.info(`api | profile | delete account | send mail | sent`)
+      } else {
+        logger.info(`api | profile | delete account | send mail | error`)
+      }
+
+      response.status(200).send()
+    }
+
   } catch(e) {
     logger.info(`api | profile | error | ${e}`)
 

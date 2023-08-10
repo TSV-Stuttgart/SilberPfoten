@@ -97,7 +97,24 @@ export default function Profile() {
 
     return
   }
-  
+
+  const handleAccountDeletion = async (wrongInput = false) => {
+    const confirmed = prompt(`'Möchtest du wirklich deinen Account vollständig und unwiderruflich löschen? Falls ja, bestätige mit "JETZT LÖSCHEN"' ${wrongInput ? 'Falsche Eingabe' : ''}`, [])
+
+    if (confirmed === 'JETZT LÖSCHEN') {
+      const deleteUserRequest = await fetch(`/api/profile`, {method: 'DELETE'})
+
+      if (deleteUserRequest.status === 200) {
+
+        router.push(`/signin`)
+      }
+
+    }
+    else if (confirmed !== null) {
+      handleAccountDeletion(true)
+    }
+  }
+
   return <>
     <Wrapper>
 
@@ -365,7 +382,8 @@ export default function Profile() {
           <div className="col-12">
             <div className="bg-white border border-danger rounded p-2">
               <div className="fw-bold">Account löschen?</div>
-              <div className="fw-normal">Bitte sende uns dazu eine E-Mail an <a href="mailto:info@silberpfoten.de" className="text-dark">info@silberpfoten.de</a></div>
+              <div className="fw-normal">Hier kannst du deinen Account vollständig und unwiderruflich löschen.</div>
+              <button className="btn btn-danger px-4 mt-4" onClick={() => handleAccountDeletion()}>Account löschen</button>
             </div>
           </div>
         </div>
