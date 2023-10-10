@@ -32,6 +32,7 @@ export default async function handler(request, response) {
         firstname,
         zipcode,
         street,
+        street_number,
         city,
         CASE WHEN experience_with_animal != '' THEN array_to_string(experience_with_animal::text[], ',') ELSE '' END as experience_with_animal,
         experience_with_animal_other,
@@ -45,6 +46,7 @@ export default async function handler(request, response) {
       WHERE
         status = ANY(ARRAY['ADMIN', 'USER'])
       
+      ${filter === 'nocoords' ? 'AND lat IS NULL' : ''}
       ${filter === 'active' ? 'AND activated_at IS NOT NULL' : ''}
       ${filter === 'pending' ? 'AND activated_at IS NULL' : ''}
       ${filter === 'blocked' ? 'AND blocked_at IS NOT NULL' : 'AND blocked_at IS NULL'}

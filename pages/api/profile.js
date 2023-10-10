@@ -110,7 +110,14 @@ export default async function handler(request, response) {
         experience_with_animal,
         experience_with_animal_other,
       } = request.body
+
+      logger.info(`api | profile | change data | get coords from openstreetmap`)
+
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
       
+      logger.info(`api | profile | change data | lat | ${location?.[0]?.lat}`)
+      logger.info(`api | profile | change data | lon | ${location?.[0]?.lon}`)
+
       logger.info(`api | profile | change data | db request`)
 
       const dbRequest = await db.query(`
@@ -124,12 +131,14 @@ export default async function handler(request, response) {
           street_number = $5,
           zipcode = $6,
           city = $7,
-          experience_with_animal = $8,
-          experience_with_animal_other = $9,
-          support_activity = $10,
+          lat = $8,
+          lon = $9,
+          experience_with_animal = $10,
+          experience_with_animal_other = $11,
+          support_activity = $12,
           updated_at = 'now()'
         WHERE
-          user_id = $11
+          user_id = $13
         RETURNING user_id
       `, [
           birthdate,
@@ -139,6 +148,8 @@ export default async function handler(request, response) {
           streetNumber,
           zipcode,
           city,
+          location && location.length > 0 && location[0].lat ? location[0].lat : null,
+          location && location.length > 0 && location[0].lon ? location[0].lon : null,
           experience_with_animal,
           experience_with_animal_other,
           support_activity,

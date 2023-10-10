@@ -29,55 +29,40 @@ export default function Registrieren({csrf}) {
   const [formStreetNumber, setFormStreetNumber] = useState('')
   const [formZipcode, setFormZipcode] = useState('')
   const [formCity, setFormCity] = useState('')
-  const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
-  const [autoCompleteTimeoutId, setAutoCompleteTimeoutId] = useState(undefined)
-  const [autoCompleteIsLoading, setAutoCompleteIsLoading] = useState(false)
+
   const [formSupportingActivity, setFormSupportingActivity] = useState([])
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
   const [formBecameAwareThrough, setFormBecameAwareThrough] = useState([])
   const [formBecameAwareThroughOther, setFormBecameAwareThroughOther] = useState('')
 
-  useEffect(() => {
+  //const [focusOut, setFocusOut] = useState(false)
+  //const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
+  //const [placeId, setPlaceId] = useState('')
+  //const [coordLat, setCoordLat] = useState('')
+  //const [coordLon, setCoordLon] = useState('')
 
-    searchAddress(formStreet)
-  }, [formStreet])
+  //useEffect(() => {
 
-  const setAddress = (osmObject) => {
-    console.log(osmObject)
-    setFormStreet(osmObject.address.road || '')
-    setFormStreetNumber(osmObject.address.house_number || '')
-    setFormZipcode(osmObject.address.postcode || '')
-    setFormCity(osmObject.address.village || '')
+  //  if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
+  //    searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
+  //  }
+  //  else {
+  //    setFocusOut(false)
+  //  }
 
-    setFormAutoCompleteValues('')
-  }
+  //}, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
 
-  const searchAddress = async (value) => {
+  //const searchAddress = async (value) => {
+  //  const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
 
-    if (formStreet && formStreetNumber && formZipcode && formCity) {
-      return
-    }
-    
-    if (value.length > 10) {
-      setAutoCompleteIsLoading(true)
-    }
+  //  setFormAutoCompleteValues(location)
+  //  setFocusOut(false)
+  //}
 
-    if (autoCompleteTimeoutId) {
-      clearTimeout(autoCompleteTimeoutId)
-    }
-
-    const timeoutId = setTimeout(async () => {
-      if (value.length > 10) {
-        const locations = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&limit=5&email=info@silberpfoten.de`)).json()
-
-        setFormAutoCompleteValues(locations)
-        setAutoCompleteIsLoading(false)
-      }
-    }, 1000)
-
-    setAutoCompleteTimeoutId(timeoutId)
-  }
+  //const resetCoords = () => {
+  //  setPlaceId('')
+  //}
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -178,18 +163,50 @@ export default function Registrieren({csrf}) {
             <input type="text" name="city" className="form-control mt-1" placeholder="Stadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
           </div>
         </div>
-        {/* <div className="row justify-content-center">
-          <div className="col-12 col-md-6 col-lg-4 text-center">
-            <div className="">
-              {formAutoCompleteValues || autoCompleteIsLoading ? <>
-              <div className="text-start border rounded-bottom p-2 bg-light">
-                {autoCompleteIsLoading ? <div className="">Suchergebnise werden geladen...</div> : null}
-                {formAutoCompleteValues && formAutoCompleteValues?.map(item => <div key={item.place_id} className="p-1" onClick={() => setAddress(item)}>{item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</div>)}
-              </div>
-              </> : null}
-            </div>
+
+        {/*<div className="row justify-content-center">
+          <div className="col-9 col-md-4 col-lg-3 text-center">
+            <input type="text" name="street" className="form-control mt-1" placeholder="Strasse" value={formStreet} onChange={(e) => { setFormStreet(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
           </div>
-        </div> */}
+          <div className="col-3 col-md-2 col-lg-1 text-center">
+            <input type="text" name="streetnumber" className="form-control mt-1" placeholder="Hausnr." value={formStreetNumber} onChange={(e) => { setFormStreetNumber(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
+          </div>
+        </div>
+        <div className="row justify-content-center mt-2">
+          <div className="col-4 col-md-2 col-lg-1 text-center">
+            <input type="text" name="zipcode" className="form-control mt-1" placeholder="PLZ" value={formZipcode} onChange={(e) => { setFormZipcode(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
+          </div>
+          <div className="col-8 col-md-4 col-lg-3 text-center">
+            <input type="text" name="city" className="form-control mt-1" placeholder="Stadt" value={formCity} onChange={(e) => { setFormCity(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
+          </div>
+        </div>*/}
+
+        {/*{formAutoCompleteValues ?
+          <div className="row justify-content-center mt-0">
+            <div className="col-12 col-md-6 col-lg-4">
+              <div className="border rounded-bottom p-2 bg-light">
+              {formAutoCompleteValues?.length > 0 ? <>
+                {!placeId 
+                ? <div className="p-1 text-danger fw-bold"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                : <div className="p-1 text-success"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+                }
+
+                {formAutoCompleteValues.map(item => 
+                  <div key={item.place_id} className={`p-1 cursor-pointer ${placeId && placeId != item.place_id ? 'text-muted' : null}`} 
+                    onClick={(e) => { setPlaceId(`${item.place_id}`); setCoordLat(`${item.lat}`); setCoordLon(`${item.lon}`) }}>
+                    {placeId == item.place_id ? <><i className="bi bi-check-lg"></i>&nbsp;</> : null} 
+                    <strong>{item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</strong> 
+                    <small>({item.display_name})</small>
+                  </div>)
+                }
+                </> : <div>Keine gültige Adresse gefunden</div>
+              }
+              </div> 
+            </div> 
+          </div>
+          : null
+        }*/}
+
         <div className="row justify-content-center mt-4">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="mt-3 ms-1 fw-bold">Folgende unterstützende Tätigkeiten<br/>kann ich anbieten</div>
@@ -293,9 +310,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('dog') ? [...formExperienceWithAnimal, ...['dog']] : formExperienceWithAnimal.filter(i => i !== 'dog'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('dog') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('dog') ? [...formExperienceWithAnimal, ...['dog']] : formExperienceWithAnimal.filter(i => i !== 'dog'))}>Hund</div>
+                <div className="col-10 border-start">Hund</div>
               </div>
             </div>
           </div>
@@ -303,9 +320,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('cat') ? [...formExperienceWithAnimal, ...['cat']] : formExperienceWithAnimal.filter(i => i !== 'cat'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('cat') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('cat') ? [...formExperienceWithAnimal, ...['cat']] : formExperienceWithAnimal.filter(i => i !== 'cat'))}>Katze</div>
+                <div className="col-10 border-start">Katze</div>
               </div>
             </div>
           </div>
@@ -313,9 +330,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('small_animal') ? [...formExperienceWithAnimal, ...['small_animal']] : formExperienceWithAnimal.filter(i => i !== 'small_animal'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('small_animal') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('small_animal') ? [...formExperienceWithAnimal, ...['small_animal']] : formExperienceWithAnimal.filter(i => i !== 'small_animal'))}>Kleintiere</div>
+                <div className="col-10 border-start">Kleintiere</div>
               </div>
             </div>
           </div>
@@ -323,9 +340,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('bird') ? [...formExperienceWithAnimal, ...['bird']] : formExperienceWithAnimal.filter(i => i !== 'bird'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('bird') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('bird') ? [...formExperienceWithAnimal, ...['bird']] : formExperienceWithAnimal.filter(i => i !== 'bird'))}>Vögel</div>
+                <div className="col-10 border-start">Vögel</div>
               </div>
             </div>
           </div>
@@ -333,9 +350,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('other') ? [...formExperienceWithAnimal, ...['other']] : formExperienceWithAnimal.filter(i => i !== 'other'))}>
                 <div className="col-2 text-center"><i className={formExperienceWithAnimal.includes('other') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormExperienceWithAnimal(!formExperienceWithAnimal.includes('other') ? [...formExperienceWithAnimal, ...['other']] : formExperienceWithAnimal.filter(i => i !== 'other'))}>Sonstiges</div>
+                <div className="col-10 border-start">Sonstiges</div>
               </div>
               {formExperienceWithAnimal.includes('other') ? <>
               <div className="row cursor-pointer align-items-center">
@@ -355,9 +372,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('facebook') ? [...formBecameAwareThrough, ...['facebook']] : formBecameAwareThrough.filter(i => i !== 'facebook'))}>
                 <div className="col-2 text-center"><i className={formBecameAwareThrough.includes('facebook') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('facebook') ? [...formBecameAwareThrough, ...['facebook']] : formBecameAwareThrough.filter(i => i !== 'facebook'))}>Facebook</div>
+                <div className="col-10 border-start">Facebook</div>
               </div>
             </div>
           </div>
@@ -365,9 +382,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('instagram') ? [...formBecameAwareThrough, ...['instagram']] : formBecameAwareThrough.filter(i => i !== 'instagram'))}>
                 <div className="col-2 text-center"><i className={formBecameAwareThrough.includes('instagram') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('instagram') ? [...formBecameAwareThrough, ...['instagram']] : formBecameAwareThrough.filter(i => i !== 'instagram'))}>Instagram</div>
+                <div className="col-10 border-start">Instagram</div>
               </div>
             </div>
           </div>
@@ -375,9 +392,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('internet') ? [...formBecameAwareThrough, ...['internet']] : formBecameAwareThrough.filter(i => i !== 'internet'))}>
                 <div className="col-2 text-center"><i className={formBecameAwareThrough.includes('internet') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('internet') ? [...formBecameAwareThrough, ...['internet']] : formBecameAwareThrough.filter(i => i !== 'internet'))}>Internet</div>
+                <div className="col-10 border-start">Internet</div>
               </div>
             </div>
           </div>
@@ -385,9 +402,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('press') ? [...formBecameAwareThrough, ...['press']] : formBecameAwareThrough.filter(i => i !== 'press'))}>
                 <div className="col-2 text-center"><i className={formBecameAwareThrough.includes('press') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('press') ? [...formBecameAwareThrough, ...['press']] : formBecameAwareThrough.filter(i => i !== 'press'))}>Presse</div>
+                <div className="col-10 border-start">Presse</div>
               </div>
             </div>
           </div>
@@ -395,9 +412,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('friend') ? [...formBecameAwareThrough, ...['friend']] : formBecameAwareThrough.filter(i => i !== 'friend'))}>
                 <div className="col-2 text-center"><i className={formBecameAwareThrough.includes('friend') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('friend') ? [...formBecameAwareThrough, ...['friend']] : formBecameAwareThrough.filter(i => i !== 'friend'))}>Freunde/Familie/Bekannte</div>
+                <div className="col-10 border-start">Freunde/Familie/Bekannte</div>
               </div>
             </div>
           </div>
@@ -405,9 +422,9 @@ export default function Registrieren({csrf}) {
         <div className="row justify-content-center mt-2">
           <div className="col-12 col-md-6 col-lg-4">
             <div className="bg-light rounded p-2">
-              <div className="row cursor-pointer align-items-center">
+              <div className="row cursor-pointer align-items-center" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('other') ? [...formBecameAwareThrough, ...['other']] : formBecameAwareThrough.filter(i => i !== 'other'))}>
                 <div className="col-2 text-center"><i className={formBecameAwareThrough.includes('other') ? `bi bi-check-circle-fill text-success` : `bi bi-circle text-secondary`} style={{fontSize: 14}}></i></div>
-                <div className="col-10 border-start" onClick={() => setFormBecameAwareThrough(!formBecameAwareThrough.includes('other') ? [...formBecameAwareThrough, ...['other']] : formBecameAwareThrough.filter(i => i !== 'other'))}>Sonstiges</div>
+                <div className="col-10 border-start">Sonstiges</div>
               </div>
               {formBecameAwareThrough.includes('other') ? <>
               <div className="row cursor-pointer align-items-center">

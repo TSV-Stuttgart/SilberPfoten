@@ -2,6 +2,8 @@ import getToken from '../../../lib/auth/getToken'
 import db from '../../../lib/db'
 import logger from '../../../lib/logger'
 import sharp from 'sharp'
+import sendMail from '../../../lib/sendMail'
+import slugify from 'slugify'
 
 export const config = {
   api: {
@@ -12,6 +14,24 @@ export const config = {
 }
 
 export default async function handler(request, response) {
+
+  const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+    var R = 6371 // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1)  // deg2rad below
+    var dLon = deg2rad(lon2-lon1) 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    var d = R * c // Distance in km
+    return d
+  }
+  
+  const deg2rad = (deg) => {
+    return deg * (Math.PI/180)
+  }
 
   const uploadImage = async (messageId, file) => {
 
@@ -192,6 +212,13 @@ export default async function handler(request, response) {
       logger.info(`${request.url} | ${request.method} | body | experienceWithAnimalOther | ${experienceWithAnimalOther}`)
       logger.info(`${request.url} | ${request.method} | body | uploads | ${JSON.stringify(formUploads?.length)}`)
 
+      logger.info(`${request.url} | ${request.method} | get coords from openstreetmap`)
+
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      
+      logger.info(`${request.url} | ${request.method} | lat | ${location?.[0]?.lat}`)
+      logger.info(`${request.url} | ${request.method} | lon | ${location?.[0]?.lon}`)
+
       logger.info(`${request.url} | ${request.method} | putRequest`)
 
       const dbPutMessageRequest = await db.query(`
@@ -209,11 +236,13 @@ export default async function handler(request, response) {
             street_number,
             zipcode,
             city,
+            lat,
+            lon,
             search_radius,
             support_activity,
             experience_with_animal,
             experience_with_animal_other
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
             RETURNING message_id, subject
         `, 
         [
@@ -229,6 +258,8 @@ export default async function handler(request, response) {
           streetNumber,
           zipcode,
           city,
+          location && location.length > 0 && location[0].lat ? location[0].lat : null,
+          location && location.length > 0 && location[0].lon ? location[0].lon : null,
           searchRadius,
           supportActivity,
           experienceWithAnimal,
@@ -240,12 +271,81 @@ export default async function handler(request, response) {
 
         // Upload Images
         if (formUploads) {
+          logger.info(`${request.url} | ${request.method} | uploadingImages`)
+
           for(const upload of formUploads) {
             const messageId = dbPutMessageRequest.rows[0].message_id
             const file = upload
 
             const uploadedImage = await uploadImage(messageId, file)
           }
+        }
+
+        
+        logger.info(`${request.url} | ${request.method} | sendEmails | calculate distances`)
+
+        if ((location && location.length > 0 && location[0].lat) && location && location.length > 0 && location[0].lon) {
+
+          let emailReceivers = []
+
+          const getUsersRequest = await db.query(`
+            SELECT 
+              lastname,
+              firstname,
+              email,
+              lat,
+              lon
+            FROM 
+              public.user
+            WHERE
+              status = 'USER'
+            AND
+              activated_at IS NOT NULL
+          `, [])
+
+          let distance = 9999999999999
+          for (const user of getUsersRequest.rows) {
+            logger.info(`${request.url} | ${request.method} | user:${user.firstname},${user.lastname}`)
+
+            if(user.lat && user.lon) { 
+              distance = getDistanceFromLatLonInKm(location[0].lat, location[0].lon, user.lat, user.lon)
+
+              logger.info(`${request.url} | ${request.method} | distance:${distance}`)
+            }
+
+            if(distance <= searchRadius) {
+              logger.info(`${request.url} | ${request.method} | radius:${searchRadius}`)
+
+              emailReceivers.push(user)
+            }
+          }
+
+          logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius`)
+
+          const templateName = 'newCaseNotification'
+          const emailSubject = 'Neuer möglicher Suchauftrag'
+
+          for (const receiver of emailReceivers) {
+
+            const params = {
+              firstname: receiver.firstname,
+              caseLink: `${process.env.NEXT_PUBLIC_HOST}/message/${dbPutMessageRequest.rows[0].message_id}/${slugify(`${subject}`, {lower: true})}`,
+              caseTitle: subject,
+            }
+
+            let sent = await sendMail(receiver.email, emailSubject, templateName, params)
+
+            if (sent.statusCode === 200) {
+              logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius | success`)
+            } else {
+              logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius | error`)
+            }
+          }
+          
+        }
+        else {
+
+          logger.info(`${request.url} | ${request.method} | sendEmails | calculate distances | couldn't find coordinates for case`)
         }
 
         logger.info(`${request.url} | ${request.method} | putRequest | success | ${JSON.stringify(dbPutMessageRequest.rows[0])}`)
@@ -307,6 +407,13 @@ export default async function handler(request, response) {
       logger.info(`${request.url} | ${request.method} | body | experienceWithAnimalOther | ${experienceWithAnimalOther}`)
       logger.info(`${request.url} | ${request.method} | body | uploads | ${JSON.stringify(formUploads?.length)}`)
 
+      logger.info(`${request.url} | ${request.method} | get coords from openstreetmap`)
+
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      
+      logger.info(`${request.url} | ${request.method} | lat | ${location?.[0]?.lat}`)
+      logger.info(`${request.url} | ${request.method} | lon | ${location?.[0]?.lon}`)
+
       logger.info(`${request.url} | ${request.method} | patchRequest`)
 
       const dbPatchMessageRequest = await db.query(`
@@ -324,12 +431,14 @@ export default async function handler(request, response) {
           street_number = $9,
           zipcode = $10,
           city = $11,
-          search_radius = $12,
-          support_activity = $13,
-          experience_with_animal = $14,
-          experience_with_animal_other = $15
+          lat = $12,
+          lon = $13,
+          search_radius = $14,
+          support_activity = $15,
+          experience_with_animal = $16,
+          experience_with_animal_other = $17
         WHERE
-          message_id = $16
+          message_id = $18
         RETURNING 
           message_id
         `, [
@@ -344,6 +453,8 @@ export default async function handler(request, response) {
           streetNumber,
           zipcode,
           city,
+          location && location.length > 0 && location[0].lat ? location[0].lat : null,
+          location && location.length > 0 && location[0].lon ? location[0].lon : null,
           searchRadius,
           supportActivity,
           experienceWithAnimal,

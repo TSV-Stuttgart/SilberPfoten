@@ -50,6 +50,13 @@ export async function getServerSideProps(context) {
     logger.info(`signup | verify | code | token | verify | decoded jwt`)
 
     if (jwtDecoded && codeIsVerified) {
+      logger.info(`signup | verify | code | get coords from openstreetmap`)
+
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${decryptedData.zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      
+      logger.info(`signup | verify | code | lat | ${location?.[0]?.lat}`)
+      logger.info(`signup | verify | code | lon | ${location?.[0]?.lon}`)
+
       logger.info(`signup | verify | code | verified successfully | insert user into database`)
 
       const createUserRequest = await db.query(`
@@ -66,13 +73,15 @@ export async function getServerSideProps(context) {
           street_number,
           zipcode,
           city,
+          lat,
+          lon,
           job,
           became_aware_through,
           became_aware_through_other,
           experience_with_animal,
           experience_with_animal_other,
           support_activity
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING user_id`, 
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING user_id`, 
         [
           decryptedData.gender,
           decryptedData.firstname,
@@ -84,6 +93,8 @@ export async function getServerSideProps(context) {
           decryptedData.street_number,
           decryptedData.zipcode,
           decryptedData.city,
+          location && location.length > 0 && location[0].lat ? location[0].lat : null,
+          location && location.length > 0 && location[0].lon ? location[0].lon : null,
           decryptedData.job,
           decryptedData.became_aware_through,
           decryptedData.became_aware_through_other,

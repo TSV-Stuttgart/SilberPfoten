@@ -31,6 +31,12 @@ export default function Profile() {
   const [isEmailChangeStarted, setIsEmailChangeStarted] = useState(false)
   const [isEmailChangedSuccess, setIsEmailChangedSuccess] = useState(false)
 
+  //const [focusOut, setFocusOut] = useState(false)
+  //const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
+  //const [placeId, setPlaceId] = useState('')
+  //const [coordLat, setCoordLat] = useState('')
+  //const [coordLon, setCoordLon] = useState('')
+
   useEffect(() => {
     setFormEmail(member?.email || '')
     setFormPhone(member?.phone || '')
@@ -43,8 +49,32 @@ export default function Profile() {
     setFormSupportingActivity(member?.support_activity.split(',') || [])
     setFormExperienceWithAnimal(member?.experience_with_animal?.split(',') || [])
     setFormExperienceWithAnimalOther(member?.experience_with_animal_other || '')
+    //setCoordLat(member?.lat)
+    //setCoordLon(member?.lon)
     if (emailSuccess === '1') setIsEmailChangedSuccess(true)
   }, [member, emailSuccess])
+
+  //useEffect(() => {
+
+  //  if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
+  //    searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
+  //  }
+  //  else {
+  //    setFocusOut(false)
+  //  }
+
+  //}, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
+
+  //const searchAddress = async (value) => {
+  //  const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
+
+  //  setFormAutoCompleteValues(location)
+  //  setFocusOut(false)
+  //}
+
+  //const resetCoords = () => {
+  //  setPlaceId('')
+  //}
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -145,7 +175,7 @@ export default function Profile() {
             {isEmailChangeStarted
               ? <div className="ms-0">
                   <span className="form-text text-warning fw-bold">
-                    <i class="bi bi-hourglass"></i> E-Mail Änderung muss separat in der E-Mail, die wir dir soeben gesandt haben, bestätigt werden.
+                    <i className="bi bi-hourglass"></i> E-Mail Änderung muss separat in der E-Mail, die wir dir soeben gesandt haben, bestätigt werden.
                   </span>
                 </div>
               : null
@@ -153,7 +183,7 @@ export default function Profile() {
               {isEmailChangedSuccess
               ? <div className="ms-0">
                   <span className="form-text text-success fw-bold">
-                    <i class="bi bi-check-lg"></i>Deine E-Mail-Adresse wurde erfolgreich geändert. Verwende diese ab jetzt um dich einzuloggen.
+                    <i className="bi bi-check-lg"></i>Deine E-Mail-Adresse wurde erfolgreich geändert. Verwende diese ab jetzt um dich einzuloggen.
                   </span>
                 </div>
               : null
@@ -212,6 +242,45 @@ export default function Profile() {
             <input type="text" name="city" className="form-control" placeholder="Stadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
           </div>
         </div>
+
+        {/*<div className="row mt-1">
+          <div className="col-9">
+            <input type="text" name="street" className="form-control" placeholder="Strasse" value={formStreet} onChange={(e) => { setFormStreet(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
+          </div>
+          <div className="col-3">
+            <input type="text" name="streetnumber" className="form-control" placeholder="Hausnr." value={formStreetNumber} onChange={(e) => { setFormStreetNumber(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
+          </div>
+        </div>
+        <div className="row mt-2">
+          <div className="col-4">
+            <input type="text" name="zipcode" className="form-control" placeholder="PLZ" value={formZipcode} onChange={(e) => { setFormZipcode(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
+          </div>
+          <div className="col-8">
+            <input type="text" name="city" className="form-control" placeholder="Stadt" value={formCity} onChange={(e) => { setFormCity(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
+          </div>
+        </div>*/}
+
+        {/*{formAutoCompleteValues ?
+          <div className="border rounded-bottom p-2 bg-light mb-3">
+          {formAutoCompleteValues?.length > 0 ? <>
+            {!placeId 
+            ? <div className="p-1 text-danger fw-bold"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+            : <div className="p-1 text-success"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
+            }
+
+            {formAutoCompleteValues.map(item => 
+              <div key={item.place_id} className={`p-1 cursor-pointer ${placeId && placeId != item.place_id ? 'text-muted' : null}`} 
+                onClick={(e) => { setPlaceId(`${item.place_id}`); setCoordLat(`${item.lat}`); setCoordLon(`${item.lon}`) }}>
+                {placeId == item.place_id ? <><i className="bi bi-check-lg"></i>&nbsp;</> : null} 
+                <strong>{item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</strong> 
+                <small>({item.display_name})</small>
+              </div>)
+            }
+            </> : <div>Keine gültige Adresse gefunden</div>
+          }
+          </div> 
+          : null
+        }*/}
 
         <div className="row justify-content-center mt-4">
           <div className="col-12">
@@ -372,8 +441,18 @@ export default function Profile() {
         </div>
         <div className="row justify-content-end">
           <div className="col-12 col-md-6 col-lg-4 text-end">
+            {/*{isSavedSuccess
+              ? <button className="btn btn-primary w-100 mt-4" disabled>Erfolgreich gespeichert <i className="bi bi-check"></i></button>
+              : <>
+                { !placeId && formAutoCompleteValues
+                  ? <button className="btn btn-primary w-100 mt-4" type="submit" disabled>Änderungen speichern</button>
+                  : <button className="btn btn-primary w-100 mt-4" type="submit">Änderungen speichern</button>
+                }
+                </>   
+            }*/}
+            
             {isSavedSuccess
-              ? <button className="btn btn-primary w-100 mt-4" disabled>Erfolgreich gespeichert <i class="bi bi-check"></i></button>
+              ? <button className="btn btn-primary w-100 mt-4" disabled>Erfolgreich gespeichert <i className="bi bi-check"></i></button>
               : <button className="btn btn-primary w-100 mt-4" type="submit">Änderungen speichern</button>
             }
           </div>
