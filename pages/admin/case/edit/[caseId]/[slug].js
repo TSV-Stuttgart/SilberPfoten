@@ -94,7 +94,7 @@ export default function AdminCaseAdd({query}) {
   }, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
 
   const searchAddress = async (value) => {
-    const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
+    const location = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
 
     setFormAutoCompleteValues(location)
     setFocusOut(false)

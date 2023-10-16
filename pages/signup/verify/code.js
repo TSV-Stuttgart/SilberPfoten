@@ -52,7 +52,7 @@ export async function getServerSideProps(context) {
     if (jwtDecoded && codeIsVerified) {
       logger.info(`signup | verify | code | get coords from openstreetmap`)
 
-      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${decryptedData.zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${decryptedData.zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
       
       logger.info(`signup | verify | code | lat | ${location?.[0]?.lat}`)
       logger.info(`signup | verify | code | lon | ${location?.[0]?.lon}`)

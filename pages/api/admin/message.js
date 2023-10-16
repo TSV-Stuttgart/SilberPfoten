@@ -214,7 +214,7 @@ export default async function handler(request, response) {
 
       logger.info(`${request.url} | ${request.method} | get coords from openstreetmap`)
 
-      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
       
       logger.info(`${request.url} | ${request.method} | lat | ${location?.[0]?.lat}`)
       logger.info(`${request.url} | ${request.method} | lon | ${location?.[0]?.lon}`)
@@ -409,7 +409,7 @@ export default async function handler(request, response) {
 
       logger.info(`${request.url} | ${request.method} | get coords from openstreetmap`)
 
-      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
       
       logger.info(`${request.url} | ${request.method} | lat | ${location?.[0]?.lat}`)
       logger.info(`${request.url} | ${request.method} | lon | ${location?.[0]?.lon}`)

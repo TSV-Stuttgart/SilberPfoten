@@ -47,7 +47,7 @@ export default function Users() {
       setUpdateCounter(counterUpdates)
       setIsUpdatingCoordsOf(user.user_id)
 
-      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${user.zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${user.zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
       
       await new Promise(r => setTimeout(r, 1000))
 

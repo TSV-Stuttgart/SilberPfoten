@@ -113,7 +113,7 @@ export default async function handler(request, response) {
 
       logger.info(`api | profile | change data | get coords from openstreetmap`)
 
-      const location = await (await fetch(`https://nominatim.openstreetmap.org/search/?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
       
       logger.info(`api | profile | change data | lat | ${location?.[0]?.lat}`)
       logger.info(`api | profile | change data | lon | ${location?.[0]?.lon}`)
