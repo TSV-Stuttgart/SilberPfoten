@@ -16,7 +16,7 @@
     "handlebars": "^4.7.7",
     "jsonwebtoken": "^9.0.0",
     "mjml": "^4.13.0",
-    "next": "13.2.4",
+    "next": "13.5.5",
     "next-pwa": "^5.5.4",
     "nodemailer": "^6.8.0",
     "pg": "^8.8.0",
@@ -32,8 +32,8 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz"
   },
   "devDependencies": {
-    "eslint": "8.37.0",
-    "eslint-config-next": "13.2.4",
+    "eslint": "8.51.0",
+    "eslint-config-next": "13.5.5",
     "sass": "^1.55.0"
   }
 }
