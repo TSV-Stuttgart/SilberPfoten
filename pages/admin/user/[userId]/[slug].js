@@ -1,54 +1,31 @@
 import React from 'react'
 import useSWR from 'swr'
-import Error from '../../../components/Error'
-import Loading from '../../../components/Loading'
-import Wrapper from '../../../components/Wrapper'
-import logger from '../../../lib/logger'
-import getToken from '../../../lib/auth/getToken'
-import NavigationHeader from '../../../components/NavigationHeader'
-
-export async function getServerSideProps(context) {
-
-  try {
-    const token = await getToken(context.req)
-
-    if (!token) {
-      logger.info(`members | :userId | :slug | unauthorized`)
-
-      return {
-        redirect: {
-          destination: `/signin`,
-          statusCode: 302,
-        },
-      }
-    }
-    
-    return {
-      props: {
-        userId: context.query.userId
-      }
-    }
-
-  } catch(e) {
-    logger.info(`members | :userId | :slug | error | ${e}`)
-
-    return {
-      props: {}
-    }
-  }
-}
+import {useRouter} from 'next/router'
+import Error from '../../../../components/Error'
+import Loading from '../../../../components/Loading'
+import Wrapper from '../../../../components/Wrapper'
+import NavigationHeader from '../../../../components/NavigationHeader'
+import useSession from '../../../../lib/auth/useSession'
 
 export default function Members({userId}) {
-  const {data: member, error} = useSWR(`/api/admin/user/${userId}`, (url) => fetch(url).then(r => r.json()))
+  const router = useRouter()
+  const {session} = useSession()
+  const {data: member, error} = useSWR(router.query.userId ? `/api/admin/user/${router.query.userId}` : null, (url) => fetch(url).then(r => r.json()))
 
   if (error) return <Error />
   if (!member && !error) return <Loading />
+
+  if (!session) {
+    router.push('/signin')
+
+    return
+  }
   
   return <>
     <Wrapper>
 
       <NavigationHeader 
-        goBack={`/users`} 
+        goBack={`/admin/users`} 
         title={`Benutzer`}
       />
 
