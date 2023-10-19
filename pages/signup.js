@@ -29,6 +29,8 @@ export default function Registrieren({csrf}) {
   const [formStreetNumber, setFormStreetNumber] = useState('')
   const [formZipcode, setFormZipcode] = useState('')
   const [formCity, setFormCity] = useState('')
+  const [formNotice, setFormNotice] = useState(false)
+  const [formRecordNotice, setFormRecordNotice] = useState(false)
 
   const [formSupportingActivity, setFormSupportingActivity] = useState([])
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
@@ -434,6 +436,59 @@ export default function Registrieren({csrf}) {
               </div>
               </> : null}
             </div>
+          </div>
+        </div>
+        <div className="row justify-content-center mt-4">
+          <div className="col-12 col-md-6 col-lg-4">
+            <div className="mt-3 ms-1 fw-bold">Hinweise</div>
+          </div>
+        </div>
+        <div className="row justify-content-center mt-2">
+          <div className="col-12 col-md-6 col-lg-4">
+            <ul className="" style={{listStyleType: 'decimal'}}>
+              <li>Ich bin volljährig und daran interessiert, als ehrenamtlicher Helfer die Initiative SilberPfoten zu unterstützen.</li>
+              <li>Es ist mir bewusst, dass der Umgang mit Tieren Gefahren in sich birgt, wie z. B. eine Salmonelleninfektion, Tollwutgefahr bei Bissverletzungen oder Hirnhautentzündung durch einen Zeckenbiss. Ich weiß auch,  dass ich mich vor bestimmten Gefahren durch Impfungen schützen kann.</li>
+              <li>
+                Mit meiner Unterschrift verpflichte ich mich, mich an die Weisungen des Projektleiters und   ggf. des jeweiligen Tierhalters zu halten und insbesondere folgende Punkte einzuhalten:
+                <ul>
+                  <li>Hunde während des Ausführens nicht von der Leine zu lassen</li>
+                  <li>Ausschließlich eine Führleine von max. 2 m Länge zu verwenden</li>
+                  <li>Beißkorb-Anordnungen und -Empfehlungen zu befolgen</li>
+                  <li>Futter und Leckerlis nur nach Absprache zu verabreichen</li>
+                  <li>Örtliche Anordnungen zur Entfernung von Hundekot zu beachten</li>
+                  <li>Alle besonderen Vorkommnisse zu melden, vor allem Beißereien mit anderen Hunden,   etwaige Deckakte, Angriffe auf sowie Anspringen von Menschen, Entlaufen, Körper-,   Gesundheits- und Sachschäden und jeden Schadensfall,</li>
+                  <li>Mit dem Tierhalter vereinbarte Termine einzuhalten bzw. diese so rechtzeitig wie möglich   abzusagen, sollte ich verhindert sein.</li>
+                </ul>
+              </li>
+              <li>Es ist mir bekannt, dass ich bei nicht (rechtzeitig) erfolgter, nicht vollständiger oder unwahrer Schadensmeldung unter Umständen selbst hafte, wie auch bei Vorsatz und grober Fahrlässigkeit.</li>
+              <li>Es ist mir bekannt, dass ich über eine private Haftpflichtversicherung verfügen muss, welche auch  das Hüten fremder Hunde als Risiko umfasst.</li>
+              <li>Mir ist bekannt, dass Verstöße gegen Leinen- und Beißkorbzwang auch zu zivil- und strafrechtlichen Konsequenzen führen können.</li>
+              <li>Mir ist bewusst, dass die Mitnahme von anderen Personen, insbesondere von Kindern und Jugendlichen, zu Einsätzen für SilberPfoten allein in meiner Verantwortung liegt und diese Personen die Tiere nicht führen und betreuen dürfen. Für eventuelle Schadensfälle in Zusammenhang mit diesen Personen  wird seitens der Initiative und ihres Trägers keinerlei Haftung übernommen.</li>
+              <li>Mit der Zusendung von E-Mails, die im Zusammenhang mit SilberPfoten und seinem Träger,  dem Tierschutzverein Stuttgart u. U. e.V. stehen, bin ich einverstanden.</li>
+              <li>Mir ist bekannt, dass im Rahmen der Initiative die Daten zwischen Helfern und Hilfesuchenden  ggf. ausgetauscht werden. Die Datenschutzhinweise unter https://silberpfoten.de/datenschutz/  habe ich zur Kenntnis genommen.</li>
+              <li>Ich bin darüber informiert, dass ich mich jederzeit schriftlich von der Teilnahme an SilberPfoten abmelden kann. Ebenso hat der Projektleiter das Recht, mich ohne Angabe von Gründen von  der Initiative abzumelden.</li>
+            </ul>
+
+            <div className="bg-light rounded p-2">
+              <div className="row cursor-pointer align-items-center">
+                <div className="col-2 text-center"><input type="checkbox" className="mt-1" onChange={() => setFormNotice(!formNotice)} checked={formNotice ? 'checked' : ''} required /></div>
+                <div className="col-10 border-start">Ich habe die Hinweise gelesen und akzeptiere diese</div>
+              </div>
+            </div>
+
+            <div className="bg-light rounded p-2 mt-2">
+              <div className="row cursor-pointer align-items-center">
+                <div className="col-2 text-center"><input type="checkbox" className="mt-1" onChange={() => setFormRecordNotice(!formRecordNotice)} checked={formRecordNotice ? 'checked' : ''} required /></div>
+                <div className="col-10 border-start">Mit der Veröffentlichung etwaiger von mir in Zusammenhang mit den Aktivitäten von SilberPfoten gemachten Bild- und Tonaufnahmen zum Zweck der Öffentlichkeitsarbeit der Initiative bzw. ihres Trägers bin ich einverstanden.*</div>
+              </div>
+            </div>
+
+            <div className="mt-2">
+              <div className="row cursor-pointer align-items-center">
+                <div className="col-12">*Da nicht auszuschließen ist, dass auf Bildaufnahmen z. B. von Aktionen, Festen oder Veranstaltungen der Initiative und  ihres Trägers ehrenamtliche Helfer zu sehen sind, ist dieses Einverständnis zur rechtlichen Absicherung der Initiative notwendig.  Ohne das Einverständnis kann die Registrierung leider nicht berücksichtigt werden. Wir bitten um Dein Verständnis.</div>
+              </div>
+            </div>
+
           </div>
         </div>
         <div className="row justify-content-center">
