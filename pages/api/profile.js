@@ -98,6 +98,8 @@ export default async function handler(request, response) {
       logger.info(`api | profile | change data`)
 
       const {
+        firstname,
+        lastname,
         email,
         phone,
         birthdate,
@@ -136,9 +138,11 @@ export default async function handler(request, response) {
           experience_with_animal = $10,
           experience_with_animal_other = $11,
           support_activity = $12,
+          firstname = $13,
+          lastname = $14,
           updated_at = 'now()'
         WHERE
-          user_id = $13
+          user_id = $15
         RETURNING user_id
       `, [
           birthdate,
@@ -153,6 +157,8 @@ export default async function handler(request, response) {
           experience_with_animal,
           experience_with_animal_other,
           support_activity,
+          firstname,
+          lastname,
           token.user.user_id,
         ]
       )
