@@ -15,6 +15,8 @@ export default function Profile() {
   
   const member = session?.user
 
+  const [formFirstname, setFormFirstname] = useState('')
+  const [formLastname, setFormLastname] = useState('')
   const [formEmail, setFormEmail] = useState('')
   const [formPhone, setFormPhone] = useState('')
   const [formBirthdate, setFormBirthdate] = useState('')
@@ -38,6 +40,8 @@ export default function Profile() {
   //const [coordLon, setCoordLon] = useState('')
 
   useEffect(() => {
+    setFormFirstname(member?.firstname || '')
+    setFormLastname(member?.lastname || '')
     setFormEmail(member?.email || '')
     setFormPhone(member?.phone || '')
     setFormBirthdate(member?.birthdate || '')
@@ -88,6 +92,8 @@ export default function Profile() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        firstname: formFirstname,
+        lastname: formLastname,
         email: formEmail,
         phone: formPhone,
         birthdate: formBirthdate,
@@ -152,18 +158,33 @@ export default function Profile() {
         <div className="row">
           <div className="col">
             <div className="fw-bold h3">
-              {member.lastname}, {member.firstname}
-              <span className="ms-2">(
-                {member.gender === 'male' ? <>Herr</> : null} 
-                {member.gender === 'female' ? <>Frau</> : null} 
-                {member.gender === 'diverse' ? <>Divers</> : null} 
-              )</span>
+              Meine Daten
             </div>
           </div>
         </div>
       </div>
 
       <form className="container mt-2" onSubmit={(e) => handleSubmit(e)}>
+        <div className="row mt-3">
+          <div className="col-12">
+            <span className="small">Vorname</span>
+          </div>
+        </div>
+        <div className="row mt-1">
+          <div className="col-12">
+            <input type="text" name="firstname" className="form-control" placeholder="Vorname" value={formFirstname} onChange={(e) => setFormFirstname(e.target.value)} required />
+          </div>
+        </div>
+        <div className="row mt-3">
+          <div className="col-12">
+            <span className="small">Nachname</span>
+          </div>
+        </div>
+        <div className="row mt-1">
+          <div className="col-12">
+            <input type="text" name="lastname" className="form-control" placeholder="Nachname" value={formLastname} onChange={(e) => setFormLastname(e.target.value)} required />
+          </div>
+        </div>
         <div className="row mt-3">
           <div className="col-12">
             <span className="small">E-Mail</span>
