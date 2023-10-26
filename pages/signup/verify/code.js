@@ -108,7 +108,7 @@ export async function getServerSideProps(context) {
         logger.info(`signup | verify | setpassword | verified successfully | post request | user inserted`)
         
         logger.info(`signup | verify | setpassword | verified successfully | post request | user inserted | send email to admin`)
-        const to = 'info@stigits.com, info@silberpfoten.de'
+        const to = 'support@silberpfoten.de, info@silberpfoten.de'
         const templateName = 'newMemberNotification'
         const subject = 'Neue Registrierung'
         const params = {
