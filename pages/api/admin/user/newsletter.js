@@ -67,13 +67,15 @@ export default async function handler(request, response) {
           UPDATE
             public.user
           SET
-            newsletter_sent_at = $1
+            newsletter_sent_at = $1,
+            newsletter_bounced = $2
           WHERE
-            user_id = $2
+            user_id = $3
           RETURNING 
             user_id
           `, [
             new Date().toISOString(),
+            null,
             userId,
           ]
         )
