@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS public.user (
   newsletter TIMESTAMP WITHOUT TIME ZONE,
   newsletter_bounced TIMESTAMP WITHOUT TIME ZONE,
   newsletter_deactivated TIMESTAMP WITHOUT TIME ZONE,
+  newsletter_sent_at TIMESTAMP WITHOUT TIME ZONE,
   deactivated_at TIMESTAMP WITHOUT TIME ZONE,
   deactivated_from_user BIGINT,
   blocked_at TIMESTAMP WITHOUT TIME ZONE,

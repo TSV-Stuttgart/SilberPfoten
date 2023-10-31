@@ -28,6 +28,7 @@ export default async function handler(request, response) {
     const dbRequest = await db.query(`
       SELECT
         user_id,
+        email,
         lastname,
         firstname,
         zipcode,
@@ -40,12 +41,16 @@ export default async function handler(request, response) {
         created_at,
         blocked_at,
         deactivated_at,
-        status
+        status,
+        newsletter,
+        newsletter_deactivated,
+        newsletter_bounced
       FROM 
         public.user u
       WHERE
         status = ANY(ARRAY['ADMIN', 'USER'])
       
+      ${filter === 'newsletter' ? 'AND newsletter IS NOT NULL AND newsletter_deactivated IS NULL AND newsletter_sent_at IS NULL' : ''}
       ${filter === 'nocoords' ? 'AND lat IS NULL' : ''}
       ${filter === 'active' ? 'AND activated_at IS NOT NULL' : ''}
       ${filter === 'pending' ? 'AND activated_at IS NULL' : ''}

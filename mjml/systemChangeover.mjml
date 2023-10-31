@@ -1,0 +1,41 @@
+<mjml>
+  <mj-body background-color="#f2f4f7">
+    <mj-include path="./components/header.mjml" />
+    <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
+      <mj-column width="100%">
+        <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
+          Liebes Mitglied von SilberPfoten,
+          <br/><br/>
+          erst einmal ganz herzlichen Dank, dass Du Dich ehrenamtlich bei SilberPfoten engagierst und Senioren und ihre Tiere unterstützt bzw. bereit bist zu helfen!  
+          <br/><br/>
+          Um die – glücklicherweise! – wachsende Zahl unserer ehrenamtlichen Helfer weiterhin verwalten und über alles rund um SilberPfoten informieren zu können, ist es an der Zeit, unser System anzupassen. Ab jetzt können sich neue Helfer online selbst registrieren. Bereits registrierte Helfer wie Du können sich im neuen internen Bereich mein.silberpfoten.de mit ihrer E-Mail-Adresse einloggen und dort bei Bedarf ihre Daten selbst bearbeiten (z. B. Adresse ändern bei Umzug). 
+          <br/><br/>
+          Und das Wichtigste: Im Bereich „Neuigkeiten“ werden die aktuellen Informationen und Hilfsaufrufe gezeigt. Kommt ein neues Hilfegesuch in Deiner Gegend dazu, wirst Du per E-Mail informiert. Du kannst Dir das Gesuch dann im Mitgliederbereich ansehen und über einen Klick Deine Hilfe anbieten. Wir schalten Dir dann die Kontaktdaten frei und Du kannst wie gewohnt mit dem Tierhalter telefonisch in Verbindung treten. Diesen Zwischenschritt der Freigabe haben wir eingebaut, da manche Senioren mit zu vielen Hilfsangeboten auf einmal überfordert sind und wir diese so notfalls etwas kanalisieren können.
+          <br/><br/>
+          Hier ist der Link, über den Du Dich nun erstmals in den neuen Bereich einloggen kannst:
+          <br/><br/>
+          <a href="https://mein.silberpfoten.de">https://mein.silberpfoten.de/</a>
+          <br/><br/>
+          Bitte beachte, dass Du nach Eingabe Deiner E-Mail-Adresse an diese einen Sicherheitscode zugeschickt bekommst, der nur einige Minuten gültig ist und den Du zum Freischalten eingeben musst. Habe daher am besten parallel Dein E-Mail-Postfach geöffnet, um den Code direkt parat zu haben. Beim Einloggen kannst Du angeben, ob Du für die nächsten 30 Tage eingeloggt bleiben willst, dann benötigst Du nicht jedes Mal einen neuen Sicherheitscode. 
+          <br/><br/>
+          Uns ist bewusst, dass die Umstellung auf das neue System erst einmal ungewohnt ist, und vielleicht hapert es anfangs hier und da noch ein wenig. Dies bitten wir zu entschuldigen! Langfristig ist diese teilweise Automatisierung jedoch die einzige Möglichkeit für uns, unsere Arbeit bestmöglich zu stemmen und sie bietet Chancen für einen weiteren Ausbau. Wir hoffen daher auf Dein Verständnis für die Veränderungen und dass Du wie bisher für SilberPfoten engagiert bleibst. Vielen Dank!!
+          <br/><br/>
+          Bei Fragen kannst Du Dich natürlich wie gehabt immer per E-Mail an <a href="mailto:support@silberpfoten.de">support@silberpfoten.de</a> an uns wenden.
+          <br/><br/>
+          Viele Grüße aus der SilberPfoten-„Zentrale“
+          <br/>
+          Marcel und Karo 
+        </mj-text>
+        <mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-include path="./components/footer.mjml" />
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="12px" color="#212529" line-height="18px" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
+          Du möchtest nicht weiter über Neuigkeiten informiert werden? <a href={{deactivateNewsletterLink}}>Hier kannst Du Dich vom Newsletter abmelden</a>.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
