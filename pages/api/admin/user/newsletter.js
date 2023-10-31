@@ -61,7 +61,7 @@ export default async function handler(request, response) {
       if (sent.statusCode === 200) {
         logger.info(`${request.url} | ${request.method} | send newsletter email | success`)
 
-        logger.info(`${request.url} | ${request.method} | update user newletter | ${userId}`)
+        logger.info(`${request.url} | ${request.method} | update user newsletter | ${userId}`)
 
         updateUserNewsletterRequest = await db.query(`
           UPDATE
@@ -120,7 +120,7 @@ export default async function handler(request, response) {
       }
           
       if (updateUserNewsletterRequest.rowCount > 0) {
-        logger.info(`${request.url} | ${request.method} | update user newletter | success | ${updateUserNewsletterRequest.rowCount} rows`)
+        logger.info(`${request.url} | ${request.method} | update user newsletter | success | ${updateUserNewsletterRequest.rowCount} rows`)
 
         response.status(200).json({
           statusCode: 200,
@@ -139,7 +139,7 @@ export default async function handler(request, response) {
     }
 
   } catch(e) {
-    logger.info(`api | update user newletter | error | ${e}`)
+    logger.info(`api | update user newsletter | error | ${e}`)
 
     if (e.message.includes('duplicate key')) {
       response.status(200).json({

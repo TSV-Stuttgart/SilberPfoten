@@ -14,8 +14,8 @@ export default function Users() {
   const router = useRouter()
   const {data: users, error} = useSWR(`/api/admin/users?filter=newsletter`, (url) => fetch(url).then(r => r.json()))
   
-  const [isSendingNewletter, setIsSendingNewletter] = useState(false)
-  const [isSendingNewletterTo, setIsSendingNewletterTo] = useState('')
+  const [isSendingNewsletter, setIsSendingNewsletter] = useState(false)
+  const [isSendingNewsletterTo, setIsSendingNewsletterTo] = useState('')
   const [success, setSuccess] = useState('')
   const [updateCounter, setUpdateCounter] = useState('')
   const [pauseSending, setPauseSending] = useState(false)
@@ -36,18 +36,18 @@ export default function Users() {
 
   const sendNewsletter = async () => {
 
-    setIsSendingNewletter(true)
+    setIsSendingNewsletter(true)
     setPauseSending(false)
 
     let counter = 0
-    /// filter bei users für deaktivated newletter
+    /// filter bei users für deaktivated newsletter
     for (const user of users?.filter(u => filter === 'with_bounce' ? u.newsletter_bounced : !u.newsletter_bounced)) {
 
       if(pauseSending) break
 
       counter++
       setUpdateCounter(counter)
-      setIsSendingNewletterTo(user.email)
+      setIsSendingNewsletterTo(user.email)
       
       await new Promise(r => setTimeout(r, 1000))
 
@@ -68,7 +68,7 @@ export default function Users() {
 
     setSuccess(true)
 
-    setIsSendingNewletter(false)   
+    setIsSendingNewsletter(false)   
 
   }
   
@@ -79,7 +79,7 @@ export default function Users() {
       <div className="container mt-3">
         <div className="row">
           <div className="col-12 col-md-6">
-            <div className="fw-bold h3">Mitglieder Newletter noch nicht gesendet</div>
+            <div className="fw-bold h3">Mitglieder Newsletter noch nicht gesendet</div>
           </div>
           <div className="col-12 col-md-6 text-end">
             <div className="fw-bold h3">
@@ -94,8 +94,8 @@ export default function Users() {
 
       <div className="container mt-3">
         <div className="row">
-        {isSendingNewletter ? <>
-            <div className="col-12">Sending to: {isSendingNewletterTo} ({updateCounter})</div>
+        {isSendingNewsletter ? <>
+            <div className="col-12">Sending to: {isSendingNewsletterTo} ({updateCounter})</div>
             </>
         : <>
         <div className="col-12">Sending: {updateCounter ? <>{success ? <>Successfully sent</> : <>Not successfully sent</>}</> : <>Not started</>}</div>
@@ -106,7 +106,7 @@ export default function Users() {
 
       <div className="container mt-3">
         <div className="row">
-        {!isSendingNewletter 
+        {!isSendingNewsletter 
           ? <div className="col-3"><button onClick={() => sendNewsletter()} type="button" className="btn btn-light">Starte mit Newsletter Versand</button></div>
           : <div className="col-3"><button onClick={() => setPauseSending(true)} type="button" className="btn btn-light" disabled>Pausiere den Newsletter Versand</button></div>
         }
