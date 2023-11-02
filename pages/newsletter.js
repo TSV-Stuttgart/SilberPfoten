@@ -32,16 +32,16 @@ export default function Newsletter({query}) {
     />
   }
 
-  const patchUserNewsletter = async () => {
+  const deleteUserNewsletter = async () => {
 
     setTokenHandling(true)
 
-    const sendUserChangeEmailRequest = await fetch(`/api/deactivateNewsletter?token=${token}`, {method: 'PATCH'})
+    const deleteUserNewsletterRequest = await fetch(`/api/deactivateNewsletter?token=${token}`, {method: 'DELETE'})
 
-    if (sendUserChangeEmailRequest.status === 200) {
+    if (deleteUserNewsletterRequest.status === 200) {
       setSuccess(true)
       setTokenHandling(false)
-      setNoticeText('Erfolgreich von Newsletter abgemeldet')
+      setNoticeText('Erfolgreich von Newsletter abgemeldet und Account gelöscht')
     }
     else {
       setError(true)
@@ -79,7 +79,8 @@ export default function Newsletter({query}) {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-md-6 col-lg-4 text-right">
-            <button className="btn btn-primary w-100 mt-4" onClick={() => patchUserNewsletter()}>Von Newsletter abmelden</button>
+            <div className="fw-bold h4 mt-4">Für eine Abmeldung vom Newsletter ist es nötig, deinen Account vollständig zu löschen. Möchtest du das tun?</div>
+            <button className="btn btn-primary w-100 mt-4" onClick={() => deleteUserNewsletter()}>Von Newsletter abmelden und Account unwiderruflich löschen</button>
           </div>
         </div>
       </div>

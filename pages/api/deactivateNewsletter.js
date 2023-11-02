@@ -2,6 +2,7 @@ import logger from '../../lib/logger'
 import db from '../../lib/db'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
+import sendMail from '../../lib/sendMail'
 
 export default async function handler(request, response) {
 
@@ -9,49 +10,74 @@ export default async function handler(request, response) {
 
   try {
 
-    if (request.method === 'PATCH' && request.query.token) {
+    if (request.method === 'DELETE' && request.query.token) {
 
-      logger.info(`${request.url} | ${request.method} | token | decode jwt token`)
+      logger.info(`${request.url.slice(0, 50)} | ${request.method} | token | decode jwt token`)
 
       const jwtDecoded = jwt.verify(request.query.token, process.env.JWT_SECRET)
       const bytes = CryptoJS.AES.decrypt(jwtDecoded.encryptedData, process.env.JWT_SECRET)
       const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
 
-      logger.info(`${request.url} | ${request.method} | token | decode jwt token | check token type`)
+      logger.info(`${request.url.slice(0, 50)} | ${request.method} | token | decode jwt token | check token type`)
 
       if (decryptedData.type !== 'deactivateNewsletter') {
-        logger.info(`${request.url} | ${request.method} | token | decode jwt token | check token type | wrong token type | error`)
+        logger.info(`${request.url.slice(0, 50)} | ${request.method} | token | decode jwt token | check token type | wrong token type | error`)
 
         return response.status(400).send()
       }
 
-      logger.info(`${request.url} | ${request.method} | patchRequest`)
+      logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | deleteRequest`)
+      const dbRequest = await db.query(`DELETE FROM public.user WHERE user_id = $1 AND email = $2 RETURNING firstname, lastname`, [decryptedData.userId, decryptedData.email,])
+      logger.info(`${request.url} | ${request.method} | delete account | deleteRequest | response | rowCount | ${dbRequest.rowCount}`)
 
-      const dbRequest = await db.query(`
-        UPDATE
-          public.user 
-        SET
-          newsletter_deactivated = 'now()'
-        WHERE
-          email = $1
-        AND
-          user_id = $2
-        RETURNING user_id
-      `, [
-          decryptedData.email,
-          decryptedData.userId,
-        ]
+      if (dbRequest.rowCount === 0) {
+        logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | deleteRequest | error`)
+
+        return response.status(403).send()
+      }
+
+      logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | delete session in database`)
+      await db.query(`DELETE FROM public.session WHERE user_id = $1`, [decryptedData.userId])
+      logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | delete session in database | deleted`)
+
+      logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | cookie | invalidate`)
+      response.setHeader('set-cookie',`session=deleted; SameSite=Lax; HttpOnly; Path=/; Expires=${new Date('1970-01-01').toUTCString()}`)
+
+      logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | db getAdminsRequest`)
+
+      const dbGetAdminsRequest = await db.query(
+        `SELECT email FROM public.user WHERE status = 'ADMIN'`
       )
 
-      logger.info(`${request.url} | ${request.method} | patchRequest | response | rowCount | ${dbRequest.rowCount}`)
+      logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | send mail`)
 
-      response.status(dbRequest.rowCount > 0 ? 200 : 304).json({})
+      const templateName = 'userDeletionNotification'
+      const subject = 'User Löschung'
+      const params = {
+        email: decryptedData.email,
+        firstname: dbRequest.rows[0].firstname,
+        lastname: dbRequest.rows[0].lastname,
+      }
+
+      let sent
+      for (const admin of dbGetAdminsRequest.rows) {
+
+        sent = await sendMail(admin.email, subject, templateName, params)
+      }
+
+      if (sent.statusCode === 200) {
+        logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | send mail | sent`)
+      } else {
+        logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | send mail | error`)
+      }
+
+      response.status(200).send({})
 
       return
     }
 
   } catch(e) {
-    logger.info(`api | profile | error | ${e}`)
+    logger.info(`${request.url.slice(0, 50)} | ${request.method} | error | ${e}`)
 
     response.status(500).send({})
   }
