@@ -60,6 +60,20 @@ export default function Users() {
     mutate(`/api/admin/users?filter=deactivated`)
   }
 
+  const handleDelete = async (userId) => {
+    const confirmed = confirm('Soll der Benutzer wirklich gelöscht werden?')
+
+    if (confirmed) {
+
+      await fetch(`/api/admin/user/delete?userId=${userId}`)
+    
+      mutate(`/api/admin/users?filter=active`)
+      mutate(`/api/admin/users?filter=pending`)
+      mutate(`/api/admin/users?filter=blocked`)
+      mutate(`/api/admin/users?filter=deactivated`)
+    }
+  }
+
   if (error) return <Error />
   if (!users && !error) return <Loading />
   if (!pendingUsers && !pendingError) return <Loading />
@@ -139,16 +153,20 @@ export default function Users() {
                           {user.activated_at && !user.deactivated_at ? <>
                             <li><div className="dropdown-item cursor-pointer" onClick={() => handleDeactivation(user.user_id)}>Deaktivieren</div></li>
                             <li><div className="dropdown-item cursor-pointer" onClick={() => handleBlock(user.user_id)}>Sperren</div></li>
+                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDelete(user.user_id)}>Löschen</div></li>
                           </> : null}
                           {!user.activated_at && !user.blocked_at ? <>
                             <li><div className="dropdown-item cursor-pointer" onClick={() => handleActivation(user.user_id)}>Aktivieren</div></li>
                             <li><div className="dropdown-item cursor-pointer" onClick={() => handleBlock(user.user_id)}>Ablehnen &amp; Sperren</div></li>
+                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDelete(user.user_id)}>Löschen</div></li>
                           </> : null}
                           {user.blocked_at ? <>
                             <li><div className="dropdown-item cursor-pointer" onClick={() => handleUnblock(user.user_id)}>Sperre aufheben &amp; Aktivieren</div></li>
+                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDelete(user.user_id)}>Löschen</div></li>
                           </> : null}
                           {user.deactivated_at ? <>
                             <div className="dropdown-item">Benutzer können sich selbst deaktivieren. Daher kann der Admin den Status nicht revidieren.</div>
+                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDelete(user.user_id)}>Löschen</div></li>
                             {/* <li><div className="dropdown-item cursor-pointer" onClick={() => handleUnblock(user.user_id)}>Sperre aufheben &amp; Aktivieren</div></li> */}
                           </> : null}
                         </ul>
