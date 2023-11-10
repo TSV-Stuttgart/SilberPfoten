@@ -6,9 +6,12 @@
         <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
           Hallo {{firstname}},
           <br/><br/>
-          dein Hilfsangebot für den Fall <strong>{{caseTitle}}</strong> wurde soeben angenommen.
+          vielen Dank für Deine Hilfsbereitschaft! Dein Hilfsangebot für den Fall <strong>{{caseTitle}}</strong> wurde soeben angenommen.
           <br/><br/>
-          In der Detailansicht zum Fall werden dir nun Kontaktmöglichkeiten angezeigt.
+          Anbei erhältst Du im internen Bereich von <a href="https://mein.silberpfoten.de">mein.silberpfoten.de</a> die Kontaktdaten des Tierhalters. Darüber kannst Du Dich direkt mit ihm in Verbindung setzen.
+          Diese werden dir in der Detailansicht des Falls angezeigt.
+          <br/><br/>
+          Bei Fragen wende Dich gerne per E-Mail an <a href="mailto:info@silberpfoten.de">info@silberpfoten.de</a> an uns.
         </mj-text>
       </mj-column>
     </mj-section>

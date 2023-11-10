@@ -4,19 +4,30 @@
     <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
       <mj-column width="100%">
         <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
-          Hallo {{firstname}} {{lastname}},<br/>
-          <br/>
-          dein Profil wurde soeben aktiviert. Du kannst dich jetzt anmelden.
+          Hallo {{firstname}} {{lastname}},
+          <br/><br/>
+          herzlich willkommen bei SilberPfoten! Deine Registrierung ist hiermit abgeschlossen und Dein Zugang zu 
+          <a href="https://mein.silberpfoten.de">mein.silberpfoten.de</a> ist freigeschaltet. 
+          Wir freuen uns, dass Du SilberPfoten – Für Senioren und ihre Tiere als ehrenamtlicher Helfer unterstützt!
+          <br/><br/>
+          Ab jetzt kannst Du Dich mit Deiner E-Mail-Adresse und dem beim Einloggen zugesendeten Verifizierungscode in unseren 
+          internen Bereich <a href="https://mein.silberpfoten.de">mein.silberpfoten.de</a> einloggen. 
+          Dort findest Du dann zukünftig die Hilfegesuche aus Deiner Nachbarschaft. 
+          Kommt ein neues Gesuch in Deiner Nähe oder eine Nachricht von uns hinzu, wirst Du automatisch per E-Mail informiert. 
+          Unsere Fälle findest Du auch unter <a href="https://silberpfoten.de/ueber-uns/aktuelles/">https://silberpfoten.de/ueber-uns/aktuelles/</a>
+          <br/><br/>
+          Um SilberPfoten bekannter zu machen und mehr Menschen und ihren Tieren helfen zu können, 
+          wäre es toll, wenn Du in Deiner Nachbarschaft über SilberPfoten informierst, z. B. über Aushänge beim Bäcker, Friseur, etc. 
+          Den Aushang und weitere Infomaterialien findest Du unter <a href="https://silberpfoten.de/ueber-uns/infomaterialien/">https://silberpfoten.de/ueber-uns/infomaterialien/</a>. 
+          Vielen Dank!
+          <br/><br/>
+          Wir finanzieren uns ausschließlich aus Spenden und sind dankbar für jede Unterstützung! 
+          Alle Infos findest Du unter <a href="https://silberpfoten.de/foerdern/spenden/">https://silberpfoten.de/foerdern/spenden/</a>.
+          <br/><br/>
+          Bei Fragen wende Dich gerne per E-Mail an <a href="mailto:info@silberpfoten.de">info@silberpfoten.de</a> an uns.
         </mj-text>
       </mj-column>
     </mj-section>
-    <!-- <mj-section background-color="#ffffff" padding-bottom="30px" padding-top="0">
-      <mj-column width="100%">
-        <mj-button font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif" background-color="#d9b7bc" color="white" font-size="16px">
-          {{verificationCode}}
-         </mj-button>
-      </mj-column>
-    </mj-section> -->
     <mj-include path="./components/footer.mjml" />
   </mj-body>
 </mjml>
