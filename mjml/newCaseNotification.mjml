@@ -6,9 +6,13 @@
         <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
           Hallo {{firstname}},
           <br/><br/>
-          soeben wurde ein neuer Suchauftrag eingestellt, der für dich interessant sein könnte.
+          es gibt einen neuen Fall in Deiner Nähe, bei dem Hilfe gebraucht wird. Alle Infos dazu findest Du im internen Bereich mein.silberpfoten.de unter folgendem Link:
           <br/><br/>
-          Hier kommst du zum Suchauftrag: <strong><a href="{{caseLink}}" target="_blank">{{caseTitle}}</a></strong>
+          <strong><a href="{{caseLink}}" target="_blank">{{caseTitle}}</a></strong>
+          <br/><br/>
+          Vielen Dank für Deine Unterstützung!
+          <br/><br/>
+          Bei Fragen wende Dich gerne per E-Mail an <a href="mailto:info@silberpfoten.de">info@silberpfoten.de</a> an uns.
         </mj-text>
       </mj-column>
     </mj-section>

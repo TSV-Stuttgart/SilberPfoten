@@ -6,7 +6,7 @@
         <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
           Hallo {{firstname}} {{lastname}},<br/>
           <br/>
-          vielen Dank für Deine Registrierung. Anbei erhältst Du Deinen Verifizierungscode:
+          vielen Dank für Dein Interesse an einer Mithilfe bei SilberPfoten! Anbei erhältst Du Deinen Verifizierungscode:  
         </mj-text>
       </mj-column>
     </mj-section>
@@ -20,26 +20,8 @@
     <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
       <mj-column width="100%">
         <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
-          Mit diesem Code und Deiner E-Mail-Adresse kannst Du Dich nun in den internen Bereich mein.silberpfoten.de einloggen. 
-          Dort findest Du zukünftig auch die Hilfegesuche aus Deiner Nachbarschaft. Kommt ein neues Gesuch in Deiner Nähe oder eine Nachricht von uns hinzu, 
-          wirst Du automatisch per E-Mail informiert. Unsere Fälle findest Du auch unter https://silberpfoten.de/ueber-uns/aktuelles/
-        </mj-text>
-      </mj-column>
-    </mj-section>
-    <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
-      <mj-column width="100%">
-        <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
-          Um SilberPfoten bekannter zu machen und mehr Menschen und ihren Tieren helfen zu können, wäre es 
-          toll, wenn Du in Deiner Nachbarschaft über SilberPfoten informierst, z. B. über Aushänge beim 
-          Bäcker, Friseur, etc. Den Aushang und weitere Infomaterialien findest Du unter 
-          https://silberpfoten.de/ueber-uns/infomaterialien/. Vielen Dank!
-        </mj-text>
-      </mj-column>
-    </mj-section>
-    <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
-      <mj-column width="100%">
-        <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
-          Bei Fragen wende Dich gerne per E-Mail an info@silberpfoten.de an uns.
+        Bitte gib diesen Code in das entsprechende Feld ein und klicke auf "Anmelden". 
+        Sobald wir Deine Anmeldung geprüft und freigeschaltet haben, erhältst Du eine Nachricht über die Aktivierung Deines Zugangs zu <a href="https://mein.silberpfoten.de">mein.silberpfoten.de</a>. 
         </mj-text>
       </mj-column>
     </mj-section>
