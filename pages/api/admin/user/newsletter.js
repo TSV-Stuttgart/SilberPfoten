@@ -27,7 +27,7 @@ export default async function handler(request, response) {
         email,
       } = request.body
 
-      logger.info(`${request.url} | ${request.method} | send newsletter email`)
+      logger.info(`${request.url} | ${request.method} | send newsletter email | ${email}`)
 
       const templateName = 'systemChangeover'
       const emailSubject = 'Wichtig! Systemumstellung bei SilberPfoten / Neuer interner Bereich mein.silberpfoten.de'
@@ -59,7 +59,7 @@ export default async function handler(request, response) {
       let updateUserNewsletterRequest
 
       if (sent.statusCode === 200) {
-        logger.info(`${request.url} | ${request.method} | send newsletter email | success`)
+        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | success`)
 
         logger.info(`${request.url} | ${request.method} | update user newsletter | ${userId}`)
 
@@ -81,7 +81,7 @@ export default async function handler(request, response) {
         )
       } 
       else if (sent.statusCode === 400) {
-        logger.info(`${request.url} | ${request.method} | send newsletter email | error | SOFT bounce`)
+        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | SOFT bounce`)
 
         updateUserNewsletterRequest = await db.query(`
           UPDATE
@@ -98,8 +98,18 @@ export default async function handler(request, response) {
           ]
         )
       }
+      else if (sent.statusCode === 535) {
+        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | WE ARE BLOCKED FROM SENDING EMAILS`)
+        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | WE ARE BLOCKED FROM SENDING EMAILS`)
+        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | WE ARE BLOCKED FROM SENDING EMAILS`)
+
+        response.status(535).json({
+          statusCode: 535,
+          body: {}
+        })
+      }
       else if (sent.statusCode === 500) {
-        logger.info(`${request.url} | ${request.method} | send newsletter email | error | HARD bounce`)
+        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | HARD bounce`)
 
         updateUserNewsletterRequest = await db.query(`
           UPDATE
@@ -120,7 +130,7 @@ export default async function handler(request, response) {
       }
           
       if (updateUserNewsletterRequest.rowCount > 0) {
-        logger.info(`${request.url} | ${request.method} | update user newsletter | success | ${updateUserNewsletterRequest.rowCount} rows`)
+        logger.info(`${request.url} | ${request.method} | update user newsletter | ${email} | success | ${updateUserNewsletterRequest.rowCount} rows`)
 
         response.status(200).json({
           statusCode: 200,

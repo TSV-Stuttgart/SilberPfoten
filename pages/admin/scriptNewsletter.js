@@ -19,6 +19,7 @@ export default function Users() {
   const [success, setSuccess] = useState('')
   const [updateCounter, setUpdateCounter] = useState('')
   const [pauseSending, setPauseSending] = useState(false)
+  const [weAreBlocked, setWeAreBlocked] = useState(false)
   const [filter, setFilter] = useState('without_bounce')
 
   useEffect(() => {
@@ -49,9 +50,9 @@ export default function Users() {
       setUpdateCounter(counter)
       setIsSendingNewsletterTo(user.email)
       
-      await new Promise(r => setTimeout(r, 1000))
+      await new Promise(r => setTimeout(r, 10000))
 
-      const updateUserCoords = await fetch(`/api/admin/user/newsletter`, {
+      const sendNewsletter = await fetch(`/api/admin/user/newsletter`, {
         method: 'POST', 
         headers: {
           'Content-Type': 'application/json'
@@ -62,8 +63,13 @@ export default function Users() {
         })
       })
 
-      mutate(`/api/admin/users?filter=newsletter`)
-      
+      if (sendNewsletter.status === 535) {
+        setPauseSending(true)
+        setWeAreBlocked(true)
+        break
+      }
+
+      mutate(`/api/admin/users?filter=newsletter`)   
     }
 
     setSuccess(true)
@@ -98,7 +104,10 @@ export default function Users() {
             <div className="col-12">Sending to: {isSendingNewsletterTo} ({updateCounter})</div>
             </>
         : <>
-        <div className="col-12">Sending: {updateCounter ? <>{success ? <>Successfully sent</> : <>Not successfully sent</>}</> : <>Not started</>}</div>
+        <div className="col-12">
+          Sending: {updateCounter ? <>{success ? <>Successfully sent</> : <>Not successfully sent</>}</> : <>Not started</>}
+          {weAreBlocked ? <span className="text-danger">Wir wurden geblockt E-Mails zu versenden!!!</span> : null}
+        </div>
         </>
         }
         </div>
@@ -108,7 +117,7 @@ export default function Users() {
         <div className="row">
         {!isSendingNewsletter 
           ? <div className="col-3"><button onClick={() => sendNewsletter()} type="button" className="btn btn-light">Starte mit Newsletter Versand</button></div>
-          : <div className="col-3"><button onClick={() => setPauseSending(true)} type="button" className="btn btn-light" disabled>Pausiere den Newsletter Versand</button></div>
+          : <div className="col-3"><button onClick={() => setPauseSending(true)} type="button" className="btn btn-light">Pausiere den Newsletter Versand</button></div>
         }
         </div>
       </div>
