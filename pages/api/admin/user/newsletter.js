@@ -128,6 +128,9 @@ export default async function handler(request, response) {
           ]
         )
       }
+
+      // wait two seconds to prevent IONOS lock
+      await new Promise(r => setTimeout(r, 2000))
           
       if (updateUserNewsletterRequest.rowCount > 0) {
         logger.info(`${request.url} | ${request.method} | update user newsletter | ${email} | success | ${updateUserNewsletterRequest.rowCount} rows`)
