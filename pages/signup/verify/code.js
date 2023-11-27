@@ -48,7 +48,7 @@ export async function getServerSideProps(context) {
     const codeIsVerified = verificationCode && decryptedData.verificationCode === parseInt(verificationCode)
 
     logger.info(`signup | verify | code | token | verify | decoded jwt`)
-
+    
     if (jwtDecoded && codeIsVerified) {
       logger.info(`signup | verify | code | get coords from openstreetmap`)
 
@@ -96,11 +96,11 @@ export async function getServerSideProps(context) {
           location && location.length > 0 && location[0].lat ? location[0].lat : null,
           location && location.length > 0 && location[0].lon ? location[0].lon : null,
           decryptedData.job,
-          decryptedData.became_aware_through,
+          decryptedData.became_aware_through.length > 0 ? decryptedData.became_aware_through : null,
           decryptedData.became_aware_through_other,
-          decryptedData.experience_with_animal,
+          decryptedData.experience_with_animal.length > 0 ? decryptedData.experience_with_animal : null,
           decryptedData.experience_with_animal_other,
-          decryptedData.support_activity,
+          decryptedData.support_activity.length > 0 ? decryptedData.support_activity : null,
         ]
       )
 
@@ -116,7 +116,7 @@ export async function getServerSideProps(context) {
           lastname: decryptedData.lastname,
         }
 
-        const sent = sendMail(to, subject, templateName, params)
+        const sent = await sendMail(to, subject, templateName, params)
 
         if (sent.statusCode === 200) {
           logger.info(`api | admin | member | activation | sent welcome mail`)

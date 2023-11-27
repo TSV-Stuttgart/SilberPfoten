@@ -154,9 +154,9 @@ export default async function handler(request, response) {
           city,
           location && location.length > 0 && location[0].lat ? location[0].lat : null,
           location && location.length > 0 && location[0].lon ? location[0].lon : null,
-          experience_with_animal,
+          experience_with_animal.length > 0 ? experience_with_animal : null,
           experience_with_animal_other,
-          support_activity,
+          support_activity.length > 0 ? support_activity : null,
           firstname,
           lastname,
           token.user.user_id,
@@ -183,7 +183,10 @@ export default async function handler(request, response) {
         const params = {
           firstname: token.user.firstname,
           newEmail: email,
-          changeEmailLink: `${process.env.NEXT_PUBLIC_HOST}?token=${changeEmailToken}`,
+          //changeEmailLink: `${process.env.NEXT_PUBLIC_HOST}?token=${changeEmailToken}`
+
+          // Temporär bis NEXT_PUBLIC_HOST geändert wurde
+          changeEmailLink: `https://mein.silberpfoten.de?token=${changeEmailToken}`
         }
 
         const sent = await sendMail(token.user.email, subject, templateName, params)
