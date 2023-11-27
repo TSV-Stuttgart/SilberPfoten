@@ -327,6 +327,8 @@ export default async function handler(request, response) {
 
           for (const receiver of emailReceivers) {
 
+            continue
+
             const params = {
               firstname: receiver.firstname,
               caseLink: `${process.env.NEXT_PUBLIC_HOST}/message/${dbPutMessageRequest.rows[0].message_id}/${slugify(`${subject}`, {lower: true})}`,
