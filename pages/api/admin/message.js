@@ -2,8 +2,8 @@ import getToken from '../../../lib/auth/getToken'
 import db from '../../../lib/db'
 import logger from '../../../lib/logger'
 import sharp from 'sharp'
-import sendMail from '../../../lib/sendMail'
 import slugify from 'slugify'
+import {sendToQueue} from '../../../lib/queue'
 
 export const config = {
   api: {
@@ -300,6 +300,8 @@ export default async function handler(request, response) {
             WHERE
               status = 'USER'
             AND
+              newsletter IS NOT NULL
+            AND
               activated_at IS NOT NULL
           `, [])
 
@@ -313,20 +315,21 @@ export default async function handler(request, response) {
               logger.info(`${request.url} | ${request.method} | distance:${distance}`)
             }
 
-            if(distance <= searchRadius) {
+            if(distance <= searchRadius && distance <= 50) {
               logger.info(`${request.url} | ${request.method} | radius:${searchRadius}`)
 
               emailReceivers.push(user)
             }
           }
 
-          logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius`)
+          logger.info(`${request.url} | ${request.method} | sendEmailsToQueue | to users in search radius`)
 
           const templateName = 'newCaseNotification'
           const emailSubject = 'Neuer möglicher Suchauftrag'
 
           for (const receiver of emailReceivers) {
 
+            // Temporarily disabled
             continue
 
             const params = {
@@ -335,13 +338,16 @@ export default async function handler(request, response) {
               caseTitle: subject,
             }
 
-            let sent = await sendMail(receiver.email, emailSubject, templateName, params)
-
-            if (sent.statusCode === 200) {
-              logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius | success`)
-            } else {
-              logger.info(`${request.url} | ${request.method} | sendEmails | to users in search radius | error`)
+            const data = {
+              email: receiver.email,
+              emailSubject: emailSubject,
+              templateName: templateName,
+              params: params,
             }
+
+            await sendToQueue('MAIN', data)
+
+            logger.info(`${request.url} | ${request.method} | sendEmailsToQueue | to users in search radius | success`)
           }
           
         }

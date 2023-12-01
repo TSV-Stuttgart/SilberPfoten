@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import slugify from 'slugify'
@@ -50,6 +50,12 @@ export default function Home({query, tokenType}) {
 
   const [tokenHandling, setTokenHandling] = useState(false)
   const [noticeText, setNoticeText] = useState('')
+
+  useEffect(() => {
+
+    // start worker to handle email queue
+    fetch(`/api/worker`, {method: 'POST'})
+  }, [])
 
   //const deleteMessage = async (messageId) => {
   //  await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
