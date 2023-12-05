@@ -79,8 +79,6 @@ export default function Users() {
         setWeAreBlocked(true)
         break
       }
-
-      mutate(`/api/admin/users?filter=newsletter`)   
     }
 
     setSuccess(true)
