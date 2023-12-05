@@ -41,8 +41,19 @@ export default function Users() {
     setPauseSending(false)
 
     let counter = 0
+
+    let finalUsers = []
+    if (filter === 'with_bounce') {
+
+      finalUsers = users?.filter(u => u.email && u.newsletter_bounced)
+    }
+    else {
+
+      finalUsers = users?.filter(u => u.email && !u.newsletter_bounced)
+    }
+
     /// filter bei users für deaktivated newsletter
-    for (const user of users?.filter(u => u.email && filter === 'with_bounce' ? u.newsletter_bounced : !u.newsletter_bounced)) {
+    for (const user of finalUsers) {
 
       counter++
       setUpdateCounter(counter)
@@ -161,7 +172,7 @@ export default function Users() {
                 <div className="row mb-1">
                   <div className="col-1">{user.user_id}</div>
                   <div className="col-3">
-                    <Link href={`/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}`}>
+                    <Link href={`/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}`}>
                       <div className="text-secondary">{user.lastname}, {user.firstname} {user.status === 'ADMIN' ? <i className="bi bi-person-fill-gear ms-1" style={{fontSize: 16}}></i> : null}</div>
                     </Link>
                     {/* {user.activated_at ? <i className="ms-1 bi bi-patch-check-fill text-secondary"></i> : null} */}
