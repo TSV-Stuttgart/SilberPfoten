@@ -1,10 +1,10 @@
 import getToken from '../../../../lib/auth/getToken'
 import db from '../../../../lib/db'
 import logger from '../../../../lib/logger'
-import sendMail from '../../../../lib/sendMail'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
 import { randomUUID } from 'crypto'
+import {sendToQueue} from '../../../../lib/queue'
 
 export default async function handler(request, response) {
 
@@ -54,102 +54,36 @@ export default async function handler(request, response) {
         recipient: process.env.EMAIL_USER
       }
 
-      let sent = await sendMail(email, emailSubject, templateName, params, dsn)
-
-      let updateUserNewsletterRequest
-
-      if (sent.statusCode === 200) {
-        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | success`)
-
-        logger.info(`${request.url} | ${request.method} | update user newsletter | ${userId}`)
-
-        updateUserNewsletterRequest = await db.query(`
-          UPDATE
-            public.user
-          SET
-            newsletter_sent_at = $1,
-            newsletter_bounced = $2
-          WHERE
-            user_id = $3
-          RETURNING 
-            user_id
-          `, [
-            new Date().toISOString(),
-            null,
-            userId,
-          ]
-        )
-      } 
-      else if (sent.statusCode === 400) {
-        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | SOFT bounce`)
-
-        updateUserNewsletterRequest = await db.query(`
-          UPDATE
-            public.user
-          SET
-            newsletter_bounced = $1
-          WHERE
-            user_id = $2
-          RETURNING 
-            user_id
-          `, [
-            new Date().toISOString(),
-            userId,
-          ]
-        )
-      }
-      else if (sent.statusCode === 535) {
-        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | WE ARE BLOCKED FROM SENDING EMAILS`)
-        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | WE ARE BLOCKED FROM SENDING EMAILS`)
-        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | WE ARE BLOCKED FROM SENDING EMAILS`)
-
-        response.status(535).json({
-          statusCode: 535,
-          body: {}
-        })
-      }
-      else if (sent.statusCode === 500) {
-        logger.info(`${request.url} | ${request.method} | send newsletter email | ${email} | error | HARD bounce`)
-
-        updateUserNewsletterRequest = await db.query(`
-          UPDATE
-            public.user
-          SET
-            newsletter = $1,
-            newsletter_bounced = $2
-          WHERE
-            user_id = $3
-          RETURNING 
-            user_id
-          `, [
-            null,
-            new Date().toISOString(),
-            userId,
-          ]
-        )
+      const data = {
+        userId: userId,
+        email: email,
+        emailSubject: emailSubject,
+        templateName: templateName,
+        params: params,
+        dsn: dsn,
       }
 
-      // wait two seconds to prevent IONOS lock
-      await new Promise(r => setTimeout(r, 2000))
-          
-      if (updateUserNewsletterRequest.rowCount > 0) {
-        logger.info(`${request.url} | ${request.method} | update user newsletter | ${email} | success | ${updateUserNewsletterRequest.rowCount} rows`)
+      await sendToQueue('NEWSLETTER', data)
 
-        response.status(200).json({
-          statusCode: 200,
-          body: {}
-        })
+      await db.query(`
+        UPDATE
+          public.user
+        SET
+          newsletter_sent_at = $1
+        WHERE
+          user_id = $2
+        RETURNING 
+          user_id
+        `, [
+          new Date(),
+          userId,
+        ]
+      )
 
-        return
-      }
-
-      response.status(200).json({
-        statusCode: 500,
-        body: {}
-      })
-
-      return
+      response.status(200).send()
     }
+
+    response.status(405).send()
 
   } catch(e) {
     logger.info(`api | update user newsletter | error | ${e}`)

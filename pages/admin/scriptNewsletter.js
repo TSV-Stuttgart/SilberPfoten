@@ -50,7 +50,7 @@ export default function Users() {
       setUpdateCounter(counter)
       setIsSendingNewsletterTo(user.email)
       
-      await new Promise(r => setTimeout(r, 10000))
+      await new Promise(r => setTimeout(r, 100))
 
       const sendNewsletter = await fetch(`/api/admin/user/newsletter`, {
         method: 'POST', 
@@ -75,7 +75,6 @@ export default function Users() {
     setSuccess(true)
 
     setIsSendingNewsletter(false)   
-
   }
   
   return <>

@@ -99,3 +99,13 @@ CREATE TABLE IF NOT EXISTS public.message_has_media (
   updated_at TIMESTAMP DEFAULT NOW(),
   PRIMARY KEY(message_has_media_id)
 );
+
+CREATE TABLE IF NOT EXISTS public.email_queue (
+  email_queue_id BIGSERIAL,
+  email_type VARCHAR(100) NOT NULL DEFAULT 'MAIN',
+  payload TEXT,
+  in_progress BOOLEAN DEFAULT FALSE,
+  execute_at TIMESTAMP DEFAULT NOW(),
+  created_at TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY(email_queue_id)
+);
