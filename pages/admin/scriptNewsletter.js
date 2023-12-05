@@ -44,13 +44,13 @@ export default function Users() {
     /// filter bei users für deaktivated newsletter
     for (const user of users?.filter(u => u.email && filter === 'with_bounce' ? u.newsletter_bounced : !u.newsletter_bounced)) {
 
-      if(pauseSending) break
-
       counter++
       setUpdateCounter(counter)
-      setIsSendingNewsletterTo(user.email)
+      setIsSendingNewsletterTo(`Email:${user.email} Vorname:${user.firstname} Nachname:${user.lastname} UserId:${user.user_id}`)
+
+      await new Promise(r => setTimeout(r, 1000))
       
-      await new Promise(r => setTimeout(r, 100))
+      if(pauseSending) break
 
       const sendNewsletter = await fetch(`/api/admin/user/newsletter`, {
         method: 'POST', 
@@ -73,7 +73,6 @@ export default function Users() {
     }
 
     setSuccess(true)
-
     setIsSendingNewsletter(false)   
   }
   
@@ -99,16 +98,36 @@ export default function Users() {
 
       <div className="container mt-3">
         <div className="row">
-        {isSendingNewsletter ? <>
+        {isSendingNewsletter && !pauseSending && !weAreBlocked ? 
+          <>
             <div className="col-12">Sending to: {isSendingNewsletterTo} ({updateCounter})</div>
-            </>
-        : <>
-        <div className="col-12">
-          Sending: {updateCounter ? <>{success ? <>Successfully sent</> : <>Not successfully sent</>}</> : <>Not started</>}
-          {weAreBlocked ? <span className="text-danger">Wir wurden geblockt E-Mails zu versenden!!!</span> : null}
+          </>
+        : null}
         </div>
-        </>
-        }
+      </div>
+
+      <div className="container mt-3">
+        <div className="row">
+        {pauseSending ? 
+          <>
+            <div className="col-12">
+              {weAreBlocked ? <span className="text-danger">Pausiert!</span> : null}
+            </div>
+          </>
+        : null }
+        </div>
+      </div>
+
+      <div className="container mt-3">
+        <div className="row">
+        {weAreBlocked ? 
+          <>
+            <div className="col-12">
+              Sending: {updateCounter ? <>{success ? <>Successfully sent</> : <>Not successfully sent</>}</> : <>Not started</>}
+              {weAreBlocked ? <span className="text-danger">Wir wurden geblockt E-Mails zu versenden!!!</span> : null}
+            </div>
+          </>
+        : null }
         </div>
       </div>
 
