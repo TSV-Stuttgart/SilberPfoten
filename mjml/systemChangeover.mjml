@@ -33,7 +33,7 @@
     <mj-section>
       <mj-column>
         <mj-text font-size="12px" color="#212529" line-height="18px" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
-          Du möchtest nicht weiter über Neuigkeiten informiert werden? <a href={{deactivateNewsletterLink}}>Hier kannst Du Dich vom Newsletter abmelden</a>.
+          Du möchtest nicht weiter über Neuigkeiten informiert werden? <a href="{{deactivateNewsletterLink}}" target="_blank">Hier kannst Du Dich vom Newsletter abmelden</a>.
         </mj-text>
       </mj-column>
     </mj-section>
