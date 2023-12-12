@@ -55,7 +55,7 @@ export async function getServerSideProps(context) {
         FROM 
           public.user 
         WHERE 
-          email = $1`, 
+          LOWER(email) = $1`, 
         [emailLowerCase]
       )
 
