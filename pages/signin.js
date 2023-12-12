@@ -42,6 +42,7 @@ export async function getServerSideProps(context) {
       logger.info(`signin | post data | ${JSON.stringify(body)}`)
 
       const {email} = body
+      const emailLowerCase = email.toLowerCase()
 
       logger.info(`signin | get user`)
 
@@ -55,24 +56,15 @@ export async function getServerSideProps(context) {
           public.user 
         WHERE 
           email = $1`, 
-        [email]
+        [emailLowerCase]
       )
 
-      // if user doesnt exist we create an placebo token
-      // valid for 10 seconds
       if (userEmailExists.rowCount <= 0) {
-        logger.info(`signin | user doesnt exist | generate placebo token`)
+        logger.info(`signin | account | not found`)
 
-        const placeboToken = jwt.sign({
-          encryptedData: CryptoJS.AES.encrypt(JSON.stringify({
-            email,
-            placebo: true,
-          }), process.env.JWT_SECRET).toString(),
-        }, process.env.JWT_SECRET, {expiresIn: 10})
-  
         return {
           redirect: {
-            destination: `/signin/verify/code?token=${placeboToken}`,
+            destination: `/signup?email=${emailLowerCase}`,
             statusCode: 302,
           },
         }
@@ -130,7 +122,7 @@ export async function getServerSideProps(context) {
         encryptedData: CryptoJS.AES.encrypt(JSON.stringify({
           userId,
           firstname,
-          email,
+          email: emailLowerCase,
           verificationCode,
         }), process.env.JWT_SECRET).toString(),
       }, process.env.JWT_SECRET, {expiresIn: '5m'})
@@ -160,7 +152,7 @@ export async function getServerSideProps(context) {
 
       const info = await transporter.sendMail({
         from: '"SilberPfoten" <support@silberpfoten.de>',
-        to: email,
+        to: emailLowerCase,
         subject: "Dein Verifizierungscode",
         html: mjmlObject.html,
       })

@@ -38,6 +38,12 @@ export default function Registrieren({csrf}) {
   const [formBecameAwareThrough, setFormBecameAwareThrough] = useState([])
   const [formBecameAwareThroughOther, setFormBecameAwareThroughOther] = useState('')
 
+  useEffect(() => {
+
+    setFormEmail(router.query.email || '')
+
+  }, [router.query.email])
+
   //const [focusOut, setFocusOut] = useState(false)
   //const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
   //const [placeId, setPlaceId] = useState('')
