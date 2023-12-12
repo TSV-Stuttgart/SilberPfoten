@@ -42,6 +42,7 @@ export async function getServerSideProps(context) {
       logger.info(`signin | post data | ${JSON.stringify(body)}`)
 
       const {email} = body
+      const emailLowerCase = email.toLowerCase()
 
       logger.info(`signin | get user`)
 
@@ -55,7 +56,7 @@ export async function getServerSideProps(context) {
           public.user 
         WHERE 
           email = $1`, 
-        [email]
+        [emailLowerCase]
       )
 
       if (userEmailExists.rowCount <= 0) {
@@ -121,7 +122,7 @@ export async function getServerSideProps(context) {
         encryptedData: CryptoJS.AES.encrypt(JSON.stringify({
           userId,
           firstname,
-          email,
+          email: emailLowerCase,
           verificationCode,
         }), process.env.JWT_SECRET).toString(),
       }, process.env.JWT_SECRET, {expiresIn: '5m'})
@@ -151,7 +152,7 @@ export async function getServerSideProps(context) {
 
       const info = await transporter.sendMail({
         from: '"SilberPfoten" <support@silberpfoten.de>',
-        to: email,
+        to: emailLowerCase,
         subject: "Dein Verifizierungscode",
         html: mjmlObject.html,
       })
