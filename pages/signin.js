@@ -58,21 +58,12 @@ export async function getServerSideProps(context) {
         [email]
       )
 
-      // if user doesnt exist we create an placebo token
-      // valid for 10 seconds
       if (userEmailExists.rowCount <= 0) {
-        logger.info(`signin | user doesnt exist | generate placebo token`)
+        logger.info(`signin | account | not found`)
 
-        const placeboToken = jwt.sign({
-          encryptedData: CryptoJS.AES.encrypt(JSON.stringify({
-            email,
-            placebo: true,
-          }), process.env.JWT_SECRET).toString(),
-        }, process.env.JWT_SECRET, {expiresIn: 10})
-  
         return {
           redirect: {
-            destination: `/signin/verify/code?token=${placeboToken}`,
+            destination: `/signup?email=${emailLowerCase}`,
             statusCode: 302,
           },
         }
