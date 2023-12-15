@@ -44,7 +44,9 @@ export default async function handler(request, response) {
         status,
         newsletter,
         newsletter_deactivated,
-        newsletter_bounced
+        newsletter_bounced,
+        lat,
+        lon
       FROM 
         public.user u
       WHERE
