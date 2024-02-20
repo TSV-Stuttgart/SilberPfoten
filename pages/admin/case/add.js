@@ -10,12 +10,33 @@ import 'react-quill/dist/quill.snow.css'
 import Loading from '../../../components/Loading'
 import slugify from 'slugify'
 import {filesize} from 'filesize'
+import useSWR from 'swr'
 
 const ReactQuill = dynamic(() => import('react-quill'), {ssr: false})
+
+const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+
+  var R = 6371 // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1)  // deg2rad below
+  var dLon = deg2rad(lon2-lon1) 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  var d = R * c // Distance in km
+  return d
+}
+
+const deg2rad = (deg) => {
+  return deg * (Math.PI/180)
+}
 
 export default function AdminCaseAdd() {
   const router = useRouter()
   const {session, error: sessionError} = useSession()
+  const {data: users, error} = useSWR(`/api/admin/users?filter=active`, (url) => fetch(url).then(r => r.json()))
 
   const [loading, setLoading] = useState(false)
 
@@ -38,22 +59,38 @@ export default function AdminCaseAdd() {
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
 
+  const [allDistancesOfUsers, setAllDistancesOfUsers] = useState([])
+
   //const [focusOut, setFocusOut] = useState(false)
   //const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
   //const [placeId, setPlaceId] = useState('')
   //const [coordLat, setCoordLat] = useState('')
   //const [coordLon, setCoordLon] = useState('')
 
-  //useEffect(() => {
+  useEffect(() => {
 
-  //  if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
-  //    searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
-  //  }
-  //  else {
-  //    setFocusOut(false)
-  //  }
+    const findLocation = async () => {
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${formZipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
 
-  //}, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
+      let distances = []
+      for (const user of users?.filter(u => u.newsletter && !u.newsletter_deactivated && !u.newsletter_bounced && u.status === 'USER')) {
+
+        if (user.lat === null || user.lon === null) continue
+        
+        const distance = getDistanceFromLatLonInKm(location[0].lat, location[0].lon, user.lat, user.lon)
+        distances.push(distance)
+      }
+      setAllDistancesOfUsers(distances)
+    }
+
+    if (formZipcode.length === 5 && allDistancesOfUsers.length === 0 && formSearchRadius > 0) {
+      findLocation()
+    }
+    else if (formZipcode.length !== 5 && allDistancesOfUsers.length > 0){
+      setAllDistancesOfUsers([])
+    }
+ 
+  }, [formZipcode, users, formSearchRadius, allDistancesOfUsers])
 
   //const searchAddress = async (value) => {
   //  const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
@@ -67,6 +104,7 @@ export default function AdminCaseAdd() {
   //}
 
   if (!session && !sessionError) return <Loading />
+  if (!users && !error) return <Loading />
   if (loading) return <Loading />
 
   const handleSubmit = async (e) => {
@@ -166,7 +204,7 @@ export default function AdminCaseAdd() {
               <div className="col-6">
                 <div className="btn-group float-end" role="group">
                   <Link href="/admin/messages" className="btn btn-secondary">Abbrechen</Link>
-                  {calculateUploadedTotalSize() >= 10485760
+                  {calculateUploadedTotalSize() >= 10485760 || allDistancesOfUsers?.filter(d => d <= formSearchRadius)?.length > 500
                   ? <button className="btn btn-success text-white" type="submit" disabled>Veröffentlichen</button>
                   : <button className="btn btn-success text-white" type="submit">Veröffentlichen</button>
                   }
@@ -326,8 +364,12 @@ export default function AdminCaseAdd() {
             </div>
             <div className="row mt-3">
               <div className="col-12 col-md-4">
-                <span className="p small ms-1">Suchradius in Kilometern</span>
-                <input type="number" className="form-control" placeholder="10" value={formSearchRadius} onChange={(e) => setFormSearchRadius(e.target.value)} required />
+                <span className="p small ms-1">
+                  <span>Suchradius in Kilometern </span>
+                  <span className="fw-bold">({allDistancesOfUsers?.filter(d => d <= formSearchRadius)?.length} betreffende User) <br/></span>
+                  {allDistancesOfUsers?.filter(d => d <= formSearchRadius)?.length > 500 ? <span className="fw-bold text-danger">Maximal 500 User möglich. Bitte Suchradius verkleinern!</span> : null}
+                </span>
+                <input type="number" className="form-control" placeholder="3" value={formSearchRadius} onChange={(e) => setFormSearchRadius(e.target.value)} required />
               </div>
             </div>
             <div className="row mt-4">

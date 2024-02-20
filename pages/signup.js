@@ -17,7 +17,9 @@ export async function getServerSideProps() {
 
 export default function Registrieren({csrf}) {
   const router = useRouter()
-  const [formError, setFormError] = useState(false)
+
+  const [errorMessage, setErrorMessage] = useState('')
+
   const [formGender, setFormGender] = useState('')
   const [formFirstname, setFormFirstname] = useState('')
   const [formLastname, setFormLastname] = useState('')
@@ -37,6 +39,12 @@ export default function Registrieren({csrf}) {
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
   const [formBecameAwareThrough, setFormBecameAwareThrough] = useState([])
   const [formBecameAwareThroughOther, setFormBecameAwareThroughOther] = useState('')
+
+  useEffect(() => {
+
+    setFormEmail(router.query.email || '')
+
+  }, [router.query.email])
 
   //const [focusOut, setFocusOut] = useState(false)
   //const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
@@ -101,8 +109,13 @@ export default function Registrieren({csrf}) {
       router.push(`/signup/verify/code?token=${signupRequestResponse.token}`)
     }
 
+    else if (signupRequestResponse.status === 409) {
+      setErrorMessage('Diese E-Mail Adresse gibt es bereits in unserem System. Du kannst dich einfach damit einloggen.')
+      document.documentElement.scrollTop = 0
+    }
+
     else if (signupRequestResponse.status === 500) {
-      setFormError(true)
+      setErrorMessage('Dein Sicherheitsschlüssel ist abgelaufen (10 Minuten). <br/>Bitte versuche es erneut.')
       document.documentElement.scrollTop = 0
     }
   }
@@ -111,13 +124,14 @@ export default function Registrieren({csrf}) {
 
     <FreestandingHeader />
 
-    {formError ? <>
-    <div className="container mt-4">
+    {errorMessage ? <>
+    <div className="container mt-3">
       <div className="row justify-content-center">
         <div className="col-12 col-md-6 text-center">
-          <div className="rounded bg-light p-2">
-            <div className="p fw-bold">Hups! Da ist etwas schief gelaufen</div>
-            <div className="p fw-normal mt-3">Dein Sicherheitsschlüssel ist abgelaufen (10 Minuten). <br/>Bitte versuche es erneut.</div>
+          <div className="border bg-light p-2">
+
+            <div className="p fw-bold">Hups! Da ist etwas schief gelaufen &#129300;</div>
+            <div className="p fw-normal mt-3">{errorMessage}</div>
           </div>
         </div>
       </div>

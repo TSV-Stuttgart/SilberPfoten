@@ -219,6 +219,61 @@ export default async function handler(request, response) {
       logger.info(`${request.url} | ${request.method} | lat | ${location?.[0]?.lat}`)
       logger.info(`${request.url} | ${request.method} | lon | ${location?.[0]?.lon}`)
 
+      let emailReceivers = []
+
+      if (location && location.length > 0 && location[0].lat && location[0].lon) {
+
+        const getUsersRequest = await db.query(`
+          SELECT 
+            lastname,
+            firstname,
+            email,
+            lat,
+            lon
+          FROM 
+            public.user
+          WHERE
+            status = 'USER'
+          AND
+            newsletter IS NOT NULL
+          AND
+            newsletter_bounced IS NULL
+          AND
+            newsletter_deactivated IS NULL
+          AND
+            activated_at IS NOT NULL
+        `, [])
+
+        let distance
+        for (const user of getUsersRequest.rows) {
+          logger.info(`${request.url} | ${request.method} | user:${user.firstname},${user.lastname}`)
+
+          if(!user.lat || !user.lon) { 
+            continue
+          }
+
+          distance = getDistanceFromLatLonInKm(location[0].lat, location[0].lon, user.lat, user.lon)
+
+          logger.info(`${request.url} | ${request.method} | distance:${distance}`)
+
+          if(distance <= searchRadius) {
+            logger.info(`${request.url} | ${request.method} | radius:${searchRadius}`)
+
+            emailReceivers.push(user)
+          }
+        } 
+      }
+      else {
+
+        logger.info(`${request.url} | ${request.method} | couldn't find coordinates for case`)
+      }
+
+      if (emailReceivers && emailReceivers.length > 500) {
+        logger.info(`${request.url} | ${request.method} | too many email receivers | slice to 500`)
+
+        emailReceivers = emailReceivers.slice(0, 500)
+      }
+
       logger.info(`${request.url} | ${request.method} | putRequest`)
 
       const dbPutMessageRequest = await db.query(`
@@ -284,43 +339,7 @@ export default async function handler(request, response) {
         
         logger.info(`${request.url} | ${request.method} | sendEmails | calculate distances`)
 
-        if ((location && location.length > 0 && location[0].lat) && location && location.length > 0 && location[0].lon) {
-
-          let emailReceivers = []
-
-          const getUsersRequest = await db.query(`
-            SELECT 
-              lastname,
-              firstname,
-              email,
-              lat,
-              lon
-            FROM 
-              public.user
-            WHERE
-              status = 'USER'
-            AND
-              newsletter IS NOT NULL
-            AND
-              activated_at IS NOT NULL
-          `, [])
-
-          let distance = 9999999999999
-          for (const user of getUsersRequest.rows) {
-            logger.info(`${request.url} | ${request.method} | user:${user.firstname},${user.lastname}`)
-
-            if(user.lat && user.lon) { 
-              distance = getDistanceFromLatLonInKm(location[0].lat, location[0].lon, user.lat, user.lon)
-
-              logger.info(`${request.url} | ${request.method} | distance:${distance}`)
-            }
-
-            if(distance <= searchRadius && distance <= 50) {
-              logger.info(`${request.url} | ${request.method} | radius:${searchRadius}`)
-
-              emailReceivers.push(user)
-            }
-          }
+        if (emailReceivers && emailReceivers.length > 0) {
 
           logger.info(`${request.url} | ${request.method} | sendEmailsToQueue | to users in search radius`)
 
@@ -328,9 +347,6 @@ export default async function handler(request, response) {
           const emailSubject = 'Neuer möglicher Suchauftrag'
 
           for (const receiver of emailReceivers) {
-
-            // Temporarily disabled
-            continue
 
             const params = {
               firstname: receiver.firstname,
@@ -350,10 +366,6 @@ export default async function handler(request, response) {
             logger.info(`${request.url} | ${request.method} | sendEmailsToQueue | to users in search radius | success`)
           }
           
-        }
-        else {
-
-          logger.info(`${request.url} | ${request.method} | sendEmails | calculate distances | couldn't find coordinates for case`)
         }
 
         logger.info(`${request.url} | ${request.method} | putRequest | success | ${JSON.stringify(dbPutMessageRequest.rows[0])}`)
