@@ -75,12 +75,16 @@ export default function AdminCaseAdd() {
       let distances = []
       for (const user of users?.filter(u => u.newsletter && !u.newsletter_deactivated && !u.newsletter_bounced && u.status === 'USER')) {
 
-        if (user.lat === null || user.lon === null) continue
-        
+        if (user.lat === null || user.lon === null) {
+
+          distances.push(9999999)
+          continue
+        }
+
         const distance = getDistanceFromLatLonInKm(location[0].lat, location[0].lon, user.lat, user.lon)
         distances.push(distance)
       }
-      setAllDistancesOfUsers(distances)
+      setAllDistancesOfUsers(distances.length > 0 ? distances : [9999999])
     }
 
     if (formZipcode.length === 5 && allDistancesOfUsers.length === 0 && formSearchRadius > 0) {
