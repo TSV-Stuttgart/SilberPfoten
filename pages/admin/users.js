@@ -127,6 +127,17 @@ export default function Users() {
         </div>
       </div>
 
+      <div className="container mt-3">
+        <div className="row">
+          <div className="col-12 text-end">
+            <button type="button" className={`btn btn-light`} onClick={() => exportUsersAsCSV()}>
+              <i class="bi bi-filetype-csv"></i>
+              <span className="ps-1">CSV Export</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {users?.length > 0 ? <>
         <div className="container mt-2">
           <div className="row mb-1">
