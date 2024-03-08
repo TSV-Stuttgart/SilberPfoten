@@ -148,16 +148,19 @@ export async function getServerSideProps(context) {
 
       logger.info(`signin | create | sendEmail | createTransport`)
 
-      const transporter = require('../lib/nodemailer/transporter')()
+      if (process.env.NODE_ENV !== 'development') {
+        
+        const transporter = require('../lib/nodemailer/transporter')()
 
-      const info = await transporter.sendMail({
-        from: '"SilberPfoten" <support@silberpfoten.de>',
-        to: emailLowerCase,
-        subject: "Dein Verifizierungscode",
-        html: mjmlObject.html,
-      })
+        const info = await transporter.sendMail({
+          from: '"SilberPfoten" <support@silberpfoten.de>',
+          to: emailLowerCase,
+          subject: "Dein Verifizierungscode",
+          html: mjmlObject.html,
+        })
 
-      logger.info(`signin | create | sendEmail | Message sent: ${info.messageId}`)
+        logger.info(`signin | create | sendEmail | Message sent: ${info.messageId}`)
+      }
 
       return {
         redirect: {
