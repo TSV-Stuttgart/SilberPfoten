@@ -51,3 +51,5 @@ docker-compose -f docker-compose.dev.yml down --remove-orphans --volumes --rmi=a
 
 5. Starte die Anwendung mit `yarn dev`
 6. Öffne die lokale Anwendung auf http://localhost:3000
+
+7. Signin in der lokalen Anwendung immer mit dem Verifizierungscode `123456`
