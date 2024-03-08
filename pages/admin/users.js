@@ -74,6 +74,25 @@ export default function Users() {
     }
   }
 
+  const exportUsersAsCSV = () => {
+
+    const csv = users.map(user => {
+      return `${user.user_id};${user.firstname};${user.lastname};${user.email};${user.zipcode};${user.city};${user.experience_with_animal};${user.experience_with_animal_other};${user.activated_at};${user.blocked_at};${user.deactivated_at}`
+    }).join('\n')
+
+    let csvContent = "data:text/csv;charset=utf-8," 
+
+    csvContent += 'ID;Vorname;Nachname;E-Mail;PLZ;Ort;Erfahrungen mit Tieren;Erfahrungen mit Tieren (andere);Aktiviert am;Gesperrt am;Deaktiviert am\n'
+    csvContent += csv
+
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", "mitglieder.csv")
+    document.body.appendChild(link)
+    link.click()
+  }
+
   if (error) return <Error />
   if (!users && !error) return <Loading />
   if (!pendingUsers && !pendingError) return <Loading />
