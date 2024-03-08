@@ -7,6 +7,18 @@ export default async function handler(request, response) {
   // consume all queues
   if (request.method === 'POST') {
 
+    // prevent emails from email queue being sent in development
+    if (process.env.NODE_ENV === 'development') {
+      logger.info(`${request.url} | ${request.method} | not consuming with email queue worker in development`)
+
+      response.status(200).json({
+        error: true,
+        message: `not consuming with email queue worker in development`
+      })
+
+      return
+    }
+
     const queueRequest = await getFromQueue()
 
     const acks = []
