@@ -16,6 +16,7 @@ export default function Navigation() {
       <div className="mt-4">
         <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/' ? 'bi-envelope-fill' : 'bi-envelope'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Neuigkeiten</span></div></Link>
         <Link href="/profile" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/profile' ? 'bi-person-vcard-fill' : 'bi-person-vcard'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Meine Daten</span></div></Link>
+        <Link href="https://silberpfoten.de/foerdern/spenden/" target="_blank" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`bi bi-box2-heart me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Spenden/Patenschaft</span></div></Link>
         <div className="text-secondary mt-4 border-top">
           <Link href="/signout" className="text-decoration-none"><div className="cursor-pointer text-secondary d-block h4 fw-light mt-3"><i className="bi bi-box-arrow-left me-2" style={{fontSize: 24}} /><span className="d-none d-lg-inline">Abmelden</span></div></Link>
         </div>
