@@ -20,7 +20,10 @@ BEGIN
     city,
     job,
     status,
-    activated_at
+    activated_at,
+    lat,
+    lon,
+    newsletter
   ) VALUES (
     'male',
     'Admini',
@@ -34,6 +37,9 @@ BEGIN
     'Ostfildern',
     'Developer',
     'ADMIN',
+    'now()',
+    48.719185,
+    9.266353,
     'now()'
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoAdmin1UserId;
 
@@ -50,12 +56,15 @@ BEGIN
     city,
     job,
     status,
-    activated_at
+    activated_at,
+    lat,
+    lon,
+    newsletter
   ) VALUES (
     'male',
     'Christian',
     'Mustermann',
-    'info@stigits.com',
+    'info2@stigits.com',
     '1991-08-01',
     '017277665522',
     'Im Kornfeld',
@@ -64,6 +73,9 @@ BEGIN
     'Stuttgart',
     'Developer',
     'ADMIN',
+    'now()',
+    48.759674,
+    9.15352,
     'now()'
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoAdmin2UserId;
 
@@ -86,7 +98,10 @@ BEGIN
     support_activity,
     status,
     activated_at,
-    activated_from_user
+    activated_from_user,
+    lat,
+    lon,
+    newsletter
   ) VALUES (
     'male',
     'Ingo',
@@ -106,7 +121,10 @@ BEGIN
     ARRAY['go_walk','veterinary_trips','animal_care','events','baking_cooking','creative_workshop','public_relation','light_office_work','graphic_work'],
     'USER',
     'now()',
-    demoAdmin1UserId
+    demoAdmin1UserId,
+    48.719185,
+    9.266353,
+    'now()'
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoHelper1UserId;
 
     INSERT INTO public.user (
@@ -128,7 +146,10 @@ BEGIN
     support_activity,
     status,
     activated_at,
-    activated_from_user
+    activated_from_user,
+    lat,
+    lon,
+    newsletter
   ) VALUES (
     'male',
     'Peter',
@@ -148,7 +169,10 @@ BEGIN
     ARRAY['go_walk','veterinary_trips','animal_care','events','baking_cooking','creative_workshop','public_relation','light_office_work','graphic_work'],
     'USER',
     'now()',
-    demoAdmin2UserId
+    demoAdmin2UserId,
+    48.719185,
+    9.266353,
+    'now()'
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoHelper2UserId;
 
   INSERT INTO public.user (
@@ -168,12 +192,15 @@ BEGIN
     experience_with_animal,
     experience_with_animal_other,
     support_activity,
-    status
+    status,
+    lat,
+    lon,
+    newsletter
   ) VALUES (
     'female',
     'Francesca',
     'Bolognese',
-    'demo-silberpfoten-helfer2@stigits.com',
+    'demo-silberpfoten-helfer3@stigits.com',
     '1990-09-28',
     '01771111122',
     'Schwabstraße',
@@ -186,7 +213,10 @@ BEGIN
     ARRAY['dog'],
     'Schlangen',
     ARRAY['go_walk','animal_care','events'],
-    'USER'
+    'USER',
+    48.719185,
+    9.266353,
+    'now()'
   ) ON CONFLICT DO NOTHING RETURNING user_id INTO demoHelper2NotActivatedUserId;
 
 END $$;
