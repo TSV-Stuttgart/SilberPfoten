@@ -18,6 +18,8 @@ export default function Users() {
   const {data: blockedUsers, error: blockedError} = useSWR(`/api/admin/users?filter=blocked`, (url) => fetch(url).then(r => r.json()))
   const {data: deactivatedUsers, error: deactivatedError} = useSWR(`/api/admin/users?filter=deactivated`, (url) => fetch(url).then(r => r.json()))
 
+  const [usersSortOrder, setUsersSortOrder] = useState('')
+
   useEffect(() => {
     import('bootstrap/js/dist/dropdown')
   }, [])
@@ -129,6 +131,24 @@ export default function Users() {
 
       <div className="container mt-3">
         <div className="row">
+          <div className="col-12">
+            <select className="form-select" onChange={(e) => setUsersSortOrder(e.target.value)}>
+              <option value="">Sortieren nach</option>
+              <option value="firstnameAsc">Vorname aufsteigend</option>
+              <option value="firstnameDesc">Vorname absteigend</option>
+              <option value="lastnameAsc">Nachname aufsteigend</option>
+              <option value="lastnameDesc">Nachname absteigend</option>
+              <option value="zipAsc">PLZ aufsteigend</option>
+              <option value="zipDesc">PLZ absteigend</option>
+              <option value="locationAsc">Ort aufsteigend</option>
+              <option value="locationDesc">Ort absteigend</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mt-3">
+        <div className="row">
           <div className="col-12 text-end">
             <button type="button" className={`btn btn-light`} onClick={() => exportUsersAsCSV()}>
               <i class="bi bi-filetype-csv"></i>
@@ -153,7 +173,16 @@ export default function Users() {
               </div>
             </div>
           </div>
-          {users?.map(user => <div className="row" key={`${user.user_id}`}>
+          {users?.sort((a,b) => {
+            if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
+            else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
+            else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
+            else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
+            else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
+            else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
+            else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
+            else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
+          })?.map(user => <div className="row" key={user.user_id}>
             <div className="col-12">
               <div className="px-2 py-1">
                 <div className="row mb-1">
