@@ -12,8 +12,6 @@ export default function Footer() {
   const handleCloseOffcanvas = () => setShowOffcanvas(false)
   const handleShowOffcanvas = () => setShowOffcanvas(true)
 
-  const isAdmin = session?.user?.status === 'ADMIN' ? true : false
-
   return <>
     <div className="container-fluid d-block d-md-none d-print-none bg-white fixed-bottom border-top py-2">
       <div className="row align-items-center">
@@ -28,13 +26,29 @@ export default function Footer() {
       </Offcanvas.Header>
       <Offcanvas.Body>
         <div className="">
-          <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light"><i className={`${router.pathname === '/' ? 'bi-envelope-fill' : 'bi-envelope'} me-2`} style={{fontSize: 24}}></i>Neuigkeiten</div></Link>
-          <Link href="/profile" className="text-decoration-none"><div className="text-dark d-block h4 fw-light"><i className={`${router.pathname === '/profile' ? 'bi-person-vcard-fill' : 'bi-person-vcard'} me-2`} style={{fontSize: 24}}></i>Meine Daten</div></Link>
-          <div className="text-secondary mt-4 pt-3 border-top">
-            {/* {isAdmin ? <>
-              <Link href="/helpers" className="text-decoration-none"><div className="mt-3 text-dark d-block h4 fw-light"><i className={`${router.pathname === '/helpers' ? 'bi bi-person-heart' : 'bi bi-person-heart'} me-2`} style={{fontSize: 24}} />Helfer</div></Link>
-            </> : null} */}
-            <Link href="/signout" className="text-secondary"><div className="d-block h4 fw-light text-decoration-none mt-3 cursor-pointer"><i className="bi bi-box-arrow-left me-2" />Abmelden</div></Link>
+          <div className="mt-4">
+            <Link href="/" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/' ? 'bi-envelope-fill' : 'bi-envelope'} me-2`} style={{fontSize: 24}}></i><span>Neuigkeiten</span></div></Link>
+            <Link href="/profile" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`${router.pathname === '/profile' ? 'bi-person-vcard-fill' : 'bi-person-vcard'} me-2`} style={{fontSize: 24}}></i><span>Meine Daten</span></div></Link>
+            <Link href="https://silberpfoten.de/foerdern/spenden/" target="_blank" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer"><i className={`bi bi-box2-heart me-2`} style={{fontSize: 24}}></i><span>Spenden/Patenschaft</span></div></Link>
+            <div className="text-secondary mt-4 border-top">
+              <Link href="/signout" className="text-decoration-none"><div className="cursor-pointer text-secondary d-block h4 fw-light mt-3"><i className="bi bi-box-arrow-left me-2" style={{fontSize: 24}} /><span>Abmelden</span></div></Link>
+            </div>
+
+            {session?.user?.status === 'ADMIN' ? <>
+              <div className="fw-bold mt-4">Administration</div>
+              <Link href="/admin/users" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/users' ? 'bi-people-fill' : 'bi-people'} me-2`} style={{fontSize: 24}}></i><span>Benutzer</span></div></Link>
+              <Link href="/admin/messages" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/messages' ? 'bi-envelope-fill' : 'bi-envelope'} me-2`} style={{fontSize: 24}}></i><span>Nachrichten</span></div></Link>
+              <Link href="/admin/cases" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/cases' ? 'bi-megaphone-fill' : 'bi-megaphone'} me-2`} style={{fontSize: 24}}></i><span>Suchaufträge</span></div></Link>
+            </> : null}
+          </div>
+          
+          <div className="bg-light rounded-pill mt-5 py-2 px-3 cursor-pointer">
+            <div className="row align-items-center">
+              <div className="col-10">
+                <div className="p text-muted">Angemeldet als</div>
+                <div className="h4 fw-bold">{session?.user?.firstname} {session?.user?.lastname}</div>
+              </div>
+            </div>
           </div>
           <div className="mt-3">
             <Copyright />
