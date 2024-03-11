@@ -51,6 +51,7 @@ export default async function handler(request, response) {
 
       logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | send mail`)
 
+      const to = 'info@silberpfoten.de'
       const templateName = 'userDeletionNotification'
       const subject = 'User Löschung'
       const params = {
@@ -59,11 +60,7 @@ export default async function handler(request, response) {
         lastname: dbRequest.rows[0].lastname,
       }
 
-      let sent
-      for (const admin of dbGetAdminsRequest.rows) {
-
-        sent = await sendMail(admin.email, subject, templateName, params)
-      }
+      sent = await sendMail(to, subject, templateName, params)
 
       if (sent.statusCode === 200) {
         logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | send mail | sent`)
