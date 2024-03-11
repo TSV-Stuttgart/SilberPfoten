@@ -55,7 +55,7 @@ export default function Members({userId}) {
           <div className="col-12 small">
             <span className="bg-light px-2 rounded me-1">E-Mail</span>
           </div>
-          <div className="col-12 p">{member.email}</div>
+          <div className="col-12 p"><a href={`mailto:${member.email}`}>­{member.email}</a></div>
         </div>
         <div className="row mt-2">
           <div className="col-12 small">
