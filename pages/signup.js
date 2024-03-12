@@ -114,6 +114,11 @@ export default function Registrieren({csrf}) {
       document.documentElement.scrollTop = 0
     }
 
+    else if (signupRequestResponse.status === 400) {
+      setErrorMessage('Du must mindestens 18 Jahre alt sein.')
+      document.documentElement.scrollTop = 0
+    }
+
     else if (signupRequestResponse.status === 500) {
       setErrorMessage('Dein Sicherheitsschlüssel ist abgelaufen (10 Minuten). <br/>Bitte versuche es erneut.')
       document.documentElement.scrollTop = 0
