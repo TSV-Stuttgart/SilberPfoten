@@ -47,7 +47,7 @@ export default async function handler(request, response) {
     const age = dayjs().diff(birthdate, 'year')
 
     if (age < 18) {
-      logger.info(`api | signup | check age | error | conflict: parent is under 18`)
+      logger.info(`api | signup | check age | error | conflict: need to be 18 or older`)
 
       response.status(200).json({
         status: 400,
