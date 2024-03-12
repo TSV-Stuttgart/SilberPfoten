@@ -19,6 +19,7 @@ export default function Users() {
   const {data: deactivatedUsers, error: deactivatedError} = useSWR(`/api/admin/users?filter=deactivated`, (url) => fetch(url).then(r => r.json()))
 
   const [usersSortOrder, setUsersSortOrder] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     import('bootstrap/js/dist/dropdown')
@@ -131,7 +132,10 @@ export default function Users() {
 
       <div className="container mt-3">
         <div className="row">
-          <div className="col-12">
+          <div className="col-6">
+            <input type="text" className="form-control" placeholder="Suchen" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          </div>
+          <div className="col-6">
             <select className="form-select" onChange={(e) => setUsersSortOrder(e.target.value)}>
               <option value="">Sortieren nach</option>
               <option value="firstnameAsc">Vorname aufsteigend</option>
