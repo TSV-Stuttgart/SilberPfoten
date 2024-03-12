@@ -12,6 +12,7 @@
     "bootstrap": "^5.2.2",
     "bootstrap-icons": "^1.9.1",
     "crypto-js": "^4.1.1",
+    "dayjs": "^1.11.10",
     "filesize": "^10.0.7",
     "handlebars": "^4.7.7",
     "jsonwebtoken": "^9.0.0",
