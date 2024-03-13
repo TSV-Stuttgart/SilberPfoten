@@ -147,6 +147,35 @@ export default async function handler(request, response) {
       return
     }
 
+    if (request.method === 'GET') {
+
+      logger.info(`api | message | db request`)
+
+      const dbRequest = await db.query(`
+        SELECT
+          m.message_id,
+          m.subject,
+          m.message_text,
+          m.created_at
+        FROM
+          public.message m
+        WHERE
+          m.message_id = $1
+        AND 
+          m.message_type = 'message'
+        ORDER BY 
+          created_at 
+        DESC
+      `, [request.query.messageId]
+      )
+
+      logger.info(`api | message | response`)
+
+      response.status(200).json(dbRequest.rows[0] || {})
+
+      return
+    }
+
     if (request.method === 'DELETE') {
 
       logger.info(`${request.url} | ${request.method} | deleteRequest`)
