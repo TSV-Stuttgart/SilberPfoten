@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import slugify from 'slugify'
@@ -6,9 +6,7 @@ import useSession from '../../lib/auth/useSession'
 import Wrapper from '../../components/Wrapper'
 import Error from '../../components/Error'
 import Loading from '../../components/Loading'
-import SessionExpired from '../../components/SessionExpired'
-import dynamic from 'next/dynamic'
-import ReactHtmlParser from 'react-html-parser'
+
 
 import 'react-quill/dist/quill.snow.css'
 import Link from 'next/link'
@@ -25,23 +23,6 @@ export default function Home() {
 
   if (!session) return <Loading />
 
-  const deleteMessage = async (messageId) => {
-    await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
-  
-    mutate(`/api/messages`)
-  }
-
-  const acceptCase = async (messageId) => {
-    await fetch(`/api/message/accept?messageId=${messageId}`, {method: 'POST'})
-  
-    mutate(`/api/messages`)
-  }
-
-  const cancelAcceptedCase = async (messageId) => {
-    await fetch(`/api/message/accept?messageId=${messageId}`, {method: 'DELETE'})
-  
-    mutate(`/api/messages`)
-  }
 
   if (messagesError) return <Error />
   if (!messages && !messagesError) return <Loading />
@@ -77,12 +58,14 @@ export default function Home() {
           {messages.filter(m => m.message_type === 'message').map(message => <React.Fragment key={message.message_id}>
           <div className="row">
             <div className="col-12">
-              <div className="px-3 py-1">
-                <div className="row align-items-center">
-                  <div className="col-9 border-end">{message.subject}</div>
-                  <div className="col-3">{new Date(message.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})} Uhr</div>
+              <Link href={`/admin/message/${message.message_id}/${slugify(message.subject, {lower: true})}`} className="text-decoration-none text-dark">
+                <div className="px-3 py-1">
+                  <div className="row align-items-center">
+                    <div className="col-9 border-end">{message.subject}</div>
+                    <div className="col-3">{new Date(message.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})} Uhr</div>
+                  </div>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
           </React.Fragment>)}
