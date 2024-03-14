@@ -149,7 +149,12 @@ export default function Users() {
 
       <div className="container mt-3">
         <div className="row">
-          <div className="col-12 text-end">
+          <div className="col-6 d-flex align-items-center">
+            <div className="fw-semibold mb-0">
+              Mitglieder: <span className="small bg-secondary text-white fw-bold rounded px-2">{users.length}</span>
+            </div>
+          </div>
+          <div className="col-6 text-end">
             <button type="button" className={`btn btn-light`} onClick={() => exportUsersAsCSV()}>
               <i class="bi bi-filetype-csv"></i>
               <span className="ps-1">CSV Export</span>
