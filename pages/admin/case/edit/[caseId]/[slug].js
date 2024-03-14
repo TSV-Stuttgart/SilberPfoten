@@ -111,6 +111,11 @@ export default function AdminCaseAdd({query}) {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (!formPhone && !formEmail) {
+      alert('Bitte gib eine Telefonnummer oder E-Mail-Adresse an.')
+      return
+    }
+
     setLoading(true)
 
     const patchRequest = await fetch(`/api/admin/message?messageId=${message.message_id}`, {
@@ -138,10 +143,16 @@ export default function AdminCaseAdd({query}) {
       })
     })
 
+    setLoading(false)
+
     if (patchRequest.status === 200) {
       mutate(`/api/admin/case?caseId=${query.caseId}`)
 
       router.push(`/admin/case/${query.caseId}/${slugify(message.subject, {lower: true})}`)
+    }
+
+    else if (patchRequest.status === 400) {
+      return <Error />
     }
 
     else if (patchRequest.status === 401) {
@@ -368,7 +379,7 @@ export default function AdminCaseAdd({query}) {
               </div>
               <div className="col-12 col-md-6">
                 <span className="p small ms-1">Telefon</span>
-                <input type="tel" className="form-control" placeholder="+49 711 123 456 67" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} required />
+                <input type="tel" className="form-control" placeholder="+49 711 123 456 67" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} />
               </div>
             </div>
             <div className="row mt-3">

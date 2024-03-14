@@ -241,6 +241,18 @@ export default async function handler(request, response) {
       logger.info(`${request.url} | ${request.method} | body | experienceWithAnimalOther | ${experienceWithAnimalOther}`)
       logger.info(`${request.url} | ${request.method} | body | uploads | ${JSON.stringify(formUploads?.length)}`)
 
+      if (!email && !phone) {
+
+        logger.info(`${request.url} | ${request.method} | need to have email OR phone`)
+
+        response.status(400).json({
+          statusCode: 400,
+          body: {}
+        })
+
+        return
+      }
+
       logger.info(`${request.url} | ${request.method} | get coords from openstreetmap`)
 
       const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
@@ -456,6 +468,18 @@ export default async function handler(request, response) {
       logger.info(`${request.url} | ${request.method} | body | experienceWithAnimalOther | ${experienceWithAnimalOther}`)
       logger.info(`${request.url} | ${request.method} | body | uploads | ${JSON.stringify(formUploads?.length)}`)
 
+      if (!email && !phone) {
+
+        logger.info(`${request.url} | ${request.method} | need to have email OR phone`)
+
+        response.status(400).json({
+          statusCode: 400,
+          body: {}
+        })
+
+        return
+      }
+      
       logger.info(`${request.url} | ${request.method} | get coords from openstreetmap`)
 
       const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()

@@ -202,7 +202,8 @@ export default function Home({query}) {
                     <div className="fw-bold">Danke für deine Hilfe!</div>
                     <div className="fw-normal">Du bist aktiv an diesem Auftrag dran.</div>
                     <div className="fw-bold mt-2">Kontaktdaten</div>
-                    <div className="fw-normal"><i className="bi bi-telephone"></i> Telefonnummer: {message.phone}</div>
+                    {message.phone ? <div className="fw-normal"><i className="bi bi-telephone"></i> Telefonnummer: {message.phone}</div> : null}
+                    {message.email ? <div className="fw-normal"><i className="bi bi-envelope"></i> E-Mail: {message.email}</div> : null}
                     <div className="fw-normal text-decoration-underline mt-3 cursor-pointer" onClick={() => cancelAcceptedCase(message.message_id)}>Hilfe stornieren</div>
                   </div>
                 </div>
