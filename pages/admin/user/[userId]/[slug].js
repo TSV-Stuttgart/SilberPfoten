@@ -71,6 +71,12 @@ export default function Members({userId}) {
         </div>
         <div className="row mt-2">
           <div className="col-12 small">
+            <span className="bg-light px-2 rounded me-1">Mobil</span>
+          </div>
+          <div className="col-12 p">{member.mobile || "-"}</div>
+        </div>
+        <div className="row mt-2">
+          <div className="col-12 small">
             <span className="bg-light px-2 rounded me-1">Anschrift</span>
           </div>
           <div className="col-12 p">{member.street} {member.street_number}, {member.zipcode} {member.city}</div>

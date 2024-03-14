@@ -26,6 +26,7 @@ export default async function handler(request, response) {
         email,
         birthdate,
         phone,
+        mobile,
         street,
         street_number,
         zipcode,
