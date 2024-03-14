@@ -114,6 +114,11 @@ export default function Registrieren({csrf}) {
       document.documentElement.scrollTop = 0
     }
 
+    else if (signupRequestResponse.status === 400) {
+      setErrorMessage('Du must mindestens 18 Jahre alt sein.')
+      document.documentElement.scrollTop = 0
+    }
+
     else if (signupRequestResponse.status === 500) {
       setErrorMessage('Dein Sicherheitsschlüssel ist abgelaufen (10 Minuten). <br/>Bitte versuche es erneut.')
       document.documentElement.scrollTop = 0
@@ -154,7 +159,7 @@ export default function Registrieren({csrf}) {
             <input type="email" name="email" className="form-control mt-3" placeholder="E-Mail" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} required />
             <input type="tel" name="phone" className="form-control mt-2" placeholder="Telefon" minLength="10" maxLength="20" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} />
             <div className="text-start mt-3 ms-1">Geburtsdatum</div>
-            <input type="date" name="birthdate" className="form-control mt-1" placeholder="Geburtsdatum" value={formBirthdate} onChange={(e) => setFormBirthdate(e.target.value)} max={new Date().toISOString().slice(0,10)} required />
+            <input type="date" name="birthdate" className="form-control mt-1" placeholder="Geburtsdatum" value={formBirthdate} max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().slice(0,10)} onChange={(e) => setFormBirthdate(e.target.value)} required />
             <input type="text" name="jobtitle" className="form-control mt-2" placeholder="Beruf" value={formJobTitle} onChange={(e) => setFormJobTitle(e.target.value)} required />
           </div>
         </div>

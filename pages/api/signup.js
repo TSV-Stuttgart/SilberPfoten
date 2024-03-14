@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js'
 import db from '../../lib/db'
 import logger from '../../lib/logger'
 import sendMail from '../../lib/sendMail'
+import dayjs from 'dayjs'
 
 export default async function handler(request, response) {
   logger.info(`api | signup`)
@@ -38,6 +39,18 @@ export default async function handler(request, response) {
 
       response.status(200).json({
         status: 409,
+      })
+
+      return
+    }
+
+    const age = dayjs().diff(birthdate, 'year')
+
+    if (age < 18) {
+      logger.info(`api | signup | check age | error | conflict: need to be 18 or older`)
+
+      response.status(200).json({
+        status: 400,
       })
 
       return
