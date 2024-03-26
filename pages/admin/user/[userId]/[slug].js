@@ -25,7 +25,7 @@ export default function Members({userId}) {
     <Wrapper>
 
       <NavigationHeader 
-        goBack={`/admin/users`} 
+        goBack={`/admin/users${router?.query?.refMenu ? `?refMenu=${router?.query?.refMenu}` : ''}`} 
         title={`Benutzer`}
       />
 
