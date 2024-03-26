@@ -380,7 +380,7 @@ export default function AdminCaseAdd() {
                   <span className="fw-bold">({allDistancesOfUsers?.filter(d => d <= formSearchRadius)?.length} betreffende User) <br/></span>
                   {allDistancesOfUsers?.filter(d => d <= formSearchRadius)?.length > 500 ? <span className="fw-bold text-danger">Maximal 500 User möglich. Bitte Suchradius verkleinern!</span> : null}
                 </span>
-                <input type="number" className="form-control" placeholder="3" value={formSearchRadius} onChange={(e) => setFormSearchRadius(e.target.value)} required />
+                <input type="number" step="0.1" className="form-control" placeholder="3" value={formSearchRadius} onChange={(e) => setFormSearchRadius(e.target.value)} required />
               </div>
             </div>
             <div className="row mt-4">
