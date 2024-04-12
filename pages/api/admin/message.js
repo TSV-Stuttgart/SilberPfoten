@@ -201,7 +201,60 @@ export default async function handler(request, response) {
       return
     }
 
-    if (request.method === 'PUT') {
+    if (request.method === 'PUT' && request.body.type === 'message') {
+
+      const {
+        type,
+        subject,
+        description,
+        formUploads,
+      } = request.body
+
+      logger.info(`${request.url} | ${request.method} | body | type | ${type}`)
+      logger.info(`${request.url} | ${request.method} | body | subject | ${subject}`)
+      logger.info(`${request.url} | ${request.method} | body | description | ${description}`)
+      logger.info(`${request.url} | ${request.method} | body | uploads | ${JSON.stringify(formUploads?.length)}`)
+
+      logger.info(`${request.url} | ${request.method} | putRequest`)
+
+      const dbPutMessageRequest = await db.query(`INSERT INTO public.message (message_type, subject, message_text) VALUES ($1,$2,$3) RETURNING message_id, subject`, [type, subject, description])
+
+      if (dbPutMessageRequest.rowCount > 0) {
+
+        // Upload Images
+        if (formUploads) {
+          logger.info(`${request.url} | ${request.method} | uploadingImages`)
+
+          for(const upload of formUploads) {
+            const messageId = dbPutMessageRequest.rows[0].message_id
+            const file = upload
+
+            const uploadedImage = await uploadImage(messageId, file)
+
+            logger.info(`${request.url} | ${request.method} | uploadingImages | success | ${JSON.stringify(uploadedImage)}`)
+          }
+        }
+
+        logger.info(`${request.url} | ${request.method} | putRequest | success | ${JSON.stringify(dbPutMessageRequest.rows[0])}`)
+
+        response.status(200).json({
+          statusCode: 200,
+          body: {messageId: dbPutMessageRequest.rows[0].message_id, subject: dbPutMessageRequest.rows[0].subject}
+        })
+
+        return
+      }
+
+      response.status(200).json({
+        statusCode: 500,
+        body: {}
+      })
+
+      return
+    }
+
+
+    if (request.method === 'PUT' && request.body.type === 'case') {
 
       const {
         type,
