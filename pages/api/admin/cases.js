@@ -22,7 +22,9 @@ export default async function handler(request, response) {
         array_to_string(m.support_activity::text[], ',') as support_activity,
         m.created_at,
         (SELECT array_agg(json_build_object(
-          'user_id', ac.user_id
+          'user_id', ac.user_id,
+          'accepted_at', ac.accepted_at,
+          'rejected_at', ac.rejected_at
           --'firstname', u.firstname,
           --'lastname', u.lastname
         )) FROM public.case_has_user ac LEFT JOIN public.user u ON (u.user_id = ac.user_id) WHERE message_id = m.message_id) as accepted_case_users
