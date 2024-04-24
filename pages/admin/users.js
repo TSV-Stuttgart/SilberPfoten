@@ -5,8 +5,8 @@ import Error from '../../components/Error'
 import Loading from '../../components/Loading'
 import Wrapper from '../../components/Wrapper'
 import slugify from 'slugify'
-import Link from 'next/link'
 import useSession from '../../lib/auth/useSession'
+import UserListElement from '../../components/UserListElement'
 
 export default function Users() {
   const {mutate} = useSWRConfig()
@@ -169,96 +169,41 @@ export default function Users() {
         </div>
       </div>
 
-      {users?.length > 0 ? <>
-        <div className="container mt-2">
-          <div className="row mb-1">
-            <div className="col-12">
-              <div className="bg-light rounded p-2">
-                <div className="row">
-                  <div className="col-1 border-end fw-bold">#</div>
-                  <div className="col-3 border-end fw-bold">Name</div>
-                  <div className="col-5 border-end fw-bold">Erfahrungen mit Tieren</div>
-                  <div className="col-2 fw-bold">Adresse</div>
-                  <div className="col-1 text-end"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {users.filter(u => 
-            u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            u.lastname.toLowerCase().includes(searchQuery.toLowerCase()))
-            ?.sort((a,b) => {
-              if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
-              else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
-              else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
-              else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
-              else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
-              else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
-              else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
-              else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
-          })?.map(user => <div className="row" key={user.user_id}>
-            <div className="col-12">
-              <div className="px-2 py-1">
-                <div className="row mb-1">
-                  <div className="col-1">{user.user_id}</div>
-                  <div className="col-3">
-                    <Link href={`/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}`}>
-                      <div className="text-secondary">{user.lastname}, {user.firstname} {user.status === 'ADMIN' ? <i className="bi bi-person-fill-gear ms-1" style={{fontSize: 16}}></i> : null}</div>
-                    </Link>
-                    {/* {user.activated_at ? <i className="ms-1 bi bi-patch-check-fill text-secondary"></i> : null} */}
-                  </div>
-                  <div className="col-5 text-break">{user.experience_with_animal?.split(',').map(e => <React.Fragment key={e}>
-                    {e === 'dog' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Hund</span> : null}
-                    {e === 'cat' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Katze</span> : null}
-                    {e === 'bird' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Vogel</span> : null}
-                    {e === 'small_animal' ? <span className="bg-light me-1 rounded px-2 small text-secondary">Kleintiere</span> : null}
-                    {e === 'other' ? <span className="bg-light me-1 rounded px-2 small text-secondary">{user.experience_with_animal_other}</span> : null}
-                  </React.Fragment>)}</div>
-                  {/* // new Date(user.activated_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: '2-digit'}) : <>nein</>} */}
-                  <div className="col-2">
-                    {user.zipcode} {user.city}
-                    {/* {new Date(user.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric'})} */}
-                  </div>
-                  <div className="col-1 text-end">
-                      <div className="dropdown">
-                        <i className="bi bi-three-dots-vertical text-secondary cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                        <ul className="dropdown-menu">
-                          {user.activated_at && !user.deactivated_at ? <>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDeactivation(user.user_id)}>Deaktivieren</div></li>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleBlock(user.user_id)}>Sperren</div></li>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDelete(user.user_id)}>Löschen</div></li>
-                          </> : null}
-                          {!user.activated_at && !user.blocked_at ? <>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleActivation(user.user_id)}>Aktivieren</div></li>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleBlock(user.user_id)}>Ablehnen &amp; Sperren</div></li>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDelete(user.user_id)}>Löschen</div></li>
-                          </> : null}
-                          {user.blocked_at ? <>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleUnblock(user.user_id)}>Sperre aufheben &amp; Aktivieren</div></li>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDelete(user.user_id)}>Löschen</div></li>
-                          </> : null}
-                          {user.deactivated_at ? <>
-                            <div className="dropdown-item">Benutzer können sich selbst deaktivieren. Daher kann der Admin den Status nicht revidieren.</div>
-                            <li><div className="dropdown-item cursor-pointer" onClick={() => handleDelete(user.user_id)}>Löschen</div></li>
-                            {/* <li><div className="dropdown-item cursor-pointer" onClick={() => handleUnblock(user.user_id)}>Sperre aufheben &amp; Aktivieren</div></li> */}
-                          </> : null}
-                        </ul>
-                      </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>)}
-        </div>
-      </> : <>
-        <div className="container mt-2">
-          <div className="row mb-1">
-            <div className="col-12">
-              <div className="p">Keine weiteren Einträge</div>
-            </div>
-          </div>
-        </div>
-      </>}
+      {users.filter(u => 
+        u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.lastname.toLowerCase().includes(searchQuery.toLowerCase()))
+        ?.sort((a,b) => {
+          if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
+          else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
+          else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
+          else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
+          else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
+          else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
+          else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
+          else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
+        })?.map(user => <UserListElement
+        key={user.user_id}
+        id={user.user_id}
+        name={`${user.lastname}, ${user.firstname}`}
+        status={user.status}
+        animals={user.experience_with_animal}
+        animalsOther={user.experience_with_animal_other}
+        activities={user.support_activity}
+        phone={user.phone || user.mobile || null}
+        email={user.email}
+        adress={`${user.zipcode} ${user.city}`}
+        targetHref={`/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}`}
+        navigationElements={[
+          //{title: 'Bearbeiten', href: `/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}`},
+          user.activated_at && !user.deactivated_at ? {title: 'Deaktivieren', onClick: () => handleDeactivation(user.user_id)} : null,
+          !user.activated_at && !user.blocked_at ? {title: 'Aktivieren', onClick: () => handleActivation(user.user_id)} : null,
+          user.activated_at && !user.deactivated_at ? {title: 'Sperren', onClick: () => handleBlock(user.user_id)} : null,
+          !user.activated_at && !user.blocked_at ? {title: <>Ablehnen &amp; Sperren</>, onClick: () => handleBlock(user.user_id)} : null,
+          user.blocked_at ? {title: 'Sperre aufheben', onClick: () => handleUnblock(user.user_id)} : null,
+          user.deactivated_at ? {title: 'Benutzer können sich selbst deaktivieren. Daher kann der Admin den Status nicht revidieren.', onClick: () => false} : null,
+          {title: 'Löschen', onClick: () => handleDelete(user.user_id)}
+        ]}
+      />)}
 
     </Wrapper>
   </>
