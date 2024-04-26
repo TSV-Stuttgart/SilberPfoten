@@ -22,7 +22,14 @@ export default async function handler(request, response) {
     return deg * (Math.PI/180)
   }
 
-  const user = await getToken(request).then(token => token.user)
+  const token = await getToken(request)
+
+  if (!token) {
+    response.status(401).send([])
+    return
+  }
+
+  const user = token.user
 
   logger.info(`api | messages`)
 
