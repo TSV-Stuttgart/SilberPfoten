@@ -207,17 +207,51 @@ export default async function handler(request, response) {
         type,
         subject,
         description,
+        zipcode,
+        searchRadius,
         formUploads,
       } = request.body
 
       logger.info(`${request.url} | ${request.method} | body | type | ${type}`)
       logger.info(`${request.url} | ${request.method} | body | subject | ${subject}`)
       logger.info(`${request.url} | ${request.method} | body | description | ${description}`)
+      logger.info(`${request.url} | ${request.method} | body | zipcode | ${zipcode}`)
+      logger.info(`${request.url} | ${request.method} | body | searchRadius | ${searchRadius}`)
       logger.info(`${request.url} | ${request.method} | body | uploads | ${JSON.stringify(formUploads?.length)}`)
 
       logger.info(`${request.url} | ${request.method} | putRequest`)
 
-      const dbPutMessageRequest = await db.query(`INSERT INTO public.message (message_type, subject, message_text) VALUES ($1,$2,$3) RETURNING message_id, subject`, [type, subject, description])
+      let lat = null
+      let lon = null
+      if (zipcode.length === 5) {
+        const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+        lat = location?.[0]?.lat || null
+        lon = location?.[0]?.lon || null
+      }
+
+      const dbPutMessageRequest = await db.query(`
+        INSERT INTO 
+          public.message (
+            message_type, 
+            subject, 
+            message_text, 
+            zipcode, 
+            search_radius,
+            lat,
+            lon
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7) 
+          RETURNING message_id, subject
+        `, 
+        [
+          type, 
+          subject, 
+          description,
+          zipcode || null,
+          searchRadius || null,
+          lat,
+          lon
+        ]
+      )
 
       if (dbPutMessageRequest.rowCount > 0) {
 
