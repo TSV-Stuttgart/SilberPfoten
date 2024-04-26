@@ -81,7 +81,13 @@ export default function Home() {
                   <div className="col-6 border-end">{message.subject}</div>
                   <div className="col-3 border-end">
                     {!message.accepted_case_users ? <span className="fw-normal text-success">Bedarf für Hilfe vorhanden</span> : null}
-                    {message.accepted_case_users?.length > 0 ? <span className="fw-normal text-success">{message.accepted_case_users?.length} Bewerber</span> : null}
+                    {message.accepted_case_users?.length > 0 ? 
+                      <>
+                        <span className="fw-normal text-success">{message.accepted_case_users?.length} Bewerber<br/></span> 
+                        (<span className="fw-normal">{message.accepted_case_users.filter(acu => acu.accepted_at)?.length} akzeptiert, </span>
+                        <span className="fw-normal">{message.accepted_case_users.filter(acu => !acu.accepted_at && !acu.rejected_at)?.length} wartend</span>)
+                      </>	
+                    : null}
                   </div>
                   <div className="col-2">{new Date(message.created_at).toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})} Uhr</div>
                 </div>
