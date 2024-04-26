@@ -8,6 +8,25 @@ import slugify from 'slugify'
 import useSession from '../../lib/auth/useSession'
 import UserListElement from '../../components/UserListElement'
 
+const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+
+  var R = 6371 // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1)  // deg2rad below
+  var dLon = deg2rad(lon2-lon1) 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  var d = R * c // Distance in km
+  return d
+}
+
+const deg2rad = (deg) => {
+  return deg * (Math.PI/180)
+}
+
 export default function Users() {
   const {mutate} = useSWRConfig()
   const {session} = useSession()
@@ -25,14 +44,36 @@ export default function Users() {
   const [selectedAnimals, setSelectedAnimals] = useState([])
   const [selectedActivities, setSelectedActivities] = useState([])
   
+  const [lastSelectedZipcode, setLastSelectedZipcode] = useState('')
   const [selectedZipcode, setSelectedZipcode] = useState('')
   const [selectedSearchRadius, setSelectedSearchRadius] = useState('')
-
-  console.log(selectedStatus)
+  const [searchLat, setSearchLat] = useState('')
+  const [searchLon, setSearchLon] = useState('')
 
   useEffect(() => {
     import('bootstrap/js/dist/dropdown')
   }, [])
+
+  useEffect(() => {
+
+    const findLocation = async () => {
+
+      if (lastSelectedZipcode === selectedZipcode) return
+
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${selectedZipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+
+      if (location.length > 0) {
+        setSearchLat(location[0].lat)
+        setSearchLon(location[0].lon)
+      }
+      setLastSelectedZipcode(selectedZipcode)
+    }
+    
+    if (selectedZipcode && selectedSearchRadius && selectedZipcode.length === 5 && selectedSearchRadius.length > 0) {
+      findLocation()
+    }
+
+  }, [selectedZipcode, selectedSearchRadius, lastSelectedZipcode])
 
   const handleActivation = async (userId) => {
     await fetch(`/api/admin/user/activation?userId=${userId}`)
@@ -230,6 +271,10 @@ export default function Users() {
         ) &&
         (
           selectedActivities.length === 0 || selectedActivities.some(r => u.support_activity.includes(r))
+        ) &&
+        (
+          selectedZipcode.length != 5 || !searchLat || !searchLon || !selectedSearchRadius ||
+          (getDistanceFromLatLonInKm(searchLat, searchLon, u.lat, u.lon) <= selectedSearchRadius)
         )
       )?.sort((a,b) => {
         if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
