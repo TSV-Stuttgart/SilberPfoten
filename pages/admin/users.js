@@ -3,7 +3,7 @@ import {useRouter} from 'next/router'
 import useSWR, {useSWRConfig} from 'swr'
 import Error from '../../components/Error'
 import Loading from '../../components/Loading'
-import Wrapper from '../../components/Wrapper'
+import AdminWrapper from '../../components/AdminWrapper'
 import slugify from 'slugify'
 import useSession from '../../lib/auth/useSession'
 import UserListElement from '../../components/UserListElement'
@@ -20,6 +20,15 @@ export default function Users() {
 
   const [usersSortOrder, setUsersSortOrder] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+
+  const [selectedStatus, setSelectedStatus] = useState([])
+  const [selectedAnimals, setSelectedAnimals] = useState([])
+  const [selectedActivities, setSelectedActivities] = useState([])
+  
+  const [selectedZipcode, setSelectedZipcode] = useState('')
+  const [selectedSearchRadius, setSelectedSearchRadius] = useState('')
+
+  console.log(selectedStatus)
 
   useEffect(() => {
     import('bootstrap/js/dist/dropdown')
@@ -112,7 +121,46 @@ export default function Users() {
   
   return <>
   
-    <Wrapper>
+    <AdminWrapper 
+      sidebarOptions={
+        {
+          filter: true,
+          filterOptions: {
+            statusValues: {
+              status: ['ADMIN', 'USER'],
+              selectedStatus,
+              setSelectedStatus
+            },
+            animalValues: {
+              animals: ['dog', 'cat', 'bird', 'small_animal'],
+              selectedAnimals,
+              setSelectedAnimals
+            },
+            activityValues: {
+              activities: [
+                'go_walk', 
+                'veterinary_trips', 
+                'animal_care', 
+                'events', 
+                'baking_cooking', 
+                'creative_workshop', 
+                'public_relation', 
+                'light_office_work', 
+                'graphic_work'
+              ],
+              selectedActivities,
+              setSelectedActivities
+            },
+            radiusValues: {
+              selectedZipcode,
+              setSelectedZipcode,
+              selectedSearchRadius,
+              setSelectedSearchRadius
+            }
+          }
+        }
+      }
+    >
 
       <div className="container mt-3">
         <div className="row">
@@ -170,18 +218,29 @@ export default function Users() {
       </div>
 
       {users.filter(u => 
-        u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.lastname.toLowerCase().includes(searchQuery.toLowerCase()))
-        ?.sort((a,b) => {
-          if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
-        })?.map(user => <UserListElement
+        (
+          u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          u.lastname.toLowerCase().includes(searchQuery.toLowerCase())
+        ) && 
+        (
+          selectedStatus.length === 0 || selectedStatus.includes(u.status)
+        ) &&
+        (
+          selectedAnimals.length === 0 || selectedAnimals.some(r => u.experience_with_animal.includes(r))
+        ) &&
+        (
+          selectedActivities.length === 0 || selectedActivities.some(r => u.support_activity.includes(r))
+        )
+      )?.sort((a,b) => {
+        if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
+      })?.map(user => <UserListElement
         key={user.user_id}
         id={user.user_id}
         name={`${user.lastname}, ${user.firstname}`}
@@ -205,6 +264,6 @@ export default function Users() {
         ]}
       />)}
 
-    </Wrapper>
+    </AdminWrapper>
   </>
 }
