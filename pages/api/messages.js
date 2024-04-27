@@ -66,7 +66,7 @@ export default async function handler(request, response) {
     let messagesInRadius = []
     for (const message of dbMessagesRequest.rows) {
 
-      if(!message.lat || !message.lon || !message.search_radius) { 
+      if(message.message_type === 'case' || !message.lat || !message.lon || !message.search_radius) { 
         messagesInRadius.push(message)
         continue
       }
