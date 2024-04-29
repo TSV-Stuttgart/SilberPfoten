@@ -385,7 +385,7 @@ export default function AdminCaseAdd({query}) {
             <div className="row mt-3">
               <div className="col-12 col-md-4">
                 <span className="p small ms-1">Suchradius in Kilometern</span>
-                <input type="number" className="form-control" placeholder="3" value={formSearchRadius} onChange={(e) => setFormSearchRadius(e.target.value)} required />
+                <input type="number" step="0.1" className="form-control" placeholder="3" value={formSearchRadius} onChange={(e) => setFormSearchRadius(e.target.value)} required />
               </div>
             </div>
             <div className="row mt-4">
