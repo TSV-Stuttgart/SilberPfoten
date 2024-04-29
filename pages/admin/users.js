@@ -1,4 +1,4 @@
-import React, {use, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
 import useSWR, {useSWRConfig} from 'swr'
 import Error from '../../components/Error'
