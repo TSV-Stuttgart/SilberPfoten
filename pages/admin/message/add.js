@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {useRouter} from 'next/router'
 import dynamic from 'next/dynamic'
 import useSession from '../../../lib/auth/useSession'
-import Wrapper from '../../../components/Wrapper'
+import AdminWrapper from '../../../components/AdminWrapper'
 import Error from '../../../components/Error'
 import Loading from '../../../components/Loading'
 import NavigationHeader from '../../../components/NavigationHeader'
@@ -49,7 +49,7 @@ export default function Home() {
 
   return (
     <>
-      <Wrapper>
+      <AdminWrapper>
 
         <NavigationHeader
           goBack="/admin/messages"
@@ -94,7 +94,7 @@ export default function Home() {
           </div>
         </form>
 
-      </Wrapper>
+      </AdminWrapper>
     </>
   )
 }

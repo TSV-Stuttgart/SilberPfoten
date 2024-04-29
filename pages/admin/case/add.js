@@ -3,7 +3,7 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import useSession from '../../../lib/auth/useSession'
-import Wrapper from '../../../components/Wrapper'
+import AdminWrapper from '../../../components/AdminWrapper'
 import Error from '../../../components/Error'
 import NavigationHeader from '../../../components/NavigationHeader'
 import 'react-quill/dist/quill.snow.css'
@@ -198,7 +198,7 @@ export default function AdminCaseAdd() {
 
   return (
     <>
-      <Wrapper>
+      <AdminWrapper>
 
         <NavigationHeader
           goBack="/admin/cases"
@@ -543,7 +543,7 @@ export default function AdminCaseAdd() {
           </div>
         </form>
 
-      </Wrapper>
+      </AdminWrapper>
     </>
   )
 }

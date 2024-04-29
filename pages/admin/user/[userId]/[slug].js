@@ -3,7 +3,7 @@ import useSWR from 'swr'
 import {useRouter} from 'next/router'
 import Error from '../../../../components/Error'
 import Loading from '../../../../components/Loading'
-import Wrapper from '../../../../components/Wrapper'
+import AdminWrapper from '../../../../components/AdminWrapper'
 import NavigationHeader from '../../../../components/NavigationHeader'
 import useSession from '../../../../lib/auth/useSession'
 
@@ -22,7 +22,7 @@ export default function Members({userId}) {
   }
   
   return <>
-    <Wrapper>
+    <AdminWrapper>
 
       <NavigationHeader 
         goBack={`/admin/users`} 
@@ -154,6 +154,6 @@ export default function Members({userId}) {
         </div>
       </> : null}
 
-    </Wrapper>
+    </AdminWrapper>
   </>
 }
