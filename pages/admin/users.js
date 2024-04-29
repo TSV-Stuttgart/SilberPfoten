@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {use, useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
 import useSWR, {useSWRConfig} from 'swr'
 import Error from '../../components/Error'
@@ -50,6 +50,8 @@ export default function Users() {
   const [searchLat, setSearchLat] = useState('')
   const [searchLon, setSearchLon] = useState('')
 
+  const [filteredSortedUsers, setFilteredSortedUsers] = useState([])
+
   useEffect(() => {
     import('bootstrap/js/dist/dropdown')
   }, [])
@@ -79,6 +81,46 @@ export default function Users() {
     }
 
   }, [selectedZipcode, selectedSearchRadius, lastSelectedZipcode])
+
+  useEffect(() => {
+
+    const getFilteredSortedUsers = () => {
+    
+      return users.filter(u => 
+        (
+          u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          u.lastname.toLowerCase().includes(searchQuery.toLowerCase())
+        ) && 
+        (
+          selectedStatus.length === 0 || selectedStatus.includes(u.status)
+        ) &&
+        (
+          selectedAnimals.length === 0 || selectedAnimals.some(r => u.experience_with_animal.includes(r))
+        ) &&
+        (
+          selectedActivities.length === 0 || selectedActivities.some(r => u.support_activity.includes(r))
+        ) &&
+        (
+          selectedZipcode.length != 5 || !searchLat || !searchLon || !selectedSearchRadius ||
+          (getDistanceFromLatLonInKm(searchLat, searchLon, u.lat, u.lon) <= selectedSearchRadius)
+        )
+      )?.sort((a,b) => {
+        if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
+        else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
+      })
+    }
+
+    if (users && users.length > 0) {
+      setFilteredSortedUsers(getFilteredSortedUsers())
+    }
+
+  }, [users, selectedStatus, selectedAnimals, selectedActivities, selectedZipcode, selectedSearchRadius, usersSortOrder, searchQuery, searchLat, searchLon])
 
   const handleActivation = async (userId) => {
     await fetch(`/api/admin/user/activation?userId=${userId}`)
@@ -132,7 +174,7 @@ export default function Users() {
 
   const exportUsersAsCSV = () => {
 
-    const csv = getFilteredSortedUsers()?.map(user => {
+    const csv = filteredSortedUsers?.map(user => {
       return `${user.user_id || '-'};${user.firstname || '-'};${user.lastname || '-'};${user.email || '-'};${user.zipcode || '-'};${user.city || '-'};${user.experience_with_animal || '-'};${user.experience_with_animal_other || '-'};${user.activated_at || '-'};${user.blocked_at || '-'};${user.deactivated_at || '-'}`
     }).join('\n')
 
@@ -148,39 +190,6 @@ export default function Users() {
     document.body.appendChild(link)
     link.click()
   }
-
-  const getFilteredSortedUsers = () => {
-    
-    return users.filter(u => 
-      (
-        u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.lastname.toLowerCase().includes(searchQuery.toLowerCase())
-      ) && 
-      (
-        selectedStatus.length === 0 || selectedStatus.includes(u.status)
-      ) &&
-      (
-        selectedAnimals.length === 0 || selectedAnimals.some(r => u.experience_with_animal.includes(r))
-      ) &&
-      (
-        selectedActivities.length === 0 || selectedActivities.some(r => u.support_activity.includes(r))
-      ) &&
-      (
-        selectedZipcode.length != 5 || !searchLat || !searchLon || !selectedSearchRadius ||
-        (getDistanceFromLatLonInKm(searchLat, searchLon, u.lat, u.lon) <= selectedSearchRadius)
-      )
-    )?.sort((a,b) => {
-      if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
-      else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
-      else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
-      else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
-      else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
-      else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
-      else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
-      else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
-    })
-  }
-
 
   if (error) return <Error />
   if (!users && !error) return <Loading />
@@ -280,7 +289,7 @@ export default function Users() {
         <div className="row">
           <div className="col-6 d-flex align-items-center">
             <div className="fw-semibold mb-0">
-              Mitglieder: <span className="small bg-secondary text-white fw-bold rounded px-2">{users.length}</span>
+              Mitglieder: <span className="small bg-secondary text-white fw-bold rounded px-2">{filteredSortedUsers?.length}</span>
             </div>
           </div>
           <div className="col-6 text-end">
@@ -292,7 +301,7 @@ export default function Users() {
         </div>
       </div>
 
-      {getFilteredSortedUsers()?.map(user => <UserListElement
+      {filteredSortedUsers?.map(user => <UserListElement
         key={user.user_id}
         id={user.user_id}
         name={`${user.lastname}, ${user.firstname}`}
