@@ -3,10 +3,29 @@ import {useRouter} from 'next/router'
 import useSWR, {useSWRConfig} from 'swr'
 import Error from '../../components/Error'
 import Loading from '../../components/Loading'
-import Wrapper from '../../components/Wrapper'
+import AdminWrapper from '../../components/AdminWrapper'
 import slugify from 'slugify'
 import useSession from '../../lib/auth/useSession'
 import UserListElement from '../../components/UserListElement'
+
+const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+
+  var R = 6371 // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1)  // deg2rad below
+  var dLon = deg2rad(lon2-lon1) 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  var d = R * c // Distance in km
+  return d
+}
+
+const deg2rad = (deg) => {
+  return deg * (Math.PI/180)
+}
 
 export default function Users() {
   const {mutate} = useSWRConfig()
@@ -21,9 +40,40 @@ export default function Users() {
   const [usersSortOrder, setUsersSortOrder] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
 
+  const [selectedStatus, setSelectedStatus] = useState([])
+  const [selectedAnimals, setSelectedAnimals] = useState([])
+  const [selectedActivities, setSelectedActivities] = useState([])
+  
+  const [lastSelectedZipcode, setLastSelectedZipcode] = useState('')
+  const [selectedZipcode, setSelectedZipcode] = useState('')
+  const [selectedSearchRadius, setSelectedSearchRadius] = useState('')
+  const [searchLat, setSearchLat] = useState('')
+  const [searchLon, setSearchLon] = useState('')
+
   useEffect(() => {
     import('bootstrap/js/dist/dropdown')
   }, [])
+
+  useEffect(() => {
+
+    const findLocation = async () => {
+
+      if (lastSelectedZipcode === selectedZipcode) return
+
+      const location = await (await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${selectedZipcode}&country=germany&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=1&email=info@silberpfoten.de`)).json()
+
+      if (location.length > 0) {
+        setSearchLat(location[0].lat)
+        setSearchLon(location[0].lon)
+      }
+      setLastSelectedZipcode(selectedZipcode)
+    }
+    
+    if (selectedZipcode && selectedSearchRadius && selectedZipcode.length === 5 && selectedSearchRadius.length > 0) {
+      findLocation()
+    }
+
+  }, [selectedZipcode, selectedSearchRadius, lastSelectedZipcode])
 
   const handleActivation = async (userId) => {
     await fetch(`/api/admin/user/activation?userId=${userId}`)
@@ -79,10 +129,8 @@ export default function Users() {
 
   const exportUsersAsCSV = () => {
 
-    const csv = users.filter(u => 
-      u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.lastname.toLowerCase().includes(searchQuery.toLowerCase())).map(user => {
-      return `${user.user_id};${user.firstname};${user.lastname};${user.email};${user.zipcode};${user.city};${user.experience_with_animal};${user.experience_with_animal_other};${user.activated_at};${user.blocked_at};${user.deactivated_at}`
+    const csv = getFilteredSortedUsers()?.map(user => {
+      return `${user.user_id || '-'};${user.firstname || '-'};${user.lastname || '-'};${user.email || '-'};${user.zipcode || '-'};${user.city || '-'};${user.experience_with_animal || '-'};${user.experience_with_animal_other || '-'};${user.activated_at || '-'};${user.blocked_at || '-'};${user.deactivated_at || '-'}`
     }).join('\n')
 
     let csvContent = "data:text/csv;charset=utf-8," 
@@ -98,6 +146,39 @@ export default function Users() {
     link.click()
   }
 
+  const getFilteredSortedUsers = () => {
+    
+    return users.filter(u => 
+      (
+        u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.lastname.toLowerCase().includes(searchQuery.toLowerCase())
+      ) && 
+      (
+        selectedStatus.length === 0 || selectedStatus.includes(u.status)
+      ) &&
+      (
+        selectedAnimals.length === 0 || selectedAnimals.some(r => u.experience_with_animal.includes(r))
+      ) &&
+      (
+        selectedActivities.length === 0 || selectedActivities.some(r => u.support_activity.includes(r))
+      ) &&
+      (
+        selectedZipcode.length != 5 || !searchLat || !searchLon || !selectedSearchRadius ||
+        (getDistanceFromLatLonInKm(searchLat, searchLon, u.lat, u.lon) <= selectedSearchRadius)
+      )
+    )?.sort((a,b) => {
+      if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
+    })
+  }
+
+
   if (error) return <Error />
   if (!users && !error) return <Loading />
   if (!pendingUsers && !pendingError) return <Loading />
@@ -112,7 +193,46 @@ export default function Users() {
   
   return <>
   
-    <Wrapper>
+    <AdminWrapper 
+      sidebarOptions={
+        {
+          filter: true,
+          filterOptions: {
+            statusValues: {
+              status: ['ADMIN', 'USER'],
+              selectedStatus,
+              setSelectedStatus
+            },
+            animalValues: {
+              animals: ['dog', 'cat', 'bird', 'small_animal'],
+              selectedAnimals,
+              setSelectedAnimals
+            },
+            activityValues: {
+              activities: [
+                'go_walk', 
+                'veterinary_trips', 
+                'animal_care', 
+                'events', 
+                'baking_cooking', 
+                'creative_workshop', 
+                'public_relation', 
+                'light_office_work', 
+                'graphic_work'
+              ],
+              selectedActivities,
+              setSelectedActivities
+            },
+            radiusValues: {
+              selectedZipcode,
+              setSelectedZipcode,
+              selectedSearchRadius,
+              setSelectedSearchRadius
+            }
+          }
+        }
+      }
+    >
 
       <div className="container mt-3">
         <div className="row">
@@ -169,19 +289,7 @@ export default function Users() {
         </div>
       </div>
 
-      {users.filter(u => 
-        u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.lastname.toLowerCase().includes(searchQuery.toLowerCase()))
-        ?.sort((a,b) => {
-          if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
-          else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
-        })?.map(user => <UserListElement
+      {getFilteredSortedUsers()?.map(user => <UserListElement
         key={user.user_id}
         id={user.user_id}
         name={`${user.lastname}, ${user.firstname}`}
@@ -205,6 +313,6 @@ export default function Users() {
         ]}
       />)}
 
-    </Wrapper>
+    </AdminWrapper>
   </>
 }

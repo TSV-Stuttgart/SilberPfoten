@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import useSession from '../../../../lib/auth/useSession'
-import Wrapper from '../../../../components/Wrapper'
+import AdminWrapper from '../../../../components/AdminWrapper'
 import Error from '../../../../components/Error'
 import Loading from '../../../../components/Loading'
 import ReactHtmlParser from 'react-html-parser'
@@ -59,7 +59,7 @@ export default function AdminmessageDetail({query}) {
 
   return (
     <>
-      <Wrapper>
+      <AdminWrapper>
 
         <NavigationHeader
           goBack="/admin/messages"
@@ -135,7 +135,7 @@ export default function AdminmessageDetail({query}) {
         </div>
         </> : null}
 
-      </Wrapper>
+      </AdminWrapper>
     </>
   )
 }

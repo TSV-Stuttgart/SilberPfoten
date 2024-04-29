@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
 import slugify from 'slugify'
 import useSession from '../../lib/auth/useSession'
-import Wrapper from '../../components/Wrapper'
+import AdminWrapper from '../../components/AdminWrapper'
 import Error from '../../components/Error'
 import Loading from '../../components/Loading'
 import 'react-quill/dist/quill.snow.css'
@@ -32,7 +32,7 @@ export default function Home() {
 
   return (
     <>
-      <Wrapper>
+      <AdminWrapper>
 
         <div className="container mt-3 mb-3">
           <div className="row">
@@ -98,7 +98,7 @@ export default function Home() {
           </React.Fragment>)}
         </div>
 
-      </Wrapper>
+      </AdminWrapper>
     </>
   )
 }
