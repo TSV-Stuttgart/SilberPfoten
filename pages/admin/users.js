@@ -129,10 +129,8 @@ export default function Users() {
 
   const exportUsersAsCSV = () => {
 
-    const csv = users.filter(u => 
-      u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.lastname.toLowerCase().includes(searchQuery.toLowerCase())).map(user => {
-      return `${user.user_id};${user.firstname};${user.lastname};${user.email};${user.zipcode};${user.city};${user.experience_with_animal};${user.experience_with_animal_other};${user.activated_at};${user.blocked_at};${user.deactivated_at}`
+    const csv = getFilteredSortedUsers()?.map(user => {
+      return `${user.user_id || '-'};${user.firstname || '-'};${user.lastname || '-'};${user.email || '-'};${user.zipcode || '-'};${user.city || '-'};${user.experience_with_animal || '-'};${user.experience_with_animal_other || '-'};${user.activated_at || '-'};${user.blocked_at || '-'};${user.deactivated_at || '-'}`
     }).join('\n')
 
     let csvContent = "data:text/csv;charset=utf-8," 
@@ -147,6 +145,39 @@ export default function Users() {
     document.body.appendChild(link)
     link.click()
   }
+
+  const getFilteredSortedUsers = () => {
+    
+    return users.filter(u => 
+      (
+        u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.lastname.toLowerCase().includes(searchQuery.toLowerCase())
+      ) && 
+      (
+        selectedStatus.length === 0 || selectedStatus.includes(u.status)
+      ) &&
+      (
+        selectedAnimals.length === 0 || selectedAnimals.some(r => u.experience_with_animal.includes(r))
+      ) &&
+      (
+        selectedActivities.length === 0 || selectedActivities.some(r => u.support_activity.includes(r))
+      ) &&
+      (
+        selectedZipcode.length != 5 || !searchLat || !searchLon || !selectedSearchRadius ||
+        (getDistanceFromLatLonInKm(searchLat, searchLon, u.lat, u.lon) <= selectedSearchRadius)
+      )
+    )?.sort((a,b) => {
+      if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
+      else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
+    })
+  }
+
 
   if (error) return <Error />
   if (!users && !error) return <Loading />
@@ -258,34 +289,7 @@ export default function Users() {
         </div>
       </div>
 
-      {users.filter(u => 
-        (
-          u.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          u.lastname.toLowerCase().includes(searchQuery.toLowerCase())
-        ) && 
-        (
-          selectedStatus.length === 0 || selectedStatus.includes(u.status)
-        ) &&
-        (
-          selectedAnimals.length === 0 || selectedAnimals.some(r => u.experience_with_animal.includes(r))
-        ) &&
-        (
-          selectedActivities.length === 0 || selectedActivities.some(r => u.support_activity.includes(r))
-        ) &&
-        (
-          selectedZipcode.length != 5 || !searchLat || !searchLon || !selectedSearchRadius ||
-          (getDistanceFromLatLonInKm(searchLat, searchLon, u.lat, u.lon) <= selectedSearchRadius)
-        )
-      )?.sort((a,b) => {
-        if (usersSortOrder === 'firstnameAsc') { if (b.firstname < a.firstname) { return 1 } else { return -1 } }
-        else if (usersSortOrder === 'firstnameDesc') { if (b.firstname > a.firstname) { return 1 } else { return -1 } }
-        else if (usersSortOrder === 'lastnameAsc') { if (b.lastname < a.lastname) { return 1 } else { return -1 } }
-        else if (usersSortOrder === 'lastnameDesc') { if (b.lastname > a.lastname) { return 1 } else { return -1 } }
-        else if (usersSortOrder === 'zipAsc') { if (b.zipcode < a.zipcode) { return 1 } else { return -1 } }
-        else if (usersSortOrder === 'zipDesc') { if (b.zipcode > a.zipcode) { return 1 } else { return -1 } }
-        else if (usersSortOrder === 'locationAsc') { if (b.city < a.city) { return 1 } else { return -1 } }
-        else if (usersSortOrder === 'locationDesc') { if (b.city > a.city) { return 1 } else { return -1 } }
-      })?.map(user => <UserListElement
+      {getFilteredSortedUsers()?.map(user => <UserListElement
         key={user.user_id}
         id={user.user_id}
         name={`${user.lastname}, ${user.firstname}`}
