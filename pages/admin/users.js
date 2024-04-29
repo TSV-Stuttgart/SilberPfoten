@@ -55,7 +55,12 @@ export default function Users() {
   }, [])
 
   useEffect(() => {
+    if (router.query.refMenu) {
+      setFormFilter(router.query.refMenu)
+    }
+  }, [router.query.refMenu])
 
+  useEffect(() => {
     const findLocation = async () => {
 
       if (lastSelectedZipcode === selectedZipcode) return
@@ -82,8 +87,6 @@ export default function Users() {
     mutate(`/api/admin/users?filter=pending`)
     mutate(`/api/admin/users?filter=blocked`)
     mutate(`/api/admin/users?filter=deactivated`)
-
-    setFormFilter('active')
   }
 
   const handleDeactivation = async (userId) => {
@@ -300,7 +303,7 @@ export default function Users() {
         phone={user.phone || user.mobile || null}
         email={user.email}
         adress={`${user.zipcode} ${user.city}`}
-        targetHref={`/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}`}
+        targetHref={`/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}?refMenu=${formFilter}`}
         navigationElements={[
           //{title: 'Bearbeiten', href: `/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}`},
           user.activated_at && !user.deactivated_at ? {title: 'Deaktivieren', onClick: () => handleDeactivation(user.user_id)} : null,
