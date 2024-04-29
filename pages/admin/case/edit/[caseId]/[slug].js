@@ -4,7 +4,7 @@ import useSWR, {useSWRConfig} from 'swr'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import useSession from '../../../../../lib/auth/useSession'
-import Wrapper from '../../../../../components/Wrapper'
+import AdminWrapper from '../../../../../components/AdminWrapper'
 import Error from '../../../../../components/Error'
 import NavigationHeader from '../../../../../components/NavigationHeader'
 import 'react-quill/dist/quill.snow.css'
@@ -216,7 +216,7 @@ export default function AdminCaseAdd({query}) {
 
   return (
     <>
-      <Wrapper>
+      <AdminWrapper>
 
         <NavigationHeader
           goBack={`/admin/case/${query.caseId}/${slugify(message.subject, {lower: true})}`}
@@ -548,7 +548,7 @@ export default function AdminCaseAdd({query}) {
           </div>
         </form>
 
-      </Wrapper>
+      </AdminWrapper>
     </>
   )
 }

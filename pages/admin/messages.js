@@ -3,7 +3,7 @@ import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import slugify from 'slugify'
 import useSession from '../../lib/auth/useSession'
-import Wrapper from '../../components/Wrapper'
+import AdminWrapper from '../../components/AdminWrapper'
 import Error from '../../components/Error'
 import Loading from '../../components/Loading'
 
@@ -29,7 +29,7 @@ export default function Home() {
 
   return (
     <>
-      <Wrapper>
+      <AdminWrapper>
 
         <div className="container mt-3 mb-3">
           <div className="row">
@@ -194,7 +194,7 @@ export default function Home() {
               </> : null} */}
 
 
-      </Wrapper>
+      </AdminWrapper>
     </>
   )
 }
