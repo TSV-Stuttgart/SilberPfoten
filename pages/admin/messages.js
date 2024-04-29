@@ -14,7 +14,7 @@ import Link from 'next/link'
 export default function Home() {
   const router = useRouter()
   const {mutate} = useSWRConfig()
-  const {data: messages, error: messagesError} = useSWR(`/api/messages`, (url) => fetch(url).then(r => r.json()))
+  const {data: messages, error: messagesError} = useSWR(`/api/admin/messages`, (url) => fetch(url).then(r => r.json()))
   const {session} = useSession()
 
   useEffect(() => {
