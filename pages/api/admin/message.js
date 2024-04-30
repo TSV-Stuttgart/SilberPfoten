@@ -238,8 +238,9 @@ export default async function handler(request, response) {
             zipcode, 
             search_radius,
             lat,
-            lon
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7) 
+            lon,
+            status
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) 
           RETURNING message_id, subject
         `, 
         [
@@ -249,7 +250,8 @@ export default async function handler(request, response) {
           zipcode || null,
           searchRadius || null,
           lat,
-          lon
+          lon,
+          'OPEN'
         ]
       )
 
@@ -421,11 +423,12 @@ export default async function handler(request, response) {
             city,
             lat,
             lon,
+            status,
             search_radius,
             support_activity,
             experience_with_animal,
             experience_with_animal_other
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
             RETURNING message_id, subject
         `, 
         [
@@ -443,6 +446,7 @@ export default async function handler(request, response) {
           city,
           location && location.length > 0 && location[0].lat ? location[0].lat : null,
           location && location.length > 0 && location[0].lon ? location[0].lon : null,
+          'OPEN',
           searchRadius,
           supportActivity,
           experienceWithAnimal,
@@ -514,7 +518,7 @@ export default async function handler(request, response) {
       return
     }
 
-    if (request.method === 'PATCH') {
+    if (request.method === 'PATCH' && !request.body.field ) {
 
       const {
         subject,
@@ -642,6 +646,52 @@ export default async function handler(request, response) {
 
         return
       }
+
+      response.status(200).json({
+        statusCode: 500,
+        body: {}
+      })
+
+      return
+    }
+
+    if (request.method === 'PATCH' && request.body.field === 'status') {
+
+      const {
+        status,
+      } = request.body
+
+      logger.info(`${request.url} | ${request.method} | query | messageId | ${request.query.messageId}`)
+      logger.info(`${request.url} | ${request.method} | body | status | ${status}`)
+
+      logger.info(`${request.url} | ${request.method} | patchRequest`)
+
+      const dbPatchMessageRequest = await db.query(`
+        UPDATE
+          public.message
+        SET
+          status = $1
+        WHERE
+          message_id = $2
+        RETURNING 
+          message_id
+        `, [
+          status,
+          request.query.messageId
+        ]
+      )
+
+      if (dbPatchMessageRequest.rowCount > 0) {
+          
+          logger.info(`${request.url} | ${request.method} | patchRequest | success | ${JSON.stringify(dbPatchMessageRequest.rows[0])}`)
+  
+          response.status(200).json({
+            statusCode: 200,
+            body: {}
+          })
+  
+          return
+        }
 
       response.status(200).json({
         statusCode: 500,

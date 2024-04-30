@@ -54,10 +54,18 @@ export default async function handler(request, response) {
         (SELECT array_agg(user_id) FROM public.case_has_user WHERE message_id = m.message_id) as accepted_case_members
       FROM
         public.message m
+      WHERE 
+        (m.status = 'OPEN' OR m.status IS NULL)
+      OR
+        (
+          m.status = 'CLOSED' 
+        AND
+          EXISTS(SELECT 1 FROM case_has_user WHERE message_id = m.message_id AND user_id = $1)
+        ) 
       ORDER BY 
         created_at 
       DESC
-    `, []
+    `, [user.user_id]
     )
 
     logger.info(`api | messages | response`)
