@@ -1,6 +1,6 @@
 {
   "name": "mein.silberpfoten.de",
-  "version": "1.21.5",
+  "version": "1.22.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
