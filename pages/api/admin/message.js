@@ -238,8 +238,9 @@ export default async function handler(request, response) {
             zipcode, 
             search_radius,
             lat,
-            lon
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7) 
+            lon,
+            status
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) 
           RETURNING message_id, subject
         `, 
         [
@@ -249,7 +250,8 @@ export default async function handler(request, response) {
           zipcode || null,
           searchRadius || null,
           lat,
-          lon
+          lon,
+          'OPEN'
         ]
       )
 
@@ -421,11 +423,12 @@ export default async function handler(request, response) {
             city,
             lat,
             lon,
+            status,
             search_radius,
             support_activity,
             experience_with_animal,
             experience_with_animal_other
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
             RETURNING message_id, subject
         `, 
         [
@@ -443,6 +446,7 @@ export default async function handler(request, response) {
           city,
           location && location.length > 0 && location[0].lat ? location[0].lat : null,
           location && location.length > 0 && location[0].lon ? location[0].lon : null,
+          'OPEN',
           searchRadius,
           supportActivity,
           experienceWithAnimal,
