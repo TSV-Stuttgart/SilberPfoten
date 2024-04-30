@@ -33,9 +33,17 @@ export default async function handler(request, response) {
       logger.info(`api | message | accept | POST | db getCaseRequest`)
 
       const dbGetCaseRequest = await db.query(
-        `SELECT subject FROM public.message WHERE message_id = $1`, 
+        `SELECT subject FROM public.message WHERE message_id = $1 AND status = 'OPEN'`, 
         [request.query.messageId]
       )
+
+      if (dbGetCaseRequest.rowCount === 0) {
+        response.status(404).send({})
+
+        logger.info(`api | message | accept | POST | db request | not found`)
+
+        return
+      }
 
       logger.info(`api | message | accept | POST | db request`)
 

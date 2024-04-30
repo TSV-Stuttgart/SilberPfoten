@@ -42,6 +42,25 @@ export default function AdminCaseDetail({query}) {
     }
   }
 
+  const closeMessage = async () => {
+
+    const patchRequest = await fetch(`/api/admin/message?messageId=${query.caseId}`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        field: 'status',
+        status: message.status === 'OPEN' ? 'CLOSED' : 'OPEN',
+      })
+    })
+    
+    if (patchRequest.status === 200) {
+
+      mutate(`/api/admin/case?caseId=${query.caseId}`)
+    }
+  }
+
   const acceptUser = async (userId) => {
     await fetch(`/api/admin/case/accept?caseId=${query.caseId}&userId=${userId}`, {method: 'PATCH'})
     
@@ -101,16 +120,26 @@ export default function AdminCaseDetail({query}) {
 
         <div className="container mt-3 mb-3">
           <div className="row">
-            <div className="col-7">
+            <div className="col-10">
               <div className="fw-bold h3 mb-0">{message.subject} {message.message_type === 'case' ? <>| {message.zipcode}</> : null}</div>
               <div className="fw-normal p mt-0">
                 {new Date(message.created_at).toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})} Uhr
               </div>
             </div>
-            <div className="col-5 text-end">
+            {/*<div className="col-5 text-end">
               <div className="btn-group" role="group">
                 <button className="btn btn-danger" onClick={() => deleteMessage()}>Löschen</button>
                 <Link href={`/admin/case/edit/${query.caseId}/${slugify(message.subject, {lower: true})}`} className="btn btn-primary">Bearbeiten</Link>
+              </div>
+            </div>*/}
+            <div className="col-2 text-center">
+              <div className="bi bi-three-dots-vertical cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false" style={{fontSize: 20}} />
+              <div className="dropdown">
+                <ul className="dropdown-menu">
+                  <li><div className="dropdown-item cursor-pointer" onClick={() => closeMessage()}>{message.status === 'OPEN' ? 'Schließen' : 'Öffnen'}</div></li>
+                  <li><Link href={`/admin/case/edit/${query.caseId}/${slugify(message.subject, {lower: true})}`} className="dropdown-item">Bearbeiten</Link></li>
+                  <li><div className="dropdown-item cursor-pointer" onClick={() => deleteMessage()}>Löschen</div></li>
+                </ul>
               </div>
             </div>
           </div>

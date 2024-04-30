@@ -49,6 +49,11 @@ export default function Home({query}) {
 
   if (messageError) return <Error />
   if (!message && !messageError) return <Loading />
+  if (message && Object.keys(message).length === 0) {
+    router.push('/')
+
+    return
+  }
   if (!session) {
     router.push('/signin')
 

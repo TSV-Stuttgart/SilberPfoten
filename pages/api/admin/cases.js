@@ -17,6 +17,7 @@ export default async function handler(request, response) {
         m.search_radius,
         m.city,
         m.zipcode,
+        m.status,
         array_to_string(m.experience_with_animal::text[], ',') as experience_with_animal,
         m.experience_with_animal_other,
         array_to_string(m.support_activity::text[], ',') as support_activity,

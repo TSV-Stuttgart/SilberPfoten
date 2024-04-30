@@ -514,7 +514,7 @@ export default async function handler(request, response) {
       return
     }
 
-    if (request.method === 'PATCH') {
+    if (request.method === 'PATCH' && !request.body.field ) {
 
       const {
         subject,
@@ -642,6 +642,52 @@ export default async function handler(request, response) {
 
         return
       }
+
+      response.status(200).json({
+        statusCode: 500,
+        body: {}
+      })
+
+      return
+    }
+
+    if (request.method === 'PATCH' && request.body.field === 'status') {
+
+      const {
+        status,
+      } = request.body
+
+      logger.info(`${request.url} | ${request.method} | query | messageId | ${request.query.messageId}`)
+      logger.info(`${request.url} | ${request.method} | body | status | ${status}`)
+
+      logger.info(`${request.url} | ${request.method} | patchRequest`)
+
+      const dbPatchMessageRequest = await db.query(`
+        UPDATE
+          public.message
+        SET
+          status = $1
+        WHERE
+          message_id = $2
+        RETURNING 
+          message_id
+        `, [
+          status,
+          request.query.messageId
+        ]
+      )
+
+      if (dbPatchMessageRequest.rowCount > 0) {
+          
+          logger.info(`${request.url} | ${request.method} | patchRequest | success | ${JSON.stringify(dbPatchMessageRequest.rows[0])}`)
+  
+          response.status(200).json({
+            statusCode: 200,
+            body: {}
+          })
+  
+          return
+        }
 
       response.status(200).json({
         statusCode: 500,

@@ -47,6 +47,14 @@ export default async function handler(request, response) {
         public.message m
       WHERE
         m.message_id = $1
+      AND 
+        (m.status = 'OPEN' OR m.status IS NULL)
+      OR
+        (
+          m.status = 'CLOSED' 
+        AND
+          EXISTS(SELECT 1 FROM case_has_user WHERE message_id = m.message_id AND user_id = $2)
+        ) 
     `, [
         request.query.messageId, 
         token.user.user_id
