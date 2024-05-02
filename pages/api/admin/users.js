@@ -19,8 +19,11 @@ export default async function handler(request, response) {
 
     logger.info(`api | members | query params | filter | ${filter}`)
 
-    if (filter === 'active') {
-      
+    if (!filter) {
+      console.log('no filter')
+      response.status(200).json([])
+
+      return
     }
 
     logger.info(`api | members | db request`)

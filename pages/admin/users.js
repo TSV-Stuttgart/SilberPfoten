@@ -31,7 +31,9 @@ export default function Users() {
   const {mutate} = useSWRConfig()
   const {session} = useSession()
   const router = useRouter()
-  const [formFilter, setFormFilter] = useState('active')
+  
+  const [formFilter, setFormFilter] = useState('')
+
   const {data: users, error} = useSWR(`/api/admin/users?filter=${formFilter}`, (url) => fetch(url).then(r => r.json()))
   const {data: pendingUsers, error: pendingError} = useSWR(`/api/admin/users?filter=pending`, (url) => fetch(url).then(r => r.json()))
   const {data: blockedUsers, error: blockedError} = useSWR(`/api/admin/users?filter=blocked`, (url) => fetch(url).then(r => r.json()))
@@ -57,10 +59,14 @@ export default function Users() {
   }, [])
 
   useEffect(() => {
-    if (router.query.refMenu) {
+
+    if (router.query.refMenu && !formFilter) {
       setFormFilter(router.query.refMenu)
     }
-  }, [router.query.refMenu])
+    else if (!formFilter) {
+      setFormFilter('active')
+    }
+  }, [router.query.refMenu, formFilter])
 
   useEffect(() => {
     const findLocation = async () => {
@@ -116,7 +122,7 @@ export default function Users() {
       })
     }
 
-    if (users && users.length > 0) {
+    if (users) {
       setFilteredSortedUsers(getFilteredSortedUsers())
     }
 
@@ -256,8 +262,8 @@ export default function Users() {
               <div className="btn-group" role="group" aria-label="Basic example">
                 <button type="button" className={`btn btn-light ${formFilter === 'active' ? 'active' : ''}`} onClick={() => setFormFilter('active')}>Aktive Mitglieder</button>
                 <button type="button" className={`btn btn-light ${formFilter === 'pending' ? 'active' : ''}`} onClick={() => setFormFilter('pending')}>Nicht bestätigt {pendingUsers.length > 0 ? <span className="small bg-secondary text-white fw-bold rounded px-2">{pendingUsers.length}</span> : null}</button>
-                <button type="button" className={`btn btn-light ${formFilter === 'deactivated' ? 'active' : ''}`} onClick={() => setFormFilter('deactivated')}>Deaktiviert</button>
-                <button type="button" className={`btn btn-light ${formFilter === 'blocked' ? 'active' : ''}`} onClick={() => setFormFilter('blocked')}>Gesperrt</button>
+                <button type="button" className={`btn btn-light ${formFilter === 'deactivated' ? 'active' : ''}`} onClick={() => setFormFilter('deactivated')}>Deaktiviert {deactivatedUsers.length > 0 ? <span className="small bg-secondary text-white fw-bold rounded px-2">{deactivatedUsers.length}</span> : null}</button>
+                <button type="button" className={`btn btn-light ${formFilter === 'blocked' ? 'active' : ''}`} onClick={() => setFormFilter('blocked')}>Gesperrt {blockedUsers.length > 0 ? <span className="small bg-secondary text-white fw-bold rounded px-2">{blockedUsers.length}</span> : null}</button>
               </div>
             </div>
           </div>
