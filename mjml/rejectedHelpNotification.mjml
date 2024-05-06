@@ -1,0 +1,19 @@
+<mjml>
+  <mj-body background-color="#fee1e3">
+    <mj-include path="./components/header.mjml" />
+    <mj-section background-color="#ffffff" padding-bottom="0px" padding-top="0">
+      <mj-column width="100%">
+        <mj-text line-height="24px" font-size="14px" color="#212529" font-family="TitilliumWeb, Ubuntu, Helvetica, Arial, sans-serif">
+          Hallo {{firstname}},
+          <br/><br/>
+          vielen Dank für Deine Hilfsbereitschaft im Fall <strong>{{caseTitle}}</strong>! Aufgrund der erfreulich großen Resonanz auf unseren Aufruf ist der Bedarf an Hilfe hier aktuell nun bereits gedeckt. Wir informieren über die sozialen Medien, unsere Webseite und unseren E-Mail-Verteiler in der Nachbarschaft des Falls, wenn weitere Hilfe gebraucht wird.
+          <br/>
+          Nochmals vielen Dank für Dein Engagement!
+          <br/><br/>
+          Bei Fragen wende Dich gerne per E-Mail an <a href="mailto:info@silberpfoten.de">info@silberpfoten.de</a> an uns.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-include path="./components/footer.mjml" />
+  </mj-body>
+</mjml>
