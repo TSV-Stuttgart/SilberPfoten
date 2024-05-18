@@ -11,6 +11,8 @@ export default async function handler(request, response) {
 
     const token = await getToken(request)
 
+    console.log(request.query.messageId)
+
     const dbRequest = await db.query(`
       SELECT
         m.message_id,
@@ -48,13 +50,15 @@ export default async function handler(request, response) {
       WHERE
         m.message_id = $1
       AND 
-        (m.status = 'OPEN' OR m.status IS NULL)
-      OR
         (
-          m.status = 'CLOSED' 
-        AND
-          EXISTS(SELECT 1 FROM case_has_user WHERE message_id = m.message_id AND user_id = $2)
-        ) 
+          (m.status = 'OPEN' OR m.status IS NULL)
+        OR
+          (
+            m.status = 'CLOSED' 
+          AND
+            EXISTS(SELECT 1 FROM case_has_user WHERE message_id = m.message_id AND user_id = $2)
+          ) 
+        )
     `, [
         request.query.messageId, 
         token.user.user_id
@@ -62,6 +66,8 @@ export default async function handler(request, response) {
     )
 
     logger.info(`api | message | response`)
+
+    console.log(dbRequest.rows[0])
 
     response.status(200).json(dbRequest.rows[0] || {})
 
