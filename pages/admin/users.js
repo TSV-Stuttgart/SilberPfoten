@@ -31,7 +31,9 @@ export default function Users() {
   const {mutate} = useSWRConfig()
   const {session} = useSession()
   const router = useRouter()
-  const [formFilter, setFormFilter] = useState('active')
+
+  const [formFilter, setFormFilter] = useState('')
+
   const {data: users, error} = useSWR(`/api/admin/users?filter=${formFilter}`, (url) => fetch(url).then(r => r.json()))
   const {data: pendingUsers, error: pendingError} = useSWR(`/api/admin/users?filter=pending`, (url) => fetch(url).then(r => r.json()))
   const {data: blockedUsers, error: blockedError} = useSWR(`/api/admin/users?filter=blocked`, (url) => fetch(url).then(r => r.json()))
@@ -57,10 +59,14 @@ export default function Users() {
   }, [])
 
   useEffect(() => {
-    if (router.query.refMenu) {
+
+    if (router.query.refMenu && !formFilter) {
       setFormFilter(router.query.refMenu)
     }
-  }, [router.query.refMenu])
+    else if (!formFilter) {
+      setFormFilter('active')
+    }
+  }, [router.query.refMenu, formFilter])
 
   useEffect(() => {
     const findLocation = async () => {
@@ -116,7 +122,7 @@ export default function Users() {
       })
     }
 
-    if (users && users.length > 0) {
+    if (users) {
       setFilteredSortedUsers(getFilteredSortedUsers())
     }
 
