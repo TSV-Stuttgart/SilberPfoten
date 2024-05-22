@@ -1,7 +1,7 @@
 import getToken from '../../../../lib/auth/getToken'
 import logger from '../../../../lib/logger'
 import db from '../../../../lib/db'
-import sendMail from '../../../../lib/sendMail'
+import { sendToQueue } from '../../../../lib/queue'
 
 export default async function handler(request, response) {
 
@@ -62,7 +62,7 @@ export default async function handler(request, response) {
         ]
       )
 
-      logger.info(`api | admin | case | reject | PATCH | send mail`)
+      logger.info(`api | admin | case | reject | PATCH | send mail to queue`)
 
       const templateName = 'rejectedHelpNotification'
       const subject = 'Bedarf gedeckt'
@@ -71,13 +71,14 @@ export default async function handler(request, response) {
         firstname: helperRequest.rows[0].firstname,
       }
 
-      const sent = await sendMail(helperRequest.rows[0].email, subject, templateName, params)
-
-      if (sent.statusCode === 200) {
-        logger.info(`api | admin | case | reject | PATCH | send mail | sent`)
-      } else {
-        logger.info(`api | admin | case | reject | PATCH | send mail | error`)
+      const data = {
+        email: helperRequest.rows[0].email,
+        emailSubject: subject,
+        templateName: templateName,
+        params: params,
       }
+
+      await sendToQueue('MAIN', data)
 
       response.status(200).json(dbRequest.rows[0] || {})
 
