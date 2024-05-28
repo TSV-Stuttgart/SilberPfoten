@@ -1,7 +1,7 @@
 import getToken from '../../../../lib/auth/getToken'
 import logger from '../../../../lib/logger'
 import db from '../../../../lib/db'
-import sendMail from '../../../../lib/sendMail'
+import { sendToQueue } from '../../../../lib/queue'
 
 export default async function handler(request, response) {
 
@@ -18,10 +18,9 @@ export default async function handler(request, response) {
       [token.user.user_id, request.query.userId]
     )
 
-    logger.info(`api | admin | member | activation | send welcome mail`)
+    logger.info(`api | admin | member | activation | send welcome mail to queue`)
 
     if (dbRequest.rowCount > 0) {
-      const to = dbRequest.rows[0].email
       const templateName = 'activationNotification'
       const subject = 'Dein Profil wurde freigeschaltet'
       const params = {
@@ -29,13 +28,14 @@ export default async function handler(request, response) {
         lastname: dbRequest.rows[0].lastname,
       }
 
-      const sent = sendMail(to, subject, templateName, params)
-
-      if (sent.statusCode === 200) {
-        logger.info(`api | admin | member | activation | sent welcome mail`)
-      } else {
-        logger.info(`api | admin | member | activation | error sending email`)
+      const data = {
+        email: dbRequest.rows[0].email,
+        emailSubject: subject,
+        templateName: templateName,
+        params: params,
       }
+
+      await sendToQueue('MAIN', data)
     }
 
     logger.info(`api | admin | member | activation | response`)

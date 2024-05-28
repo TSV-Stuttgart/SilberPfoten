@@ -1,7 +1,7 @@
 import getToken from '../../../lib/auth/getToken'
 import logger from '../../../lib/logger'
 import db from '../../../lib/db'
-import sendMail from '../../../lib/sendMail'
+import { sendToQueue } from '../../../lib/queue'
 
 export default async function handler(request, response) {
 
@@ -58,7 +58,7 @@ export default async function handler(request, response) {
         `SELECT email FROM public.user WHERE status = 'ADMIN'`
       )
 
-      logger.info(`api | message | accept | POST | send mail`)
+      logger.info(`api | message | accept | POST | send mail to queue`)
 
       const to = 'info@silberpfoten.de'
       const templateName = 'acceptedCaseNotification'
@@ -69,20 +69,14 @@ export default async function handler(request, response) {
         lastname : token.user.lastname,
       }
 
-      sent = await sendMail(to, subject, templateName, params)
-
-      if (sent.statusCode === 200) {
-        logger.info(`api | message | accept | POST | send mail | sent`)
-
-        response.status(200).json({
-          status: 200,
-          token,
-        })
-
-        return
-      } else {
-        logger.info(`api | message | accept | POST | send mail | error`)
+      const data = {
+        email: to,
+        emailSubject: subject,
+        templateName: templateName,
+        params: params,
       }
+
+      await sendToQueue('MAIN', data)
 
       logger.info(`api | message | accept | POST | response`)
 

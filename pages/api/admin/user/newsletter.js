@@ -4,7 +4,7 @@ import logger from '../../../../lib/logger'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
 import { randomUUID } from 'crypto'
-import {sendToQueue} from '../../../../lib/queue'
+import { sendToQueue } from '../../../../lib/queue'
 
 export default async function handler(request, response) {
 

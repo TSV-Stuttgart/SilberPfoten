@@ -2,7 +2,7 @@ import logger from '../../lib/logger'
 import db from '../../lib/db'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
-import sendMail from '../../lib/sendMail'
+import { sendToQueue } from '../../lib/queue'
 
 export default async function handler(request, response) {
 
@@ -60,7 +60,14 @@ export default async function handler(request, response) {
         lastname: dbRequest.rows[0].lastname,
       }
 
-      sent = await sendMail(to, subject, templateName, params)
+      const data = {
+        email: to,
+        emailSubject: subject,
+        templateName: templateName,
+        params: params,
+      }
+
+      await sendToQueue('MAIN', data)
 
       if (sent.statusCode === 200) {
         logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | send mail | sent`)
