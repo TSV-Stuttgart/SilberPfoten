@@ -2,6 +2,7 @@ import getToken from '../../../lib/auth/getToken'
 import logger from '../../../lib/logger'
 import db from '../../../lib/db'
 import { sendToQueue } from '../../../lib/queue'
+import putAudit from '../../../database/queries/audit/putAudit'
 
 export default async function handler(request, response) {
 
@@ -18,6 +19,8 @@ export default async function handler(request, response) {
         `DELETE FROM public.case_has_user WHERE user_id = $1 AND message_id = $2 RETURNING user_id, message_id`, 
         [token.user.user_id, request.query.messageId]
       )
+
+      putAudit('deleteCaseHelpOffer', {user_id: token.user.user_id, message_id: request.query.messageId})
 
       logger.info(`api | message | accept | DELETE | response`)
 
@@ -52,11 +55,7 @@ export default async function handler(request, response) {
         [token.user.user_id, request.query.messageId]
       )
 
-      logger.info(`api | message | accept | POST | db getAdminsRequest`)
-
-      const dbGetAdminsRequest = await db.query(
-        `SELECT email FROM public.user WHERE status = 'ADMIN'`
-      )
+      putAudit('addCaseHelpOffer', {user_id: token.user.user_id, message_id: request.query.messageId})
 
       logger.info(`api | message | accept | POST | send mail to queue`)
 

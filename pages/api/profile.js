@@ -4,6 +4,7 @@ import db from '../../lib/db'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
 import sendMail from '../../lib/sendMail'
+import putAudit from '../../database/queries/audit/putAudit'
 
 export default async function handler(request, response) {
 
@@ -213,6 +214,8 @@ export default async function handler(request, response) {
       logger.info(`api | profile | delete account`)
 
       await db.query(`DELETE FROM public.user WHERE user_id = $1`, [token.user.user_id])
+
+      putAudit('deleteAccount', {user_id: token.user.user_id})
 
       logger.info(`api | profile | delete account | response`)
 

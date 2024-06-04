@@ -8,6 +8,7 @@ import Link from 'next/link'
 import {useRouter} from 'next/router'
 import db from '../../../lib/db'
 import sendMail from '../../../lib/sendMail'
+import putAudit from '../../../database/queries/audit/putAudit'
 
 export async function getServerSideProps(context) {
   logger.info(`signup | verify | code`)
@@ -106,6 +107,8 @@ export async function getServerSideProps(context) {
 
       if (createUserRequest.rows.length > 0) {
         logger.info(`signup | verify | setpassword | verified successfully | post request | user inserted`)
+
+        putAudit('addAccount', {user_id: createUserRequest.rows[0].user_id})
         
         logger.info(`signup | verify | setpassword | verified successfully | post request | user inserted | send email to admin`)
         const to = 'info@silberpfoten.de'

@@ -2,6 +2,7 @@ import getToken from '../../../../lib/auth/getToken'
 import logger from '../../../../lib/logger'
 import db from '../../../../lib/db'
 import { sendToQueue } from '../../../../lib/queue'
+import putAudit from '../../../../database/queries/audit/putAudit'
 
 export default async function handler(request, response) {
 
@@ -77,6 +78,8 @@ export default async function handler(request, response) {
         templateName: templateName,
         params: params,
       }
+
+      putAudit('acceptCaseHelpOffer', {user_id: request.query.userId, message_id: request.query.caseId, admin_id: token.user.user_id})
 
       await sendToQueue('MAIN', data)
 
