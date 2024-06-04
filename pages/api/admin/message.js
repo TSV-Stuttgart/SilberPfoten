@@ -480,9 +480,13 @@ export default async function handler(request, response) {
 
           for (const receiver of emailReceivers) {
 
+            // Temporär solange NEXT_PUBLIC_HOST nicht funktioniert
+            const caseLink = `https://mein.silberpfoten.de/message/${dbPutMessageRequest.rows[0].message_id}/${slugify(`${subject}`, {lower: true})}`
+            //const caseLink = `${process.env.NEXT_PUBLIC_HOST}/message/${dbPutMessageRequest.rows[0].message_id}/${slugify(`${subject}`, {lower: true})}`
+
             const params = {
               firstname: receiver.firstname,
-              caseLink: `${process.env.NEXT_PUBLIC_HOST}/message/${dbPutMessageRequest.rows[0].message_id}/${slugify(`${subject}`, {lower: true})}`,
+              caseLink: caseLink,
               caseTitle: subject,
             }
 
