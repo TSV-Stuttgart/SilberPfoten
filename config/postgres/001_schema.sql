@@ -1,5 +1,12 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+CREATE TABLE dbo.audit (
+  audit_id: BIGSERIAL,
+  action_type: VARCHAR(255),
+  data_json: TEXT,
+  created_at: TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
+)
+
 CREATE TABLE IF NOT EXISTS public.user (
   user_id BIGSERIAL,
   gender VARCHAR(8),
