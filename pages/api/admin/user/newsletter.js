@@ -44,7 +44,7 @@ export default async function handler(request, response) {
 
       logger.info(`${request.url} | ${request.method} | created jwt token | token: ${deactivateNewsletterToken?.slice(0,50)}`)
 
-      const deactivateNewsletterLink = `https://${process.env.NEXT_PUBLIC_HOST}/newsletter?token=${deactivateNewsletterToken}`
+      const deactivateNewsletterLink = `${process.env.NEXT_PUBLIC_HOST}/newsletter?token=${deactivateNewsletterToken}`
 
       const params = {deactivateNewsletterLink: deactivateNewsletterLink}
       const emailUUID = randomUUID()

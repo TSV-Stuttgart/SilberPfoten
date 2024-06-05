@@ -183,10 +183,7 @@ export default async function handler(request, response) {
         const params = {
           firstname: token.user.firstname,
           newEmail: email,
-          //changeEmailLink: `${process.env.NEXT_PUBLIC_HOST}?token=${changeEmailToken}`
-
-          // Temporär bis NEXT_PUBLIC_HOST geändert wurde
-          changeEmailLink: `https://mein.silberpfoten.de?token=${changeEmailToken}`
+          changeEmailLink: `${process.env.NEXT_PUBLIC_HOST}?token=${changeEmailToken}`,
         }
 
         const sent = await sendMail(token.user.email, subject, templateName, params)
