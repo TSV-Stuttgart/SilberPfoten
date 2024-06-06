@@ -57,7 +57,14 @@ export default async function handler(request, response) {
     }
 
     logger.info(`api | signup | generate verification code`)
-    const verificationCode = Math.floor(100000 + Math.random() * 900000)
+
+    let verificationCode
+    if (process.env.NODE_ENV === 'development') {
+      verificationCode = 123456
+    } else {
+      verificationCode = Math.floor(100000 + Math.random() * 900000)
+    }
+
     logger.info(`api | signup | generate verification code | ${verificationCode}`)
     
     logger.info(`api | signup | sign jwt`)
@@ -92,6 +99,17 @@ export default async function handler(request, response) {
       firstname,
       lastname,
       verificationCode,
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      logger.info(`api | signup | send mail | not sent in development`)
+
+      response.status(200).json({
+        status: 200,
+        token,
+      })
+
+      return
     }
 
     const sent = await sendMail(to, subject, templateName, params)
