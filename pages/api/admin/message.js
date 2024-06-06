@@ -258,7 +258,7 @@ export default async function handler(request, response) {
 
       if (dbPutMessageRequest.rowCount > 0) {
 
-        putAudit('addMessage', {user_id: token.user.user_id})
+        putAudit('addMessage', {user_id: token.user.user_id, message_id: dbPutMessageRequest.rows[0].message_id})
 
         // Upload Images
         if (formUploads) {
@@ -459,7 +459,7 @@ export default async function handler(request, response) {
 
       if (dbPutMessageRequest.rowCount > 0) {
 
-        putAudit('addCaseHelpRequest', {user_id: token.user.user_id})
+        putAudit('addCaseHelpRequest', {user_id: token.user.user_id, message_id: dbPutMessageRequest.rows[0].message_id})
 
         // Upload Images
         if (formUploads) {
