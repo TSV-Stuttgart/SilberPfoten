@@ -4,6 +4,7 @@ import logger from '../../../lib/logger'
 import sharp from 'sharp'
 import slugify from 'slugify'
 import {sendToQueue} from '../../../lib/queue'
+import putAudit from '../../../database/queries/audit/putAudit'
 
 export const config = {
   api: {
@@ -257,6 +258,8 @@ export default async function handler(request, response) {
 
       if (dbPutMessageRequest.rowCount > 0) {
 
+        putAudit('addMessage', {user_id: token.user.user_id, message_id: dbPutMessageRequest.rows[0].message_id})
+
         // Upload Images
         if (formUploads) {
           logger.info(`${request.url} | ${request.method} | uploadingImages`)
@@ -455,6 +458,8 @@ export default async function handler(request, response) {
       )
 
       if (dbPutMessageRequest.rowCount > 0) {
+
+        putAudit('addCaseHelpRequest', {user_id: token.user.user_id, message_id: dbPutMessageRequest.rows[0].message_id})
 
         // Upload Images
         if (formUploads) {

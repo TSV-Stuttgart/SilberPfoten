@@ -26,6 +26,7 @@ export default function Navigation() {
           <Link href="/admin/users" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/users' ? 'bi-people-fill' : 'bi-people'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Benutzer</span></div></Link>
           <Link href="/admin/messages" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/messages' ? 'bi-envelope-fill' : 'bi-envelope'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Nachrichten</span></div></Link>
           <Link href="/admin/cases" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/cases' ? 'bi-megaphone-fill' : 'bi-megaphone'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Suchaufträge</span></div></Link>
+          <Link href="/admin/statistics" className="text-decoration-none"><div className="text-dark d-block h4 fw-light cursor-pointer mt-3"><i className={`${router.pathname === '/admin/cases' ? 'bi-bar-chart-line-fill' : 'bi-bar-chart-line'} me-2`} style={{fontSize: 24}}></i><span className="d-none d-lg-inline">Statistiken</span></div></Link>
         </> : null}
 
       </div>
