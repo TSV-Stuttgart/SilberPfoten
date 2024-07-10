@@ -3,6 +3,7 @@ import db from '../../lib/db'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
 import { sendToQueue } from '../../lib/queue'
+import putAudit from '../../database/queries/audit/putAudit'
 
 export default async function handler(request, response) {
 
@@ -35,6 +36,8 @@ export default async function handler(request, response) {
 
         return response.status(403).send()
       }
+
+      putAudit('deleteAccount', {user_id: decryptedData.userId})
 
       logger.info(`${request.url.slice(0, 50)} | ${request.method} | delete account | delete session in database`)
       await db.query(`DELETE FROM public.session WHERE user_id = $1`, [decryptedData.userId])
