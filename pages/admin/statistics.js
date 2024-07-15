@@ -58,8 +58,7 @@ export default function Home() {
         color: 'bg-success',
         value: audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length || 0,
         difference: 
-          (audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length || 0
-          - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length || 0),
+          ((audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length) || 0),
       },
       DELETIONS: {
         title: 'LÖSCHUNGEN',
@@ -67,8 +66,7 @@ export default function Home() {
         color: 'bg-danger',
         value: audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length || 0,
         difference: 
-          (audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length || 0
-          - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length || 0),
+          ((audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length) || 0),
       },
       SEARCHES: {
         title: 'SUCHAUFTRÄGE',
@@ -76,8 +74,7 @@ export default function Home() {
         color: 'bg-warning',
         value: audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length || 0,
         difference: 
-          (audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length || 0
-          - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length || 0),
+          ((audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length) || 0),
       },
       OFFERS: {
         title: 'HILFSANGEBOTE',
@@ -85,8 +82,7 @@ export default function Home() {
         color: 'bg-success',
         value: audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length || 0,
         difference: 
-          (audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length || 0
-          - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length || 0),
+          ((audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length) || 0),
       },
     }
 
