@@ -10,8 +10,8 @@ export default function Home() {
   const {mutate} = useSWRConfig()
 
   const [selectedPeriod, setSelectedPeriod] = useState('LAST30D')
-  const [selectedPeriodDropdownText, setSelectedPeriodDropdownText] = useState('Letzte 30 Tage')
-  const [selectedComparisonText, setSelectedComparisonText] = useState('seit letzte 30 Tage')
+  const [selectedPeriodDropdownText, setSelectedPeriodDropdownText] = useState('Letzten 30 Tage')
+  const [selectedComparisonText, setSelectedComparisonText] = useState('seit letzten 30 Tage')
 
   const {data: audits, error: auditError} = useSWR(`/api/admin/audits?timePeriod=${selectedPeriod}`, (url) => fetch(url).then(r => r.json()))
   const {session} = useSession()
@@ -30,20 +30,20 @@ export default function Home() {
     setSelectedPeriod(newPeriod)
 
     if (newPeriod === 'LAST24H') {
-      setSelectedPeriodDropdownText('Letzte 24 Stunden')
-      setSelectedComparisonText('seit letzte 24 Stunden')
+      setSelectedPeriodDropdownText('Letzten 24 Stunden')
+      setSelectedComparisonText('seit letzten 24 Stunden')
     }
     else if (newPeriod === 'LAST7D') {
-      setSelectedPeriodDropdownText('Letzte 7 Tage')
-      setSelectedComparisonText('seit letzte 7 Tage')
+      setSelectedPeriodDropdownText('Letzten 7 Tage')
+      setSelectedComparisonText('seit letzten 7 Tage')
     }
     else if (newPeriod === 'LAST30D') {
-      setSelectedPeriodDropdownText('Letzte 30 Tage')
-      setSelectedComparisonText('seit letzte 30 Tage')
+      setSelectedPeriodDropdownText('Letzten 30 Tage')
+      setSelectedComparisonText('seit letzten 30 Tage')
     }
     else if (newPeriod === 'LAST365D') {
-      setSelectedPeriodDropdownText('Letzte 365 Tage')
-      setSelectedComparisonText('seit letzte 365 Tage')
+      setSelectedPeriodDropdownText('Letzten 365 Tage')
+      setSelectedComparisonText('seit letzten 365 Tage')
     }
 
     mutate(`/api/admin/audits?timePeriod=${newPeriod}`)
@@ -58,8 +58,7 @@ export default function Home() {
         color: 'bg-success',
         value: audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length || 0,
         difference: 
-          (audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length || 0
-          - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length || 0),
+          ((audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addAccount').length) || 0),
       },
       DELETIONS: {
         title: 'LÖSCHUNGEN',
@@ -67,8 +66,7 @@ export default function Home() {
         color: 'bg-danger',
         value: audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length || 0,
         difference: 
-          (audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length || 0
-          - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length || 0),
+          ((audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'deleteAccount').length) || 0),
       },
       SEARCHES: {
         title: 'SUCHAUFTRÄGE',
@@ -76,8 +74,7 @@ export default function Home() {
         color: 'bg-warning',
         value: audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length || 0,
         difference: 
-          (audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length || 0
-          - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length || 0),
+          ((audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpRequest').length) || 0),
       },
       OFFERS: {
         title: 'HILFSANGEBOTE',
@@ -85,8 +82,7 @@ export default function Home() {
         color: 'bg-success',
         value: audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length || 0,
         difference: 
-          (audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length || 0
-          - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length || 0),
+          ((audits?.currentAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length - audits?.lastAuditPeriod?.filter(audit => audit.action_type === 'addCaseHelpOffer').length) || 0),
       },
     }
 
@@ -132,10 +128,10 @@ export default function Home() {
                   {selectedPeriodDropdownText}
                 </button>
                 <ul className="dropdown-menu">
-                  <li><a className="dropdown-item" href="#" onClick={() => selectNewPeriod('LAST24H')}>Letzte 24 Stunden</a></li>
-                  <li><a className="dropdown-item" href="#" onClick={() => selectNewPeriod('LAST7D')}>Letzte 7 Tage</a></li>
-                  <li><a className="dropdown-item" href="#" onClick={() => selectNewPeriod('LAST30D')}>Letzte 30 Tage</a></li>
-                  <li><a className="dropdown-item" href="#" onClick={() => selectNewPeriod('LAST365D')}>Letzte 365 Tage</a></li>
+                  <li><a className="dropdown-item" href="#" onClick={() => selectNewPeriod('LAST24H')}>Letzten 24 Stunden</a></li>
+                  <li><a className="dropdown-item" href="#" onClick={() => selectNewPeriod('LAST7D')}>Letzten 7 Tage</a></li>
+                  <li><a className="dropdown-item" href="#" onClick={() => selectNewPeriod('LAST30D')}>Letzten 30 Tage</a></li>
+                  <li><a className="dropdown-item" href="#" onClick={() => selectNewPeriod('LAST365D')}>Letzten 365 Tage</a></li>
                 </ul>
               </div>
             </div>
