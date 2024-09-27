@@ -31,14 +31,20 @@ export default function Registrieren({csrf}) {
   const [formStreetNumber, setFormStreetNumber] = useState('')
   const [formZipcode, setFormZipcode] = useState('')
   const [formCity, setFormCity] = useState('')
+	const [formAddress, setFormAddress] = useState('')
+	const [addressNotFoundChooseInput, setAddressNotFoundChooseInput] = useState(false)
   const [formNotice, setFormNotice] = useState(false)
   const [formRecordNotice, setFormRecordNotice] = useState(false)
-
+	
   const [formSupportingActivity, setFormSupportingActivity] = useState([])
   const [formExperienceWithAnimal, setFormExperienceWithAnimal] = useState([])
   const [formExperienceWithAnimalOther, setFormExperienceWithAnimalOther] = useState('')
   const [formBecameAwareThrough, setFormBecameAwareThrough] = useState([])
   const [formBecameAwareThroughOther, setFormBecameAwareThroughOther] = useState('')
+  const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')  
+
+  const [timeoutId, setTimeoutId] = useState(undefined)
+  const [selectedAddress, setSelectedAddress] = useState('')
 
   useEffect(() => {
 
@@ -46,33 +52,31 @@ export default function Registrieren({csrf}) {
 
   }, [router.query.email])
 
-  //const [focusOut, setFocusOut] = useState(false)
-  //const [formAutoCompleteValues, setFormAutoCompleteValues] = useState('')
-  //const [placeId, setPlaceId] = useState('')
-  //const [coordLat, setCoordLat] = useState('')
-  //const [coordLon, setCoordLon] = useState('')
+  useEffect(() => {
 
-  //useEffect(() => {
+    if (formAddress && formAddress.length > 20 && formAddress.match(/\d{4}/gm)) {
+      searchAddress(formAddress)
+    }
 
-  //  if (focusOut && formStreet && formStreetNumber && formZipcode && formCity) {
-  //    searchAddress(`${formStreet},${formStreetNumber},${formZipcode},${formCity}`)
-  //  }
-  //  else {
-  //    setFocusOut(false)
-  //  }
+  }, [formAddress])
 
-  //}, [formStreet, formStreetNumber, formZipcode, formCity, focusOut])
+  const searchAddress = async (value) => {
 
-  //const searchAddress = async (value) => {
-  //  const location = await (await fetch(`https://nominatim.openstreetmap.org/search/${value}?format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&email=info@silberpfoten.de`)).json()
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      setTimeoutId(undefined)
+    }
 
-  //  setFormAutoCompleteValues(location)
-  //  setFocusOut(false)
-  //}
+		const locationTimeoutId = setTimeout(async () => {			
+			const location = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${value}&format=json&addressdetails=1&linkedplaces=1&namedetails=1&limit=5&countrycodes=de&dedupe=1&email=info@silberpfoten.de`)).json()
 
-  //const resetCoords = () => {
-  //  setPlaceId('')
-  //}
+			setFormAutoCompleteValues(location)
+			setSelectedAddress('')
+
+		}, 500)
+
+    setTimeoutId(locationTimeoutId)
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -91,10 +95,10 @@ export default function Registrieren({csrf}) {
         phone: formPhone,
         birthdate: formBirthdate,
         job: formJobTitle,
-        street: formStreet,
-        street_number: formStreetNumber,
-        zipcode: formZipcode,
-        city: formCity,
+        street: addressNotFoundChooseInput ? formStreet : selectedAddress?.address?.road,
+        street_number: addressNotFoundChooseInput ? formStreetNumber : selectedAddress?.address?.house_number,
+        zipcode: addressNotFoundChooseInput ? formZipcode : selectedAddress?.address?.postcode,
+        city: addressNotFoundChooseInput ? formCity : selectedAddress?.address?.municipality,
         support_activity: formSupportingActivity,
         experience_with_animal: formExperienceWithAnimal,
         experience_with_animal_other: formExperienceWithAnimalOther,
@@ -120,7 +124,7 @@ export default function Registrieren({csrf}) {
     }
 
     else if (signupRequestResponse.status === 500) {
-      setErrorMessage('Dein Sicherheitsschlüssel ist abgelaufen (10 Minuten). <br/>Bitte versuche es erneut.')
+      setErrorMessage(<>Dein Sicherheitsschlüssel ist abgelaufen (10 Minuten). <br/>Bitte versuche es erneut.</>)
       document.documentElement.scrollTop = 0
     }
   }
@@ -168,65 +172,70 @@ export default function Registrieren({csrf}) {
             <div className="mt-3 ms-1">Anschrift</div>
           </div>
         </div>
-        <div className="row justify-content-center">
-          <div className="col-9 col-md-4 col-lg-3 text-center">
-            <input type="text" name="street" className="form-control mt-1" placeholder="Strasse" value={formStreet} onChange={(e) => setFormStreet(e.target.value)} required />
-          </div>
-          <div className="col-3 col-md-2 col-lg-1 text-center">
-            <input type="text" name="streetnumber" className="form-control mt-1" placeholder="Hausnr." value={formStreetNumber} onChange={(e) => setFormStreetNumber(e.target.value)} required />
-          </div>
-        </div>
-        <div className="row justify-content-center mt-2">
-          <div className="col-4 col-md-2 col-lg-1 text-center">
-            <input type="text" name="zipcode" className="form-control mt-1" placeholder="PLZ" value={formZipcode} onChange={(e) => setFormZipcode(e.target.value)} required />
-          </div>
-          <div className="col-8 col-md-4 col-lg-3 text-center">
-            <input type="text" name="city" className="form-control mt-1" placeholder="Stadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
-          </div>
-        </div>
 
-        {/*<div className="row justify-content-center">
-          <div className="col-9 col-md-4 col-lg-3 text-center">
-            <input type="text" name="street" className="form-control mt-1" placeholder="Strasse" value={formStreet} onChange={(e) => { setFormStreet(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
-          </div>
-          <div className="col-3 col-md-2 col-lg-1 text-center">
-            <input type="text" name="streetnumber" className="form-control mt-1" placeholder="Hausnr." value={formStreetNumber} onChange={(e) => { setFormStreetNumber(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
-          </div>
-        </div>
-        <div className="row justify-content-center mt-2">
-          <div className="col-4 col-md-2 col-lg-1 text-center">
-            <input type="text" name="zipcode" className="form-control mt-1" placeholder="PLZ" value={formZipcode} onChange={(e) => { setFormZipcode(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
-          </div>
-          <div className="col-8 col-md-4 col-lg-3 text-center">
-            <input type="text" name="city" className="form-control mt-1" placeholder="Stadt" value={formCity} onChange={(e) => { setFormCity(e.target.value); resetCoords() }} onBlur={() => setFocusOut(true)} required />
-          </div>
-        </div>*/}
+				{!addressNotFoundChooseInput ? <>
+					<div className="row justify-content-center">
+						<div className="col-12 col-md-6 col-lg-4 text-center">
+							<input type="text" name="street" className="form-control mt-1" placeholder="Adresse" value={formAddress} onChange={(e) => setFormAddress(e.target.value)} required />
+							<div className="text-muted text-start ms-1 mt-1">Beispiel: Mustermann Straße 12, 12345 Musterstadt</div>
+						</div>
+					</div>
+				</> : <>
+					<div className="row justify-content-center">
+						<div className="col-9 col-md-4 col-lg-3 text-center">
+							<input type="text" name="street" className="form-control mt-1" placeholder="Strasse" value={formStreet} onChange={(e) => setFormStreet(e.target.value)} required />
+						</div>
+						<div className="col-3 col-md-2 col-lg-1 text-center">
+							<input type="text" name="streetnumber" className="form-control mt-1" placeholder="Hausnr." value={formStreetNumber} onChange={(e) => setFormStreetNumber(e.target.value)} required />
+						</div>
+					</div>
+					<div className="row justify-content-center mt-2">
+						<div className="col-4 col-md-2 col-lg-1 text-center">
+							<input type="text" name="zipcode" className="form-control mt-1" placeholder="PLZ" value={formZipcode} onChange={(e) => setFormZipcode(e.target.value)} required />
+						</div>
+						<div className="col-8 col-md-4 col-lg-3 text-center">
+							<input type="text" name="city" className="form-control mt-1" placeholder="Stadt" value={formCity} onChange={(e) => setFormCity(e.target.value)} required />
+						</div>
+					</div>
+				</>}
 
-        {/*{formAutoCompleteValues ?
-          <div className="row justify-content-center mt-0">
+        {formAutoCompleteValues ?
+          <div className="row justify-content-center mt-3">
             <div className="col-12 col-md-6 col-lg-4">
-              <div className="border rounded-bottom p-2 bg-light">
+              <div className="border rounded p-2 bg-light">
               {formAutoCompleteValues?.length > 0 ? <>
-                {!placeId 
-                ? <div className="p-1 text-danger fw-bold"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
-                : <div className="p-1 text-success"><i className="bi bi-info-circle-fill"></i> <small>Wähle die passendste Adresse aus:</small></div>
-                }
+                <div className="p-1 fw-bold">Wähle deine Adresse</div>
 
                 {formAutoCompleteValues.map(item => 
-                  <div key={item.place_id} className={`p-1 cursor-pointer ${placeId && placeId != item.place_id ? 'text-muted' : null}`} 
-                    onClick={(e) => { setPlaceId(`${item.place_id}`); setCoordLat(`${item.lat}`); setCoordLon(`${item.lon}`) }}>
-                    {placeId == item.place_id ? <><i className="bi bi-check-lg"></i>&nbsp;</> : null} 
-                    <strong>{item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</strong> 
-                    <small>({item.display_name})</small>
+                  <div key={item.place_id} className={`border-bottom mb-1 py-2 px-2 cursor-pointer ${selectedAddress?.place_id == item.place_id ? 'bg-white rounded' : ''}`} 
+                    onClick={(e) => setSelectedAddress(item)}>
+                    <div className="fw-bold">
+                      {item.address.road} {item.address.house_number}, {item.address.postcode} {item.address.municipality} {item.address.city}</div> 
+                    <div className="small">({item.display_name})</div>
                   </div>)
                 }
-                </> : <div>Keine gültige Adresse gefunden</div>
+                </> : <>
+									{!addressNotFoundChooseInput ? <>
+										<div className="">
+											<div className="">Keine gültige Adresse gefunden</div>
+											<div className="fw-bold">
+												<span className="cursor-pointer" onClick={() => setAddressNotFoundChooseInput(true)}>&raquo; Trotzdem verwenden</span>
+											</div>
+										</div>
+									</> : <>
+										<div className="">
+											<div className="fw-bold">
+												<span className="cursor-pointer" onClick={() => setAddressNotFoundChooseInput(false)}>&raquo; zurück zur Adress-Suche</span>
+											</div>
+										</div>
+									</>}
+								</>
               }
               </div> 
             </div> 
           </div>
           : null
-        }*/}
+        }
 
         <div className="row justify-content-center mt-4">
           <div className="col-12 col-md-6 col-lg-4">
