@@ -11,8 +11,6 @@ export default async function handler(request, response) {
 
     const token = await getToken(request)
 
-    console.log(request.query.messageId)
-
     const dbRequest = await db.query(`
       SELECT
         m.message_id,
@@ -66,8 +64,6 @@ export default async function handler(request, response) {
     )
 
     logger.info(`api | message | response`)
-
-    console.log(dbRequest.rows[0])
 
     response.status(200).json(dbRequest.rows[0] || {})
 
