@@ -43,10 +43,10 @@ JWT_SECRET=MYSECRET
 
 ```sh
 # start
-docker-compose -f docker-compose.dev.yml up --detach
+$ docker compose -f docker-compose.dev.yml up --detach
 
 # stop
-docker-compose -f docker-compose.dev.yml down --remove-orphans --volumes --rmi=all
+$ docker compose -f docker-compose.dev.yml down --remove-orphans --volumes --rmi=all
 ```
 
 5. Starte die Anwendung mit `yarn dev`
