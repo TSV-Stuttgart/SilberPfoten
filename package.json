@@ -17,24 +17,24 @@
     "handlebars": "^4.7.7",
     "jsonwebtoken": "^9.0.0",
     "mjml": "^4.13.0",
-    "next": "13.5.5",
+    "next": "14.2.14",
     "next-pwa": "^5.5.4",
     "nodemailer": "^6.8.0",
     "pg": "^8.8.0",
-    "pino": "^8.6.1",
-    "react": "18.2.0",
+    "pino": "^9.4.0",
+    "react": "18.3.1",
     "react-bootstrap": "^2.6.0",
-    "react-dom": "18.2.0",
+    "react-dom": "18.3.1",
     "react-html-parser": "^2.0.2",
     "react-quill": "^2.0.0",
-    "sharp": "^0.32.0",
+    "sharp": "^0.33.5",
     "slugify": "^1.6.5",
     "swr": "^2.0.3",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz"
   },
   "devDependencies": {
-    "eslint": "8.51.0",
-    "eslint-config-next": "13.5.5",
+    "eslint": "9.11.1",
+    "eslint-config-next": "14.2.14",
     "sass": "^1.55.0"
   }
 }
