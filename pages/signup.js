@@ -45,6 +45,7 @@ export default function Registrieren({csrf}) {
 
   const [timeoutId, setTimeoutId] = useState(undefined)
   const [selectedAddress, setSelectedAddress] = useState('')
+  const [addressIsNotValid, setAddressIsNotValid] = useState(undefined)
 
   useEffect(() => {
 
@@ -56,6 +57,7 @@ export default function Registrieren({csrf}) {
 
     if (formAddress && formAddress.length > 20 && formAddress.match(/\d{4}/gm)) {
       searchAddress(formAddress)
+      setAddressIsNotValid(false)
     }
 
   }, [formAddress])
@@ -81,6 +83,18 @@ export default function Registrieren({csrf}) {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
+    const street = addressNotFoundChooseInput ? formStreet : selectedAddress?.address?.road
+    const streetNumber = addressNotFoundChooseInput ? formStreetNumber : selectedAddress?.address?.house_number
+    const zipcode = addressNotFoundChooseInput ? formZipcode : selectedAddress?.address?.postcode
+    const city = addressNotFoundChooseInput ? formCity : selectedAddress?.address?.municipality
+    
+    // check address
+    if ((!street || !streetNumber || !zipcode || !city) && !selectedAddress) {
+      setAddressIsNotValid(true)
+
+      return
+    }
+
     const signupRequest = await fetch(`/api/signup`, {
       method: 'POST', 
       headers: {
@@ -95,10 +109,10 @@ export default function Registrieren({csrf}) {
         phone: formPhone,
         birthdate: formBirthdate,
         job: formJobTitle,
-        street: addressNotFoundChooseInput ? formStreet : selectedAddress?.address?.road,
-        street_number: addressNotFoundChooseInput ? formStreetNumber : selectedAddress?.address?.house_number,
-        zipcode: addressNotFoundChooseInput ? formZipcode : selectedAddress?.address?.postcode,
-        city: addressNotFoundChooseInput ? formCity : selectedAddress?.address?.municipality,
+        street: street,
+        street_number: streetNumber,
+        zipcode: zipcode,
+        city: city,
         support_activity: formSupportingActivity,
         experience_with_animal: formExperienceWithAnimal,
         experience_with_animal_other: formExperienceWithAnimalOther,
@@ -169,6 +183,12 @@ export default function Registrieren({csrf}) {
         </div>
         <div className="row justify-content-center">
           <div className="col-12 col-md-6 col-lg-4">
+            {addressIsNotValid ? <>
+              <div className="mt-5 ms-1 bg-danger rounded text-white p-2">
+                <span className="fw-bold">Fehler: Wir können deine Adresse nicht finden</span><br/>
+                Die angegebene Adresse kann nicht gefunden werden. Bitte gib deine Adresse wie im unten stehenden Beispiel an.
+              </div>
+            </> : null}
             <div className="mt-3 ms-1">Anschrift</div>
           </div>
         </div>
