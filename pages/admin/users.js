@@ -317,7 +317,7 @@ export default function Users() {
         activities={user.support_activity}
         phone={user.phone || user.mobile || null}
         email={user.email}
-        adress={`${user.zipcode} ${user.city}`}
+        adress={`${user.zipcode} ${user.city || ''}`}
         targetHref={`/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}?refMenu=${formFilter}`}
         navigationElements={[
           //{title: 'Bearbeiten', href: `/admin/user/${user.user_id}/${slugify(`${user.lastname}-${user.firstname}`, {lower: true})}`},

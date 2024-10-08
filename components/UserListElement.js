@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 
-export default function UserList({id, name, status, animals, animalsOther, activities, phone, email, adress, targetHref, navigationElements}) {
+export default function UserListElement({id, name, status, animals, animalsOther, activities, phone, email, adress, targetHref, navigationElements}) {
 
   return <>
     <div className="container" id={id}>
