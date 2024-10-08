@@ -86,7 +86,7 @@ export default function Registrieren({csrf}) {
     const street = addressNotFoundChooseInput ? formStreet : selectedAddress?.address?.road
     const streetNumber = addressNotFoundChooseInput ? formStreetNumber : selectedAddress?.address?.house_number
     const zipcode = addressNotFoundChooseInput ? formZipcode : selectedAddress?.address?.postcode
-    const city = addressNotFoundChooseInput ? formCity : selectedAddress?.address?.municipality
+    const city = addressNotFoundChooseInput ? formCity : selectedAddress?.address?.city || selectedAddress?.address?.municipality || selectedAddress?.address?.town || selectedAddress?.address?.village
     
     // check address
     if ((!street || !streetNumber || !zipcode || !city) && !selectedAddress) {
