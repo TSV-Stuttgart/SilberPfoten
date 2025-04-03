@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import slugify from 'slugify'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import useSession from '../lib/auth/useSession'
 import Wrapper from '../components/Wrapper'
 import Error from '../components/Error'
@@ -10,6 +11,49 @@ import Loading from '../components/Loading'
 import Notice from '../components/Notice'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
+
+// Dynamically import the map component, disable SSR
+const MapComponent = dynamic(() => import('../components/CaseMap'), {
+  ssr: false,
+  loading: () => <p>Karte wird geladen...</p> // Optional loading indicator
+});
+
+// Helper function to obfuscate coordinates
+const obfuscateCoordinates = (lat, lon, radiusMeters = 500) => {
+  if (lat == null || lon == null) return { obfuscatedLat: null, obfuscatedLon: null };
+
+  const earthRadius = 6371000; // Earth radius in meters
+
+  // Convert radius from meters to radians
+  const radiusRad = radiusMeters / earthRadius;
+
+  // Random angle and distance
+  const randomAngle = Math.random() * 2 * Math.PI;
+  // Use sqrt(random) for uniform distribution within the circle area
+  const randomDistanceRad = Math.sqrt(Math.random()) * radiusRad;
+
+  // Convert original coordinates to radians
+  const latRad = lat * Math.PI / 180;
+  const lonRad = lon * Math.PI / 180;
+
+  // Calculate new latitude
+  const newLatRad = Math.asin(
+    Math.sin(latRad) * Math.cos(randomDistanceRad) +
+    Math.cos(latRad) * Math.sin(randomDistanceRad) * Math.cos(randomAngle)
+  );
+
+  // Calculate new longitude
+  const newLonRad = lonRad + Math.atan2(
+    Math.sin(randomAngle) * Math.sin(randomDistanceRad) * Math.cos(latRad),
+    Math.cos(randomDistanceRad) - Math.sin(latRad) * Math.sin(newLatRad)
+  );
+
+  // Convert back to degrees
+  const obfuscatedLat = newLatRad * 180 / Math.PI;
+  const obfuscatedLon = newLonRad * 180 / Math.PI;
+
+  return { obfuscatedLat, obfuscatedLon };
+};
 
 export async function getServerSideProps(context) {
 
@@ -56,6 +100,17 @@ export default function Home({query, tokenType}) {
     // start worker to handle email queue
     fetch(`/api/worker`, {method: 'POST'})
   }, [])
+
+  // Calculate processed messages for the map using useMemo
+  const mapMessages = useMemo(() => {
+    if (!messages) return [];
+    return messages
+      .filter(m => m.lat != null && m.lon != null) // Filter messages with coordinates
+      .map(m => ({
+        ...m,
+        ...obfuscateCoordinates(m.lat, m.lon) // Add obfuscated coordinates
+      }));
+  }, [messages]);
 
   //const deleteMessage = async (messageId) => {
   //  await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
@@ -130,14 +185,28 @@ export default function Home({query, tokenType}) {
     <>
       <Wrapper>
 
+        {/* Map Section */}
         <div className="container mt-3 mb-3">
           <div className="row">
             <div className="col-12">
-              <div className="fw-bold h3">Nachrichten</div>
+              <div className="fw-bold h4">Fälle in deiner Nähe</div>
+                <div className="mb-3">
+                    <MapComponent messages={mapMessages} />
+                </div>
             </div>
           </div>
         </div>
 
+        {/* Messages Section Title */}
+        <div className="container mt-3 mb-3">
+          <div className="row">
+            <div className="col-12">
+              <div className="fw-bold h3">Alle Nachrichten</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Existing Messages Loop (Cases) */}
         {messages.filter(m => m.message_type === 'case').length > 0 ? <div className="mt-3 mb-4">
           <div className="ms-4">Wir haben einen passenden Suchauftrag für dich!</div>
           {messages.filter(m => m.message_type === 'case').map(message => <React.Fragment key={message.message_id}>
@@ -165,6 +234,7 @@ export default function Home({query, tokenType}) {
           </React.Fragment>)}
         </div> : null}
 
+        {/* Existing Messages Loop (Messages) */}
         {messages.filter(m => m.message_type === 'message').map(message => <React.Fragment key={message.message_id}>
         <Link href={`/message/${message.message_id}/${slugify(message.subject, {lower: true})}`} className="text-decoration-none text-secondary">
         <div className="container mt-2">
@@ -183,125 +253,6 @@ export default function Home({query, tokenType}) {
                   </div>
                 </div>
               </div>
-
-              {/* {message.message_type === 'case' ? <>
-              <div className="border-bottom pb-4 p-2 bg-light rounded-3">
-                <div className="row">
-                  <div className="col-11 offset-1">
-                    <span className="small">
-                      {new Date(message.created_at).toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})} Uhr
-                    </span>
-                  </div>
-                </div>
-                <div className="row align-items-center">
-                  <div className="col-1 text-center">
-                    <i className="bi bi-search-heart" style={{fontSize:18, color: '#748da6'}}></i>
-                  </div>
-                  <div className="col-8">
-                    <span className="p fw-bold rounded bg-white px-1">Suchauftrag in {message.zipcode} {message.city}</span>
-                  </div>
-                  <div className="col-3 text-end">
-                    <div className="dropdown">
-                      <i className="bi bi-three-dots-vertical text-secondary cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                      <ul className="dropdown-menu">
-                        <li><div className="dropdown-item cursor-pointer" onClick={() => deleteMessage(message.message_id)}>Nachricht löschen</div></li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div className="row mt-2">
-                  <div className="col-11 offset-1">
-                    <span className="small fw-light">Beschreibung</span>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-11 offset-1 ">
-                    {ReactHtmlParser(message.message_text)}
-                  </div>
-                </div>
-                {message.message_type === 'case' ? <>
-                <div className="row mt-4">
-                  <div className="col-11 offset-1 ">
-                    <span className="fw-light">Erfahrung mit folgenden Tierarten</span>
-                    <div className="text-break">{message.experience_with_animal?.split(',').map(e => <React.Fragment key={e}>
-                      {e === 'dog' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Hund</span> : null}
-                      {e === 'cat' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Katze</span> : null}
-                      {e === 'bird' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Vogel</span> : null}
-                      {e === 'small_animal' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Kleintiere</span> : null}
-                      {e === 'other' ? <span className="bg-white me-1 rounded px-2 small text-secondary">{message.experience_with_animal_other}</span> : null}
-                    </React.Fragment>)}</div>
-                  </div>
-                </div>
-                <div className="row mt-4">
-                  <div className="col-11 offset-1 ">
-                    <span className="fw-light">Benötigte Tätigkeiten</span>
-                    <div className="text-break">{message.support_activity?.split(',').map(e => <React.Fragment key={e}>
-                      {e === 'go_walk' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Gassi gehen</span> : null}
-                      {e === 'veterinary_trips' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Tierarztfahrten</span> : null}
-                      {e === 'animal_care' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Hilfe bei der Tierpflege</span> : null}
-                      {e === 'events' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Hilfe bei Veranstaltungen</span> : null}
-                      {e === 'baking_cooking' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Backen und Kochen</span> : null}
-                      {e === 'creative_workshop' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Kreativworkshops</span> : null}
-                      {e === 'public_relation' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Öffentlichkeitsarbeit</span> : null}
-                      {e === 'light_office_work' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Leichte Büroarbeiten</span> : null}
-                      {e === 'graphic_work' ? <span className="bg-white me-1 rounded px-2 small text-secondary">Grafische Arbeiten</span> : null}
-                    </React.Fragment>)}</div>
-                  </div>
-                </div>
-                <div className="row mt-4">
-                  <div className="col-11 offset-1 ">
-                    <span className="fw-light">Kontaktdaten</span>
-                    <div className="small">Die vollen Kontaktangaben werden dir angezeigt wenn du als Helfer akzeptiert wirst.</div>
-                  </div>
-                </div>
-                <div className="row mt-2">
-                  <div className="col-11 offset-1 ">
-                    Adresse: ****, 73760 Ostfildern
-                  </div>
-                </div>
-                <div className="row mt-2 align-items-center">
-                  <div className="col-12 text-end">
-                    <div className="btn-group me-2" role="group">
-                      {message?.accepted_case_members?.includes(session.user.user_id) ? 
-                        <button type="button" className={`btn btn-info`} onClick={() => cancelAcceptedCase(message.message_id)}><i className="bi bi-hearts text-dark"></i> Doch keine Hilfe anbieten</button> :
-                        <button type="button" className={`btn btn-info`} onClick={() => acceptCase(message.message_id)}><i className="bi bi-hearts text-danger"></i> Hilfe anbieten</button>
-                      }
-                    </div>
-                  </div>
-                </div>
-                <div className="row mt-2 align-items-center">
-                  <div className="col-12 col-md-11 offset-md-1">
-                    <div className="">Angebotene Helfer</div>
-                  </div>
-                </div>
-                <div className="row mt-2 align-items-center">
-                  <div className="col-12 col-md-11 offset-md-1">
-                    <div className="bg-white rounded p-2">
-                      <div className="row">
-                        <div className="col-1 border-end fw-bold">#</div>
-                        <div className="col-3 border-end fw-bold">Name</div>
-                        <div className="col-5 border-end fw-bold">Erfahrungen mit Tieren</div>
-                        <div className="col-2 text-end fw-bold">Optionen</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="row mt-1 align-items-center">
-                  <div className="col-12 col-md-11 offset-md-1">
-                    <div className="p-2">
-                      <div className="row">
-                        <div className="col-1 border-end">12</div>
-                        <div className="col-3 border-end">Bolognese, Francesca</div>
-                        <div className="col-5 border-end">pill1, pill2</div>
-                        <div className="col-2 text-end">...</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </> : null}
-              </div>
-              </> : null} */}
-
             </div>
           </div>
         </div>
