@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import 'leaflet/dist/leaflet.css'
+
 
 // Dynamically import the actual map rendering component
 const MapComponent = dynamic(() => import('../components/CaseMap'), {
@@ -7,7 +9,7 @@ const MapComponent = dynamic(() => import('../components/CaseMap'), {
   loading: () => <p>Karte wird geladen...</p>
 });
 
-// Helper function moved from index.js
+// obfuscate coordinates to protect privacy
 const obfuscateCoordinates = (lat, lon, radiusMeters = 500) => {
   if (lat == null || lon == null) return { obfuscatedLat: null, obfuscatedLon: null };
 
@@ -34,7 +36,6 @@ const obfuscateCoordinates = (lat, lon, radiusMeters = 500) => {
 };
 
 const MapSection = ({ messages }) => {
-  // Memoized calculation moved from index.js
   const mapMessages = useMemo(() => {
     if (!messages) return [];
     return messages
@@ -45,14 +46,12 @@ const MapSection = ({ messages }) => {
       }));
   }, [messages]);
 
-  // Rendering logic moved from index.js
   return (
     <div className="container mt-3 mb-3">
       <div className="row">
         <div className="col-12">
           <div className="fw-bold h4">Fälle in deiner Nähe</div>
           <div className="mb-3">
-            {/* Render the actual map component with processed data */}
             <MapComponent messages={mapMessages} />
           </div>
         </div>
