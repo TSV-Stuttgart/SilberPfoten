@@ -3,7 +3,6 @@ import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import slugify from 'slugify'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
 import useSession from '../lib/auth/useSession'
 import Wrapper from '../components/Wrapper'
 import Error from '../components/Error'
@@ -11,49 +10,7 @@ import Loading from '../components/Loading'
 import Notice from '../components/Notice'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
-
-// Dynamically import the map component, disable SSR
-const MapComponent = dynamic(() => import('../components/CaseMap'), {
-  ssr: false,
-  loading: () => <p>Karte wird geladen...</p> // Optional loading indicator
-});
-
-// Helper function to obfuscate coordinates
-const obfuscateCoordinates = (lat, lon, radiusMeters = 250) => {
-  if (lat == null || lon == null) return { obfuscatedLat: null, obfuscatedLon: null };
-
-  const earthRadius = 6371000; // Earth radius in meters
-
-  // Convert radius from meters to radians
-  const radiusRad = radiusMeters / earthRadius;
-
-  // Random angle and distance
-  const randomAngle = Math.random() * 2 * Math.PI;
-  // Use sqrt(random) for uniform distribution within the circle area
-  const randomDistanceRad = Math.sqrt(Math.random()) * radiusRad;
-
-  // Convert original coordinates to radians
-  const latRad = lat * Math.PI / 180;
-  const lonRad = lon * Math.PI / 180;
-
-  // Calculate new latitude
-  const newLatRad = Math.asin(
-    Math.sin(latRad) * Math.cos(randomDistanceRad) +
-    Math.cos(latRad) * Math.sin(randomDistanceRad) * Math.cos(randomAngle)
-  );
-
-  // Calculate new longitude
-  const newLonRad = lonRad + Math.atan2(
-    Math.sin(randomAngle) * Math.sin(randomDistanceRad) * Math.cos(latRad),
-    Math.cos(randomDistanceRad) - Math.sin(latRad) * Math.sin(newLatRad)
-  );
-
-  // Convert back to degrees
-  const obfuscatedLat = newLatRad * 180 / Math.PI;
-  const obfuscatedLon = newLonRad * 180 / Math.PI;
-
-  return { obfuscatedLat, obfuscatedLon };
-};
+import MapSection from '../components/MapSection'
 
 export async function getServerSideProps(context) {
 
@@ -94,29 +51,13 @@ export default function Home({query, tokenType}) {
 
   const [tokenHandling, setTokenHandling] = useState(false)
   const [noticeText, setNoticeText] = useState('')
+  const [showMap, setShowMap] = useState(true); 
 
   useEffect(() => {
 
     // start worker to handle email queue
     fetch(`/api/worker`, {method: 'POST'})
   }, [])
-
-  // Calculate processed messages for the map using useMemo
-  const mapMessages = useMemo(() => {
-    if (!messages) return [];
-    return messages
-      .filter(m => m.lat != null && m.lon != null) // Filter messages with coordinates
-      .map(m => ({
-        ...m,
-        ...obfuscateCoordinates(m.lat, m.lon) // Add obfuscated coordinates
-      }));
-  }, [messages]);
-
-  //const deleteMessage = async (messageId) => {
-  //  await fetch(`/api/admin/message?messageId=${messageId}`, {method: 'DELETE'})
-  
-  //  mutate(`/api/messages`)
-  //}
 
   if (messagesError) return <Error />
   if (!messages && !messagesError) return <Loading />
@@ -181,32 +122,28 @@ export default function Home({query, tokenType}) {
 
   if (token) return <Loading />
 
+  const toggleMap = () => setShowMap(!showMap);
+
   return (
     <>
       <Wrapper>
 
-        {/* Map Section */}
-        <div className="container mt-3 mb-3">
-          <div className="row">
-            <div className="col-12">
-              <div className="fw-bold h4">Fälle in deiner Nähe</div>
-                <div className="mb-3">
-                    <MapComponent messages={mapMessages} />
-                </div>
-            </div>
-          </div>
-        </div>
+        {showMap && <MapSection messages={messages} />}
 
-        {/* Messages Section Title */}
         <div className="container mt-3 mb-3">
-          <div className="row">
-            <div className="col-12">
+          <div className="row d-flex justify-content-between align-items-center">
+            <div className="col-auto">
               <div className="fw-bold h3">Alle Nachrichten</div>
             </div>
+            <div className="col-auto">
+              <button className="btn btn-outline-secondary btn-sm" onClick={toggleMap}>
+                <i className={`bi ${showMap ? 'bi-map-fill' : 'bi-map'} me-2`}></i>
+                {showMap ? 'Karte ausblenden' : 'Karte anzeigen'}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Existing Messages Loop (Cases) */}
         {messages.filter(m => m.message_type === 'case').length > 0 ? <div className="mt-3 mb-4">
           <div className="ms-4">Wir haben einen passenden Suchauftrag für dich!</div>
           {messages.filter(m => m.message_type === 'case').map(message => <React.Fragment key={message.message_id}>
@@ -234,7 +171,6 @@ export default function Home({query, tokenType}) {
           </React.Fragment>)}
         </div> : null}
 
-        {/* Existing Messages Loop (Messages) */}
         {messages.filter(m => m.message_type === 'message').map(message => <React.Fragment key={message.message_id}>
         <Link href={`/message/${message.message_id}/${slugify(message.subject, {lower: true})}`} className="text-decoration-none text-secondary">
         <div className="container mt-2">
