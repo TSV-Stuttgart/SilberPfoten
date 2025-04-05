@@ -1,5 +1,5 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
+import React, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMapEvents } from 'react-leaflet';
 import L from 'leaflet'; // Import Leaflet library
 import Link from 'next/link';
 import slugify from 'slugify';
@@ -42,7 +42,7 @@ if (typeof window !== 'undefined') { // Ensure this runs client-side only
 // --- End Custom Icons ---
 
 // --- Circle Styles ---
-const OBFUSCATION_RADIUS_METERS = 0;
+const OBFUSCATION_RADIUS_METERS = 250;
 const caseCircleOptions = {
   color: 'var(--bs-danger)',       // Outline color (Bootstrap danger)
   fillColor: 'var(--bs-danger)',   // Fill color (Bootstrap danger)
@@ -57,7 +57,25 @@ const messageCircleOptions = {
 };
 // --- End Circle Styles ---
 
-const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11 }) => { // Default center Stuttgart
+// Define the zoom level threshold for showing circles
+const MIN_ZOOM_FOR_CIRCLES = 14;
+
+// Component to handle map events (specifically zoom)
+function MapEvents({ setZoomLevel }) {
+  const map = useMapEvents({
+    zoomend: () => {
+      setZoomLevel(map.getZoom());
+    },
+    load: () => { // Also set initial zoom level on map load
+      setZoomLevel(map.getZoom());
+    },
+  });
+  return null; // This component doesn't render anything itself
+}
+
+const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11 }) => {
+  const [currentZoom, setCurrentZoom] = useState(initialZoom); // Initialize with default zoom
+
   if (!messages || messages.length === 0) {
     // Don't render anything if there are no messages to show, instead of showing a message.
     // The parent component might handle loading/empty states.
@@ -78,13 +96,17 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" // CartoDB Voyager URL
       />
 
-      {/* Render Circles Separately FIRST */}
-      {messages.map((message) => {
+      {/* Add the event listener component */}
+      <MapEvents setZoomLevel={setCurrentZoom} /> 
+
+      {/* Render Circles Separately - ONLY if zoom level is high enough */}
+      {currentZoom >= MIN_ZOOM_FOR_CIRCLES && messages.map((message) => {
         const isCase = message.message_type === 'case';
         const circleOptions = isCase ? caseCircleOptions : messageCircleOptions;
+        // Ensure coordinates are filled before rendering circle
         return message.obfuscatedLat != null && message.obfuscatedLon != null && (
           <Circle
-            key={`circle-${message.message_id}`} // Add key here
+            key={`circle-${message.message_id}`} 
             center={[message.obfuscatedLat, message.obfuscatedLon]}
             radius={OBFUSCATION_RADIUS_METERS}
             pathOptions={circleOptions}
