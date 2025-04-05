@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMapEvents } from 'react-leaflet';
-import L from 'leaflet'; // Import Leaflet library
+import L from 'leaflet';
 import Link from 'next/link';
 import slugify from 'slugify';
-import MarkerClusterGroup from 'react-leaflet-markercluster'; // Import cluster group
-import 'leaflet.markercluster/dist/MarkerCluster.css'; // <-- Import base library CSS
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css'; // <-- Import base library Default CSS
+import MarkerClusterGroup from 'react-leaflet-markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 
 // --- Custom Icons using L.divIcon ---
@@ -24,7 +24,7 @@ if (typeof window !== 'undefined') { // Ensure this runs client-side only
   const popupAnchor = [0, -12]; // Point from which the popup should open relative to the iconAnchor
 
   caseIcon = L.divIcon({
-    html: createIconHTML('bi bi-megaphone-fill', 'var(--bs-danger)'), // Use Bootstrap danger color variable
+    html: createIconHTML('bi bi-megaphone-fill', 'var(--bs-danger)'),
     className: '', // Important to override default leaflet-div-icon styles if needed
     iconSize: iconSize,
     iconAnchor: iconAnchor,
@@ -32,7 +32,7 @@ if (typeof window !== 'undefined') { // Ensure this runs client-side only
   });
 
   messageIcon = L.divIcon({
-    html: createIconHTML('bi bi-envelope-fill', 'rgb(144, 70, 132)'), // Specific purple color
+    html: createIconHTML('bi bi-envelope-fill', 'rgb(144, 70, 132)'),
     className: '',
     iconSize: iconSize,
     iconAnchor: iconAnchor,
@@ -44,23 +44,24 @@ if (typeof window !== 'undefined') { // Ensure this runs client-side only
 // --- Circle Styles ---
 const OBFUSCATION_RADIUS_METERS = 250;
 const caseCircleOptions = {
-  color: 'var(--bs-danger)',       // Outline color (Bootstrap danger)
-  fillColor: 'var(--bs-danger)',   // Fill color (Bootstrap danger)
-  fillOpacity: 0.1,             // Make fill semi-transparent
-  weight: 0.5                     // Outline thickness
+  color: 'var(--bs-danger)',
+  fillColor: 'var(--bs-danger)',
+  fillOpacity: 0.1,
+  weight: 0.5
 };
 const messageCircleOptions = {
-  color: 'rgb(144, 70, 132)',    // Outline color (Purple)
-  fillColor: 'rgb(144, 70, 132)', // Fill color (Purple)
-  fillOpacity: 0.1,              // Make fill semi-transparent
-  weight: 0.5                      // Outline thickness
+  color: 'rgb(144, 70, 132)',
+  fillColor: 'rgb(144, 70, 132)',
+  fillOpacity: 0.1,
+  weight: 0.5
 };
 // --- End Circle Styles ---
 
 // Define the zoom level threshold for showing circles
 const MIN_ZOOM_FOR_CIRCLES = 14;
 
-// Component to handle map events (specifically zoom)
+// Helper component to listen for map events (zoom changes, load)
+// Updates the parent component's state with the current zoom level.
 function MapEvents({ setZoomLevel }) {
   const map = useMapEvents({
     zoomend: () => {
@@ -70,19 +71,18 @@ function MapEvents({ setZoomLevel }) {
       setZoomLevel(map.getZoom());
     },
   });
-  return null; // This component doesn't render anything itself
+  return null; // This component doesn't render anything visual
 }
 
 const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11 }) => {
-  const [currentZoom, setCurrentZoom] = useState(initialZoom); // Initialize with default zoom
+  const [currentZoom, setCurrentZoom] = useState(initialZoom);
 
+  // Basic check to prevent rendering errors if messages aren't loaded yet
   if (!messages || messages.length === 0) {
-    // Don't render anything if there are no messages to show, instead of showing a message.
-    // The parent component might handle loading/empty states.
     return null;
   }
 
-  // Ensure initialCenter has valid numbers, fallback if not
+  // Fallback center coordinates if props are invalid
   const center = Array.isArray(initialCenter) && initialCenter.length === 2 && !initialCenter.some(isNaN)
     ? initialCenter
     : [48.7758, 9.1829]; // Fallback to Stuttgart center
@@ -90,23 +90,23 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
   return (
     // Ensure MapContainer is only rendered client-side, although dynamic import helps
     <MapContainer center={center} zoom={initialZoom} style={{ height: '400px', width: '100%' }}>
-      {/* Use CartoDB Voyager Tile Layer */}
+      {/* Base map tiles */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" // CartoDB Voyager URL
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
       />
 
-      {/* Add the event listener component */}
-      <MapEvents setZoomLevel={setCurrentZoom} /> 
+      {/* Component to update zoom state */}
+      <MapEvents setZoomLevel={setCurrentZoom} />
 
-      {/* Render Circles Separately - ONLY if zoom level is high enough */}
+      {/* Render obfuscation circles ONLY when zoomed in enough */}
       {currentZoom >= MIN_ZOOM_FOR_CIRCLES && messages.map((message) => {
         const isCase = message.message_type === 'case';
         const circleOptions = isCase ? caseCircleOptions : messageCircleOptions;
         // Ensure coordinates are filled before rendering circle
         return message.obfuscatedLat != null && message.obfuscatedLon != null && (
           <Circle
-            key={`circle-${message.message_id}`} 
+            key={`circle-${message.message_id}`}
             center={[message.obfuscatedLat, message.obfuscatedLon]}
             radius={OBFUSCATION_RADIUS_METERS}
             pathOptions={circleOptions}
@@ -114,17 +114,18 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
         );
       })}
 
-      {/* Wrap Markers in MarkerClusterGroup, using default icons */}
+      {/* Cluster group for markers */}
       <MarkerClusterGroup showCoverageOnHover={false}>
         {messages.map((message) => {
           const isCase = message.message_type === 'case';
           const icon = isCase ? caseIcon : messageIcon;
+          // Render marker only if coordinates and icon are valid
           return message.obfuscatedLat != null && message.obfuscatedLon != null && icon && (
             <Marker
-              key={message.message_id} // Key for marker
+              key={message.message_id}
               position={[message.obfuscatedLat, message.obfuscatedLon]}
               icon={icon}
-             >
+            >
               <Popup>
                 <b>{message.subject}</b><br /><br />
                 <Link href={`/message/${message.message_id}/${slugify(message.subject, { lower: true })}`}>
@@ -132,7 +133,7 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
                 </Link>
               </Popup>
             </Marker>
-           );
+          );
         })}
       </MarkerClusterGroup>
 
