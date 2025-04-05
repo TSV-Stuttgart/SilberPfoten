@@ -19,7 +19,7 @@ const MapComponent = dynamic(() => import('../components/CaseMap'), {
 });
 
 // Helper function to obfuscate coordinates
-const obfuscateCoordinates = (lat, lon, radiusMeters = 500) => {
+const obfuscateCoordinates = (lat, lon, radiusMeters = 250) => {
   if (lat == null || lon == null) return { obfuscatedLat: null, obfuscatedLon: null };
 
   const earthRadius = 6371000; // Earth radius in meters

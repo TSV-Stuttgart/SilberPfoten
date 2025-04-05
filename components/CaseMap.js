@@ -3,6 +3,10 @@ import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import L from 'leaflet'; // Import Leaflet library
 import Link from 'next/link';
 import slugify from 'slugify';
+import MarkerClusterGroup from 'react-leaflet-markercluster'; // Import cluster group
+import 'leaflet.markercluster/dist/MarkerCluster.css'; // <-- Import base library CSS
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'; // <-- Import base library Default CSS
+
 
 // --- Custom Icons using L.divIcon ---
 let caseIcon, messageIcon;
@@ -38,7 +42,7 @@ if (typeof window !== 'undefined') { // Ensure this runs client-side only
 // --- End Custom Icons ---
 
 // --- Circle Styles ---
-const OBFUSCATION_RADIUS_METERS = 750;
+const OBFUSCATION_RADIUS_METERS = 0;
 const caseCircleOptions = {
   color: 'var(--bs-danger)',       // Outline color (Bootstrap danger)
   fillColor: 'var(--bs-danger)',   // Fill color (Bootstrap danger)
@@ -68,29 +72,36 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
   return (
     // Ensure MapContainer is only rendered client-side, although dynamic import helps
     <MapContainer center={center} zoom={initialZoom} style={{ height: '400px', width: '100%' }}>
+      {/* Use CartoDB Voyager Tile Layer */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" // CartoDB Voyager URL
       />
-      {messages.map((message) => {
-        // Determine icon and circle style based on message_type
-        const isCase = message.message_type === 'case';
-        const icon = isCase ? caseIcon : messageIcon;
-        const circleOptions = isCase ? caseCircleOptions : messageCircleOptions;
 
-        // Render only if coordinates are valid and icons have been created (client-side)
-        return message.obfuscatedLat != null && message.obfuscatedLon != null && icon && (
-          <React.Fragment key={message.message_id}>
-            {/* Render the obfuscation circle with appropriate style */}
-            <Circle
-              center={[message.obfuscatedLat, message.obfuscatedLon]}
-              radius={OBFUSCATION_RADIUS_METERS}
-              pathOptions={circleOptions} // Use dynamic options
-            />
-            {/* Render the marker with the appropriate custom icon */}
+      {/* Render Circles Separately FIRST */}
+      {messages.map((message) => {
+        const isCase = message.message_type === 'case';
+        const circleOptions = isCase ? caseCircleOptions : messageCircleOptions;
+        return message.obfuscatedLat != null && message.obfuscatedLon != null && (
+          <Circle
+            key={`circle-${message.message_id}`} // Add key here
+            center={[message.obfuscatedLat, message.obfuscatedLon]}
+            radius={OBFUSCATION_RADIUS_METERS}
+            pathOptions={circleOptions}
+          />
+        );
+      })}
+
+      {/* Wrap Markers in MarkerClusterGroup, using default icons */}
+      <MarkerClusterGroup showCoverageOnHover={false}>
+        {messages.map((message) => {
+          const isCase = message.message_type === 'case';
+          const icon = isCase ? caseIcon : messageIcon;
+          return message.obfuscatedLat != null && message.obfuscatedLon != null && icon && (
             <Marker
+              key={message.message_id} // Key for marker
               position={[message.obfuscatedLat, message.obfuscatedLon]}
-              icon={icon} // Use dynamic icon
+              icon={icon}
              >
               <Popup>
                 <b>{message.subject}</b><br /><br />
@@ -99,9 +110,10 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
                 </Link>
               </Popup>
             </Marker>
-          </React.Fragment>
-         );
-      })}
+           );
+        })}
+      </MarkerClusterGroup>
+
     </MapContainer>
   );
 };
