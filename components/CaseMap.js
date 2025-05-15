@@ -42,7 +42,7 @@ if (typeof window !== 'undefined') { // Ensure this runs client-side only
 // --- End Custom Icons ---
 
 // --- Circle Styles ---
-const OBFUSCATION_RADIUS_METERS = 250;
+const AREA_RADIUS_METERS = 1000;
 const caseCircleOptions = {
   color: 'var(--bs-danger)',
   fillColor: 'var(--bs-danger)',
@@ -88,7 +88,6 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
     : [48.7758, 9.1829]; // Fallback to Stuttgart center
 
   return (
-    // Ensure MapContainer is only rendered client-side, although dynamic import helps
     <MapContainer center={center} zoom={initialZoom} style={{ height: '400px', width: '100%' }}>
       {/* Base map tiles */}
       <TileLayer
@@ -99,16 +98,16 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
       {/* Component to update zoom state */}
       <MapEvents setZoomLevel={setCurrentZoom} />
 
-      {/* Render obfuscation circles ONLY when zoomed in enough */}
+      {/* Render area circles ONLY when zoomed in enough */}
       {currentZoom >= MIN_ZOOM_FOR_CIRCLES && messages.map((message) => {
         const isCase = message.message_type === 'case';
         const circleOptions = isCase ? caseCircleOptions : messageCircleOptions;
         // Ensure coordinates are filled before rendering circle
-        return message.obfuscatedLat != null && message.obfuscatedLon != null && (
+        return message.lat != null && message.lon != null && (
           <Circle
             key={`circle-${message.message_id}`}
-            center={[message.obfuscatedLat, message.obfuscatedLon]}
-            radius={OBFUSCATION_RADIUS_METERS}
+            center={[message.lat, message.lon]}
+            radius={AREA_RADIUS_METERS}
             pathOptions={circleOptions}
           />
         );
@@ -120,10 +119,10 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
           const isCase = message.message_type === 'case';
           const icon = isCase ? caseIcon : messageIcon;
           // Render marker only if coordinates and icon are valid
-          return message.obfuscatedLat != null && message.obfuscatedLon != null && icon && (
+          return message.lat != null && message.lon != null && icon && (
             <Marker
               key={message.message_id}
-              position={[message.obfuscatedLat, message.obfuscatedLon]}
+              position={[message.lat, message.lon]}
               icon={icon}
             >
               <Popup>
