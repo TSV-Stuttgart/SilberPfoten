@@ -126,9 +126,12 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
               icon={icon}
             >
               <Popup>
-                <b>{message.subject}</b><br /><br />
-                <Link href={`/message/${message.message_id}/${slugify(message.subject, { lower: true })}`}>
-                  Details anzeigen
+                <h5>{message.subject}</h5>
+                <Link 
+                  href={`/message/${message.message_id}/${slugify(message.subject, { lower: true })}`}
+                  legacyBehavior
+                >
+                  <a className="fw-normal text-decoration-underline mt-2 cursor-pointer text-dark">Details anzeigen</a>
                 </Link>
               </Popup>
             </Marker>
