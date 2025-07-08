@@ -1,18 +1,27 @@
-version: "3.8"
 services:
 
-  silberpfoten-nginx:
-    container_name: silberpfoten-nginx
-    image: nginx:1.17.6-alpine
+  silberpfoten-proxy:
+    image: "traefik:v3.4"
+    container_name: "silberpfoten-proxy"
     restart: always
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=info@stigits.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - /etc/letsencrypt:/etc/letsencrypt
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "letsencrypt-data:/letsencrypt"
     networks:
       - silberpfoten
-    ports:
-      - 80:80
-      - 443:443
 
   silberpfoten-app:
     build: .
@@ -34,9 +43,26 @@ services:
       PGUSER: postgres
     networks:
       - silberpfoten
+    labels:
+      - traefik.enable=true
+
+      # redirect http to https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+      # set explicit network
+      - traefik.docker.network=silberpfoten
+
+      # load balancer
+      - traefik.http.services.webapp.loadbalancer.server.port=3000
+
+      # main-domain (www)
+      - traefik.http.routers.https-webapp-staging.rule=Host(`mein.silberpfoten.de`) && PathPrefix(`/`)
+      - traefik.http.routers.https-webapp-staging.entrypoints=websecure
+      - traefik.http.routers.https-webapp-staging.tls.certresolver=letsencrypt
+      - traefik.http.routers.https-webapp-staging.service=webapp
 
 networks:
   silberpfoten: {}
 
 volumes:
-  postgres-data:
+  letsencrypt-data:

@@ -1,36 +1,20 @@
 stages:
-  - build
-  - deploy
+  - deploy-production
 
-Build:
-  stage: build
-  environment:
-    name: production
-    url: https://mein.silberpfoten.stigits.com
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker compose build
-    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:${CI_COMMIT_REF_SLUG}
-  tags:
-    - "mein-silberpfoten-web-01-shell"
-  only:
-    - tags
-
-deploy:
-  stage: deploy
+deploy-production:
+  stage: deploy-production
   environment:
     name: production
     url: https://mein.silberpfoten.de
+  variables:
+    COMPOSE_BAKE: "true"
+  before_script:
+    - docker image prune -f
+    - docker volume prune -f
+    - docker container prune -f
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker compose pull
-    - docker compose up --detach
-    - docker system prune --all --force
-
-    - docker exec silberpfoten-nginx apk update
-    - docker exec silberpfoten-nginx apk add certbot certbot-nginx
-    - docker exec silberpfoten-nginx certbot run --nginx --agree-tos -d mein.silberpfoten.de -m info@stigits.com --noninteractive --redirect
+    - docker compose -f docker-compose.yml up --build --detach
+  rules:
+    - if: $CI_COMMIT_TAG
   tags:
     - "mein-silberpfoten-web-01-shell"
-  only:
-    - tags
