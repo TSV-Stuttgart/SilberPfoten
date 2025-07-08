@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import useSWR, {useSWRConfig} from 'swr'
 import {useRouter} from 'next/router'
 import slugify from 'slugify'
@@ -10,6 +10,7 @@ import Loading from '../components/Loading'
 import Notice from '../components/Notice'
 import jwt from 'jsonwebtoken'
 import CryptoJS from 'crypto-js'
+import MapSection from '../components/MapSection'
 
 export async function getServerSideProps(context) {
 
@@ -50,6 +51,7 @@ export default function Home({query, tokenType}) {
 
   const [tokenHandling, setTokenHandling] = useState(false)
   const [noticeText, setNoticeText] = useState('')
+  const [showMap, setShowMap] = useState(true); 
 
   useEffect(() => {
 
@@ -120,14 +122,24 @@ export default function Home({query, tokenType}) {
 
   if (token) return <Loading />
 
+  const toggleMap = () => setShowMap(!showMap);
+
   return (
     <>
       <Wrapper>
 
+        {showMap && <MapSection messages={messages} />}
+
         <div className="container mt-3 mb-3">
-          <div className="row">
-            <div className="col-12">
-              <div className="fw-bold h3">Nachrichten</div>
+          <div className="row d-flex justify-content-between align-items-center">
+            <div className="col-auto">
+              <div className="fw-bold h3">Alle Nachrichten</div>
+            </div>
+            <div className="col-auto">
+              <button className="btn btn-outline-secondary btn-sm" onClick={toggleMap}>
+                <i className={`bi ${showMap ? 'bi-map-fill' : 'bi-map'} me-2`}></i>
+                {showMap ? 'Karte ausblenden' : 'Karte anzeigen'}
+              </button>
             </div>
           </div>
         </div>

@@ -145,3 +145,12 @@ p, .p {
   align-items: center;
   justify-content: center;
 }
+
+// Marker Cluster Styling for Leaflet Marker Clusters
+.marker-cluster  {
+  background-color: rgba(var(--bs-light-rgb), 1) !important; 
+}
+
+.marker-cluster div {
+  background-color: white !important;
+}
