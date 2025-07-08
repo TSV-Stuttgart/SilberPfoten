@@ -177,7 +177,6 @@ export default function Home({query, tokenType}) {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
