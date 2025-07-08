@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css'
 
 
-// Dynamically import the actual map rendering component
 const MapComponent = dynamic(() => import('../components/CaseMap'), {
   ssr: false,
   loading: () => <p>Karte wird geladen...</p>
