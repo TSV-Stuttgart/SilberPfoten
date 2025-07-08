@@ -8,24 +8,22 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 
-// --- Custom Icons using L.divIcon ---
 let caseIcon, messageIcon;
-if (typeof window !== 'undefined') { // Ensure this runs client-side only
+if (typeof window !== 'undefined') {
 
-  // Helper function to create divIcon HTML with centered icon
   const createIconHTML = (iconClass, color) => (
     `<div style="font-size: 1.5rem; color: ${color}; text-align: center; line-height: 1;">` +
       `<i class="${iconClass}"></i>` +
     `</div>`
   );
 
-  const iconSize = [24, 24]; // Approx size in pixels, adjust as needed
-  const iconAnchor = [12, 12]; // Point of the icon which will correspond to marker's location
-  const popupAnchor = [0, -12]; // Point from which the popup should open relative to the iconAnchor
+  const iconSize = [24, 24];
+  const iconAnchor = [12, 12];
+  const popupAnchor = [0, -12];
 
   caseIcon = L.divIcon({
     html: createIconHTML('bi bi-megaphone-fill', 'var(--bs-danger)'),
-    className: '', // Important to override default leaflet-div-icon styles if needed
+    className: '', // important to override default leaflet-div-icon styles if needed
     iconSize: iconSize,
     iconAnchor: iconAnchor,
     popupAnchor: popupAnchor
@@ -39,9 +37,7 @@ if (typeof window !== 'undefined') { // Ensure this runs client-side only
     popupAnchor: popupAnchor
   });
 }
-// --- End Custom Icons ---
 
-// --- Circle Styles ---
 const AREA_RADIUS_METERS = 1000;
 const caseCircleOptions = {
   color: 'var(--bs-danger)',
@@ -55,54 +51,48 @@ const messageCircleOptions = {
   fillOpacity: 0.1,
   weight: 0.5
 };
-// --- End Circle Styles ---
 
-// Define the zoom level threshold for showing circles
 const MIN_ZOOM_FOR_CIRCLES = 14;
 
-// Helper component to listen for map events (zoom changes, load)
-// Updates the parent component's state with the current zoom level.
+// helper component to listen for map events (zoom changes, load)
+// updates the parent component's state with the current zoom level.
 function MapEvents({ setZoomLevel }) {
   const map = useMapEvents({
     zoomend: () => {
       setZoomLevel(map.getZoom());
     },
-    load: () => { // Also set initial zoom level on map load
+    load: () => {
       setZoomLevel(map.getZoom());
     },
   });
-  return null; // This component doesn't render anything visual
+  return null;
 }
 
 const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11 }) => {
   const [currentZoom, setCurrentZoom] = useState(initialZoom);
 
-  // Basic check to prevent rendering errors if messages aren't loaded yet
   if (!messages || messages.length === 0) {
     return null;
   }
 
-  // Fallback center coordinates if props are invalid
+  const stuttgartCenter = [48.7758, 9.1829];
   const center = Array.isArray(initialCenter) && initialCenter.length === 2 && !initialCenter.some(isNaN)
     ? initialCenter
-    : [48.7758, 9.1829]; // Fallback to Stuttgart center
+    : stuttgartCenter;
 
   return (
     <MapContainer center={center} zoom={initialZoom} style={{ height: '400px', width: '100%' }}>
-      {/* Base map tiles */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
       />
 
-      {/* Component to update zoom state */}
       <MapEvents setZoomLevel={setCurrentZoom} />
 
-      {/* Render area circles ONLY when zoomed in enough */}
       {currentZoom >= MIN_ZOOM_FOR_CIRCLES && messages.map((message) => {
         const isCase = message.message_type === 'case';
         const circleOptions = isCase ? caseCircleOptions : messageCircleOptions;
-        // Ensure coordinates are filled before rendering circle
+
         return message.lat != null && message.lon != null && (
           <Circle
             key={`circle-${message.message_id}`}
@@ -113,12 +103,11 @@ const CaseMap = ({ messages, initialCenter = [48.7758, 9.1829], initialZoom = 11
         );
       })}
 
-      {/* Cluster group for markers */}
       <MarkerClusterGroup showCoverageOnHover={false}>
         {messages.map((message) => {
           const isCase = message.message_type === 'case';
           const icon = isCase ? caseIcon : messageIcon;
-          // Render marker only if coordinates and icon are valid
+
           return message.lat != null && message.lon != null && icon && (
             <Marker
               key={message.message_id}
