@@ -3,13 +3,13 @@ services:
 
   silberpfoten-db:
     container_name: silberpfoten-db
-    image: postgres:13.1-alpine
+    image: postgres:18.2-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     ports:
-      - 5432:5432
+      - 5433:5432
     networks:
       - silberpfoten
     volumes:
