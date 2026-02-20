@@ -1,7 +1,7 @@
 services:
 
   silberpfoten-proxy:
-    image: "traefik:v3.4"
+    image: "traefik:v3.6"
     container_name: "silberpfoten-proxy"
     restart: always
     command:
