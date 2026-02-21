@@ -1,9 +1,9 @@
-const jsonPackage = require('./package.json')
+const jsonPackage = require("./package.json");
 
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development', 
-})
+const withPWA = require("next-pwa")({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+});
 
 module.exports = withPWA({
   env: {
@@ -14,5 +14,4 @@ module.exports = withPWA({
     PGPORT: process.env.PGPORT,
     PGUSER: process.env.PGUSER,
   },
-  output: 'standalone',
-})
+});
