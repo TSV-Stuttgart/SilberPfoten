@@ -1,0 +1,47 @@
+.tiptap-editor {
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.tiptap-toolbar {
+  display: flex;
+  gap: 2px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #ccc;
+  background: #f8f9fa;
+}
+
+.tiptap-toolbar button {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.tiptap-toolbar button:hover {
+  background: #e9ecef;
+}
+
+.tiptap-toolbar button.active {
+  background: #dee2e6;
+  border-color: #adb5bd;
+}
+
+.tiptap-editor .tiptap {
+  padding: 8px 12px;
+  min-height: 120px;
+  outline: none;
+}
+
+.tiptap-editor .tiptap p {
+  margin: 0 0 0.5em;
+}
+
+.tiptap-editor .tiptap p:last-child {
+  margin-bottom: 0;
+}
